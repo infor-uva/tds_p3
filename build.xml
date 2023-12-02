@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="all" name="practica2-grupo6">
+
+	<condition property="isWindows">
+		<os family="windows" />
+	</condition>
+	<condition property="isUnix">
+		<os family="unix" />
+	</condition>
+
+	<target name="all" depends="documentar,ejecutarTests,obtenerInformeCobertura">
+
+	</target>
+	<target name="compilar" depends="limpiar">
+		<exec dir="." executable="${executable}">
+			<arg line="${arglineIni} mvn test-compile${arglineEnd}" />
+		</exec>
+	</target>
+	<target name="limpiar" depends="os-check">
+		<exec dir="." executable="${executable}">
+			<arg line="${arglineIni} mvn clean${arglineEnd}" />
+		</exec>
+	</target>
+	<target name="documentar" description="generate documentation" depends="compilar">
+		<exec dir="." executable="${executable}">
+			<arg line="${arglineIni} mvn javadoc:javadoc${arglineEnd}" />
+		</exec>
+	</target>
+	<target name="ejecutarTestCobertura" depends="compilar">
+		<exec dir="." executable="${executable}">
+			<arg line="${arglineIni} mvn -Dgroups=Cobertura test${arglineEnd}" />
+		</exec>
+	</target>
+	<target name="ejecutarTestEnAislamiento" depends="compilar">
+		<exec dir="." executable="${executable}">
+			<arg line="${arglineIni} mvn -Dtest='SistemaPersistenciaTest' test${arglineEnd}" />
+		</exec>
+	</target>
+	<target name="ejecutarTestSinAislamiento" depends="compilar">
+		<exec dir="." executable="${executable}">
+               <arg line="${arglineIni} mvn -Dtest='RecorridoTest,BilleteTest,UsuarioTest,SystemTest' test${arglineEnd}" />
+		</exec>
+	</target>
+	<target name="ejecutarTests" depends="ejecutarTestCobertura,ejecutarTestEnAislamiento,ejecutarTestSinAislamiento">
+		<exec dir="." executable="${executable}">
+			<arg line="${arglineIni} mvn test${arglineEnd}" />
+		</exec>
+	</target>
+	<target name="obtenerInformeCobertura" depends="compilar">
+		<exec dir="." executable="${executable}">
+			<arg line="${arglineIni} mvn jacoco:prepare-agent test jacoco:report${arglineEnd}" />
+		</exec>
+	</target>
+	<target name="os-check" description="Determina sistema operativo y asigna executable y argline" depends="os-check-unix, os-check-win" />
+	<target name="os-check-unix" if="isUnix">
+		<property name="executable" value="sh" />
+		<property name="arglineIni" value="-c '" />
+		<property name="arglineEnd" value="'" />
+	</target>
+	<target name="os-check-win" if="isWindows">
+		<property name="executable" value="cmd" />
+		<property name="arglineIni" value="/c " />
+		<property name="arglineEnd" value="" />
+	</target>
+</project>
