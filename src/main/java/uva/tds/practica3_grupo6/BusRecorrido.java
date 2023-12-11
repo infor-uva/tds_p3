@@ -3,9 +3,9 @@ package uva.tds.practica3_grupo6;
 import java.time.LocalDateTime;
 
 public class BusRecorrido extends Recorrido {
-	
+
 	/**
-	 * Maximum number of seats the route can have 
+	 * Maximum number of seats the route can have
 	 */
 	public static final int MAX_NUM_SEATS = 50;
 
@@ -30,11 +30,20 @@ public class BusRecorrido extends Recorrido {
 		super.decreaseAvailableSeats(numSeats);
 	}
 
+	/**
+	 * Check if the numbers of seats is over the limit
+	 * 
+	 * @param numSeats to check
+	 * 
+	 * @throws IllegalArgumentException if the number of seats is more than
+	 *                                  {@link BusRecorrido#MAX_NUM_SEATS}
+	 */
 	private void checkNumSeats(int numSeats) {
 		if (numSeats > MAX_NUM_SEATS)
-			throw new IllegalArgumentException("numSeats is more than the limit of " + MAX_NUM_SEATS + " for transport " + getTransport());
+			throw new IllegalArgumentException(
+					"numSeats is more than the limit of " + MAX_NUM_SEATS + " for transport " + getTransport());
 	}
-	
+
 	/**
 	 * Increase the number of available seats
 	 * 
@@ -51,12 +60,13 @@ public class BusRecorrido extends Recorrido {
 		super.increaseAvailableSeats(numSeats);
 	}
 
+	
 	@Override
 	public BusRecorrido clone() {
 		BusRecorrido clone = new BusRecorrido(getID(), getConnection(), getPrice(), getDateTime(), getTotalSeats());
 		int decreased;
 		if ((decreased = getTotalSeats() - getNumAvailableSeats()) != 0)
-			clone.decreaseAvailableSeats(decreased);			
+			clone.decreaseAvailableSeats(decreased);
 		return clone;
 	}
 
