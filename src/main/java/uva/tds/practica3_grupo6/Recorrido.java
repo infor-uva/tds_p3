@@ -65,28 +65,32 @@ public abstract class Recorrido {
 	 * 
 	 * @throws IllegalArgumentException if id is null
 	 * @throws IllegalArgumentException if id have less than 1 character
+	 * @throws IllegalArgumentException if connection is null
 	 * @throws IllegalArgumentException if transport is null
-	 * @throws IllegalArgumentException if transport is not a bus or train
 	 * @throws IllegalArgumentException if price is less than 0
-	 * @throws IllegalArgumentException if date is null
-	 * @throws IllegalArgumentException if time is null
-	 * @throws IllegalArgumentException if numSeats is less than 1 or more than 50
-	 *                                  in the case of bus or more than 250 in the
-	 *                                  case of train
+	 * @throws IllegalArgumentException if dateTime is null
+	 * @throws IllegalArgumentException if numSeats is less than 1
 	 */
 	public Recorrido(String id, Connection connection, Transport transport, double price, LocalDateTime dateTime,
 			int numSeats) {
-		if (numSeats < 1)
-			throw new IllegalArgumentException("numSeats is less than 1");
 		setId(id);
 		setConecction(connection);
 		setTransport(transport);
 		// TODO Preguntar si se puede usar esto, tengo que usar un setter o ambos
 		updateDateTime(dateTime);
 		setPrice(price);
-		this.totalSeats = this.numAvailableSeats = numSeats;
+		setTotalSeats(numSeats);
+		setNumAvailableSeats(numSeats);
 	}
 
+	/**
+	 * Set the id
+	 * 
+	 * @param id to set
+	 * 
+	 * @throws IllegalArgumentException if id is null
+	 * @throws IllegalArgumentException if id have less than 1 character
+	 */
 	public void setId(String id) {
 		if (id == null)
 			throw new IllegalArgumentException("id is null");
@@ -94,26 +98,80 @@ public abstract class Recorrido {
 			throw new IllegalArgumentException("id is empty");
 		this.id = id;
 	}
+	
+	/**
+	 * Set the transport for this route
+	 *  
+	 * @param transport to set
+	 * 
+	 * @throws IllegalArgumentException if transport is null
+	 */
+	public void setTransport(Transport transport) {
+		if (transport == null)
+			throw new IllegalArgumentException("transport is null");
+		this.transport = transport;
+	}
 
+	/**
+	 * Set the connection for this route
+	 * 
+	 * @param connection to set
+	 * 
+	 * @throws IllegalArgumentException if id is null
+	 */
 	public void setConecction(Connection connection) {
 		if (connection == null)
 			throw new IllegalArgumentException("the connection is null");
 		this.connection = connection;
 	}
 
-	public void setTransport(Transport transport) {
-		// TODO Se supone que no se deberían lanzar
-//		if (transport == null)
-//			throw new IllegalArgumentException("transport is null");
-//		if (!Arrays.asList(Transport.values()).contains(transport))
-//			throw new IllegalArgumentException("transport isn't " + Transport.values());
-		this.transport = transport;
-	}
-
+	/**
+	 * Set the price for this route
+	 * 
+	 * @param price for this route
+	 * 
+	 * @throws IllegalArgumentException if price is less than 0
+	 */
 	public void setPrice(double price) {
 		if (price < 0)
 			throw new IllegalArgumentException("price is less than 0");
 		this.price = price;
+	}
+	
+	/**
+	 * Check if the number of seats is more than 0
+	 * 
+	 * @param numSeats
+	 * 
+	 * @throws IllegalArgumentException if numSeats is less than 1
+	 */
+	private void checkNumSeats(int numSeats) {
+		if (numSeats < 1)
+			throw new IllegalArgumentException("the num of seats is less than 1");
+	}
+	
+	/**
+	 * Set the total seats for the route
+	 * 
+	 * @param numSeats
+	 * 
+	 * @throws IllegalArgumentException if numSeats is less than 1
+	 */
+	public void setTotalSeats(int numSeats) {
+		checkNumSeats(numSeats);
+		this.totalSeats = numSeats;
+	}
+	
+	/**
+	 * Set the number of available seats for the route
+	 * 
+	 * @param numSeats
+	 * 
+	 * @throws IllegalArgumentException if numSeats is less than 1
+	 */
+	public void setNumAvailableSeats(int numSeats) {
+		checkNumSeats(numSeats);
+		this.numAvailableSeats = numSeats;
 	}
 
 	/**
@@ -334,13 +392,13 @@ public abstract class Recorrido {
 
 	/**
 	 * Create a copy of this instance of Recorrido with the same values of the
-	 * attributes but not are the same object. In case if the clone is not supported
-	 * a null will be returned
+	 * attributes but not are the same object.
 	 * 
-	 * @return null or clone of the instance
+	 * @return clone of the instance
 	 */
 	public abstract Recorrido clone();
 
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(connection, dateTime, id, numAvailableSeats, price, totalSeats, transport);

@@ -2,6 +2,11 @@ package uva.tds.practica3_grupo6;
 
 import java.time.LocalDateTime;
 
+/**
+ * A child of {@link Recorrido} who represent the routes in which the transport
+ * is Bus. The limit of seats for this type of route is
+ * {@link BusRecorrido#MAX_NUM_SEATS}
+ */
 public class BusRecorrido extends Recorrido {
 
 	/**
@@ -9,6 +14,22 @@ public class BusRecorrido extends Recorrido {
 	 */
 	public static final int MAX_NUM_SEATS = 50;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param id
+	 * @param connection
+	 * @param price
+	 * @param dateTime
+	 * @param numSeats
+	 * 
+	 * @throws IllegalArgumentException if id is null
+	 * @throws IllegalArgumentException if id have less than 1 character
+	 * @throws IllegalArgumentException if price is less than 0
+	 * @throws IllegalArgumentException if dateTime is null
+	 * @throws IllegalArgumentException if numSeats is less than 1 or more than
+	 *                                  {@link BusRecorrido#MAX_NUM_SEATS}
+	 */
 	public BusRecorrido(String id, Connection connection, double price, LocalDateTime dateTime, int numSeats) {
 		super(id, connection, Transport.BUS, price, dateTime, numSeats);
 		checkNumSeats(numSeats);
@@ -60,7 +81,12 @@ public class BusRecorrido extends Recorrido {
 		super.increaseAvailableSeats(numSeats);
 	}
 
-	
+	/**
+	 * Create a copy of this instance of BusRecorrido with the same values of the
+	 * attributes but not are the same object.
+	 * 
+	 * @return clone of the instance
+	 */
 	@Override
 	public BusRecorrido clone() {
 		BusRecorrido clone = new BusRecorrido(getID(), getConnection(), getPrice(), getDateTime(), getTotalSeats());
@@ -70,6 +96,13 @@ public class BusRecorrido extends Recorrido {
 		return clone;
 	}
 
+	/**
+	 * Compare if two BusRecorridos are the same
+	 * 
+	 * @param obj Recorrido to compare
+	 * 
+	 * @return if are the same
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {

@@ -71,7 +71,7 @@ class BusRecorridoTest {
 	}
 
 	@Test
-	void testConstructorValidoBusLimiteSuperior() {
+	void testConstructorValidoLimiteSuperior() {
 		String id = "c123";
 		double price = 25.50;
 		int numAvailableSeats = 50;
@@ -136,6 +136,13 @@ class BusRecorridoTest {
 	void testConstructorNoValidoConNumAvailableSeatsLimiteSuperior() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			new BusRecorrido(id, connection, price, dateTime, 51);
+		});
+	}
+	
+	@Test
+	void testSetTransportNull() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			recorrido.setTransport(null);
 		});
 	}
 
