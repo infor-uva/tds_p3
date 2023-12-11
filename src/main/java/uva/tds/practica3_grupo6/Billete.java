@@ -1,5 +1,12 @@
 package uva.tds.practica3_grupo6;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
  * Class dedicated for the representation of the ticket.
  * 
@@ -15,14 +22,23 @@ package uva.tds.practica3_grupo6;
  * 
  * @version 09/11/23
  */
+@Entity
+@Table(name="BILLETE")
 public class Billete {
 
 	public static final String ESTADO_COMPRADO = "comprado";
 	public static final String ESTADO_RESERVADO = "reservado";
-
+	
+	@Id
+	@Column(name="LOCALIZADOR")
 	private String localizador;
+	@ManyToOne()
+    @JoinColumn(name = "RECORRIDO_ID", referencedColumnName = "ID")
 	private Recorrido recorrido;
+	@ManyToOne()
+    @JoinColumn(name = "USUARIO_ID", referencedColumnName = "ID")
 	private Usuario usuario;
+	@Column(name="ESTADO")
 	private String estado;
 
 	/**

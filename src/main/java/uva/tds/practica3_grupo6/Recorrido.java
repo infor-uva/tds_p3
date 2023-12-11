@@ -5,6 +5,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * Class dedicated for the representation of the route.
  * 
@@ -21,6 +26,8 @@ import java.util.Objects;
  * 
  * @version 28/11/23
  */
+@Entity
+@Table(name="RECORRIDO")
 public class Recorrido implements Cloneable {
 
 	/**
@@ -35,44 +42,55 @@ public class Recorrido implements Cloneable {
 	/**
 	 * Identification of the route
 	 */
+	@Id
+	
+	@Column(name="ID")
 	private String id;
 	/**
 	 * The origin of the route (where the route start)
 	 */
+	@Column(name="ORIGIN")
 	private String origin;
 	/**
 	 * The destination of the route (where the route ends)
 	 */
+	@Column(name="DESTINATION")
 	private String destination;
 	/**
 	 * The transport will be used in the route
 	 */
+	@Column(name="TRANSPORT")
 	private String transport;
 	/**
 	 * The price of the route
 	 */
+	@Column(name="PRICE")
 	private double price;
 	/**
 	 * Date of the route
 	 */
+	@Column(name="DATE")
 	private LocalDate date;
 	/**
 	 * Time of the route
 	 */
+	@Column(name="TIME")
 	private LocalTime time;
 	/**
 	 * Number of seats on the route
 	 */
+	@Column(name="TOTALSEATS")
 	private int totalSeats;
 	/**
 	 * Number of available seats on the route
 	 */
+	@Column(name="NUMAVAILABLESEATS")
 	private int numAvailableSeats;
 	/**
 	 * Duration in minutes of the route
 	 */
+	@Column(name="DURATION")
 	private int duration;
-
 	/**
 	 * Constructor
 	 * 
