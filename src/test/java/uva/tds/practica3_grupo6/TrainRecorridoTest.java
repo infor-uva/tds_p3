@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
  * 
  * @version 28/10/2023
  */
-class RecorridoTest {
+class TrainRecorridoTest {
 	/**
 	 * Error margin for the tests which implicates operations with float and/ or
 	 * double values
@@ -29,16 +29,16 @@ class RecorridoTest {
 	/**
 	 * Type of transport bus
 	 */
-	private static final String BUS = Recorrido.BUS;
+	private static final Transport BUS = Transport.BUS;
 	/**
 	 * Type of transport train
 	 */
-	private static final String TRAIN = Recorrido.TRAIN;
+	private static final Transport TRAIN = Transport.TRAIN;
 
 	private String id;
 	private String origin;
 	private String destination;
-	private String transport;
+	private Transport transport;
 	private double price;
 	private LocalDate date;
 	private LocalTime time;

@@ -4,28 +4,45 @@ import java.time.LocalDateTime;
 
 public class TrainRecorrido extends Recorrido {
 
+	/**
+	 * Maximum number of seats the route can have 
+	 */
+	public static final int MAX_NUM_SEATS = 250;
+	/**
+	 * Percent of discount for this type of {@link Recorrido}
+	 */
+	public static final double DISCOUNT = 0.1;
+
 	public TrainRecorrido(String id, Connection connection, double price, LocalDateTime dateTime, int numSeats) {
 		super(id, connection, Transport.TRAIN, price, dateTime, numSeats);
 	}
 
 	/**
-	 * Decrease the number of available seats
+	 * Consult the price of a train route which have a discount of
+	 * {@link TrainRecorrido#DISCOUNT}
 	 * 
-	 * TODO Marcarlo como coverage
+	 * @return price with the discount
+	 */
+	@Override
+	public double getPrice() {
+		return DISCOUNT * super.getPrice();
+	}
+
+	/**
+	 * Decrease the number of available seats
 	 * 
 	 * @param numSeats to decrease
 	 * 
 	 * @throws IllegalArgumentException if the number of seats is less than 1 or
-	 *                                  more than 50 if the transport is bus or 250
-	 *                                  if the transport is train
+	 *                                  more than {@link TrainRecorrido#MAX_NUM_SEATS}
 	 * @throws IllegalStateException    if the number of seats to decremented is
 	 *                                  greater than the number of available sites
 	 */
 	@Override
 	public void decreaseAvailableSeats(int numSeats) {
-		if (numSeats > 250)
+		if (numSeats > MAX_NUM_SEATS)
 			throw new IllegalArgumentException(
-					"numSeats is more than the limit of 250 for transport " + getTransport());
+					"numSeats is more than the limit of " + MAX_NUM_SEATS + " for transport " + getTransport());
 		super.decreaseAvailableSeats(numSeats);
 	}
 
@@ -35,23 +52,24 @@ public class TrainRecorrido extends Recorrido {
 	 * @param numSeats to increase
 	 * 
 	 * @throws IllegalArgumentException if the number of seats is less than 1 or
-	 *                                  more than 50 if the transport is bus or 250
-	 *                                  if the transport is train
+	 *                                  more than {@link TrainRecorrido#MAX_NUM_SEATS}
 	 * @throws IllegalStateException    if the number of seats exceeds the total
 	 *                                  number of seats
 	 */
 	@Override
 	public void increaseAvailableSeats(int numSeats) {
-		if (numSeats > 250)
+		if (numSeats > MAX_NUM_SEATS)
 			throw new IllegalArgumentException(
-					"numSeats is more than the limit of 250 for transport " + getTransport());
+					"numSeats is more than the limit of " + MAX_NUM_SEATS + " for transport " + getTransport());
 		super.increaseAvailableSeats(numSeats);
 	}
 
 	@Override
-	public Recorrido clone(Recorrido r) {
-		Recorrido clone = new TrainRecorrido(getID(), getConnection(), getPrice(), getDateTime(), getNumAvailableSeats());
-		clone.decreaseAvailableSeats(getTotalSeats() - getNumAvailableSeats());
+	public TrainRecorrido clone() {
+		TrainRecorrido clone = new TrainRecorrido(getID(), getConnection(), getPrice(), getDateTime(), getTotalSeats());
+		int decreased;
+		if ((decreased = getTotalSeats() - getNumAvailableSeats()) != 0)
+			clone.decreaseAvailableSeats(decreased);			
 		return clone;
 	}
 
@@ -60,10 +78,10 @@ public class TrainRecorrido extends Recorrido {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof TrainRecorrido)) {
+		if (!super.equals(obj)) {
 			return false;
 		}
-		if (!super.equals(obj)) {
+		if (!(obj instanceof TrainRecorrido)) {
 			return false;
 		}
 		return true;

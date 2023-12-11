@@ -3,7 +3,6 @@ package uva.tds.practica3_grupo6;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -58,22 +57,14 @@ public abstract class Recorrido {
 	 * Constructor
 	 * 
 	 * @param id
-	 * @param origin
-	 * @param destination
+	 * @param connection
 	 * @param transport
 	 * @param price
-	 * @param date
-	 * @param time
+	 * @param dateTime
 	 * @param numSeats
-	 * @param duration    in minutes
 	 * 
 	 * @throws IllegalArgumentException if id is null
 	 * @throws IllegalArgumentException if id have less than 1 character
-	 * @throws IllegalArgumentException if origin is null
-	 * @throws IllegalArgumentException if origin have less than 1 character
-	 * @throws IllegalArgumentException if destination is null
-	 * @throws IllegalArgumentException if destination have less than 1 character
-	 * @throws IllegalArgumentException if origin and destination are the same
 	 * @throws IllegalArgumentException if transport is null
 	 * @throws IllegalArgumentException if transport is not a bus or train
 	 * @throws IllegalArgumentException if price is less than 0
@@ -82,7 +73,6 @@ public abstract class Recorrido {
 	 * @throws IllegalArgumentException if numSeats is less than 1 or more than 50
 	 *                                  in the case of bus or more than 250 in the
 	 *                                  case of train
-	 * @throws IllegalArgumentException if duration is less or equal than 0
 	 */
 	public Recorrido(String id, Connection connection, Transport transport, double price, LocalDateTime dateTime,
 			int numSeats) {
@@ -112,10 +102,11 @@ public abstract class Recorrido {
 	}
 
 	public void setTransport(Transport transport) {
-		if (transport == null)
-			throw new IllegalArgumentException("transport is null");
-		if (Arrays.asList(Transport.values()).contains(transport))
-			throw new IllegalArgumentException("transport isn't " + Transport.values());
+		// TODO Se supone que no se deberían lanzar
+//		if (transport == null)
+//			throw new IllegalArgumentException("transport is null");
+//		if (!Arrays.asList(Transport.values()).contains(transport))
+//			throw new IllegalArgumentException("transport isn't " + Transport.values());
 		this.transport = transport;
 	}
 
@@ -160,7 +151,7 @@ public abstract class Recorrido {
 	public int getDuration() {
 		return connection.getDuration();
 	}
-	
+
 	/**
 	 * Consult the connection of the recorrido
 	 * 
@@ -260,7 +251,7 @@ public abstract class Recorrido {
 	public void updateTime(LocalTime newTime) {
 		if (newTime == null)
 			throw new IllegalArgumentException("newTime is null");
-		if (getTime().equals(newTime))
+		if (newTime.equals(getTime()))
 			throw new IllegalStateException("newTime is the already date");
 		dateTime = LocalDateTime.of(getDate(), newTime);
 	}
@@ -277,7 +268,7 @@ public abstract class Recorrido {
 	public void updateDateTime(LocalDateTime newDateTime) {
 		if (newDateTime == null)
 			throw new IllegalArgumentException("newDateTime is null");
-		if (getDateTime().equals(newDateTime))
+		if (newDateTime.equals(getDateTime()))
 			throw new IllegalStateException("newDateTime is the already date");
 		dateTime = newDateTime;
 	}
@@ -298,15 +289,13 @@ public abstract class Recorrido {
 			throw new IllegalArgumentException("newDate is null");
 		if (newTime == null)
 			throw new IllegalArgumentException("newTime is null");
-		if (getDateTime().equals(LocalDateTime.of(newDate, newTime)))
+		if (LocalDateTime.of(newDate, newTime).equals(getDateTime()))
 			throw new IllegalStateException("the new Date Time is the already date");
 		dateTime = LocalDateTime.of(newDate, newTime);
 	}
 
 	/**
 	 * Decrease the number of available seats
-	 * 
-	 * TODO Marcarlo como coverage
 	 * 
 	 * @param numSeats to decrease
 	 * 
@@ -343,7 +332,6 @@ public abstract class Recorrido {
 		this.numAvailableSeats += numSeats;
 	}
 
-
 	/**
 	 * Create a copy of this instance of Recorrido with the same values of the
 	 * attributes but not are the same object. In case if the clone is not supported
@@ -351,7 +339,7 @@ public abstract class Recorrido {
 	 * 
 	 * @return null or clone of the instance
 	 */
-	public abstract Recorrido clone(Recorrido r);
+	public abstract Recorrido clone();
 
 	@Override
 	public int hashCode() {
@@ -367,16 +355,13 @@ public abstract class Recorrido {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (!(obj instanceof Recorrido)) {
+		if (!(obj instanceof Recorrido))
 			return false;
-		}
 		Recorrido other = (Recorrido) obj;
 		return Objects.equals(connection, other.connection) && Objects.equals(dateTime, other.dateTime)
-				&& Objects.equals(id, other.id) && numAvailableSeats == other.numAvailableSeats
+				&& Objects.equals(id, other.id) && totalSeats == other.totalSeats
+				&& numAvailableSeats == other.numAvailableSeats
 				&& Double.doubleToLongBits(price) == Double.doubleToLongBits(other.price)
-				&& totalSeats == other.totalSeats && transport == other.transport;
+				&& transport == other.transport;
 	}
 }

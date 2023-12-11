@@ -3,29 +3,36 @@ package uva.tds.practica3_grupo6;
 import java.time.LocalDateTime;
 
 public class BusRecorrido extends Recorrido {
+	
+	/**
+	 * Maximum number of seats the route can have 
+	 */
+	public static final int MAX_NUM_SEATS = 50;
 
 	public BusRecorrido(String id, Connection connection, double price, LocalDateTime dateTime, int numSeats) {
 		super(id, connection, Transport.BUS, price, dateTime, numSeats);
+		checkNumSeats(numSeats);
 	}
 
 	/**
 	 * Decrease the number of available seats
 	 * 
-	 * TODO Marcarlo como coverage
-	 * 
 	 * @param numSeats to decrease
 	 * 
 	 * @throws IllegalArgumentException if the number of seats is less than 1 or
-	 *                                  more than 50 if the transport is bus or 250
-	 *                                  if the transport is train
+	 *                                  more than {@link BusRecorrido#MAX_NUM_SEATS}
 	 * @throws IllegalStateException    if the number of seats to decremented is
 	 *                                  greater than the number of available sites
 	 */
 	@Override
 	public void decreaseAvailableSeats(int numSeats) {
-		if (numSeats > 50)
-			throw new IllegalArgumentException("numSeats is more than the limit of 50 for transport " + getTransport());
+		checkNumSeats(numSeats);
 		super.decreaseAvailableSeats(numSeats);
+	}
+
+	private void checkNumSeats(int numSeats) {
+		if (numSeats > MAX_NUM_SEATS)
+			throw new IllegalArgumentException("numSeats is more than the limit of " + MAX_NUM_SEATS + " for transport " + getTransport());
 	}
 	
 	/**
@@ -34,22 +41,22 @@ public class BusRecorrido extends Recorrido {
 	 * @param numSeats to increase
 	 * 
 	 * @throws IllegalArgumentException if the number of seats is less than 1 or
-	 *                                  more than 50 if the transport is bus or 250
-	 *                                  if the transport is train
+	 *                                  more than {@link BusRecorrido#MAX_NUM_SEATS}
 	 * @throws IllegalStateException    if the number of seats exceeds the total
 	 *                                  number of seats
 	 */
 	@Override
 	public void increaseAvailableSeats(int numSeats) {
-		if (numSeats > 50)
-			throw new IllegalArgumentException("numSeats is more than the limit of 50 for transport " + getTransport());
+		checkNumSeats(numSeats);
 		super.increaseAvailableSeats(numSeats);
 	}
 
 	@Override
-	public Recorrido clone(Recorrido r) {
-		Recorrido clone = new BusRecorrido(getID(), getConnection(), getPrice(), getDateTime(), getNumAvailableSeats());
-		clone.decreaseAvailableSeats(getTotalSeats() - getNumAvailableSeats());
+	public BusRecorrido clone() {
+		BusRecorrido clone = new BusRecorrido(getID(), getConnection(), getPrice(), getDateTime(), getTotalSeats());
+		int decreased;
+		if ((decreased = getTotalSeats() - getNumAvailableSeats()) != 0)
+			clone.decreaseAvailableSeats(decreased);			
 		return clone;
 	}
 
@@ -57,9 +64,6 @@ public class BusRecorrido extends Recorrido {
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
-		}
-		if (!(obj instanceof BusRecorrido)) {
-			return false;
 		}
 		if (!super.equals(obj)) {
 			return false;
