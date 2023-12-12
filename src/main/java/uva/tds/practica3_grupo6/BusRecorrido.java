@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 /**
  * A child of {@link Recorrido} who represent the routes in which the transport
- * is Bus. The limit of seats for this type of route is
+ * is {@link Transport#BUS}. The limit of seats for this type of route is
  * {@link BusRecorrido#MAX_NUM_SEATS}
  */
 public class BusRecorrido extends Recorrido {

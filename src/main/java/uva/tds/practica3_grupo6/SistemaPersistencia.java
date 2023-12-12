@@ -66,7 +66,7 @@ public class SistemaPersistencia {
 	/**
 	 * {@link Recorrido#TRAIN}
 	 */
-	private static final String TRAIN = Recorrido.TRAIN;
+	private static final Transport TRAIN = Transport.TRAIN;
 	/**
 	 * {@link Billete#ESTADO_RESERVADO}
 	 */

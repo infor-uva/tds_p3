@@ -40,7 +40,7 @@ class BusRecorridoTest {
 	@BeforeEach
 	void setUp() {
 		id = "c12345";
-		price = 0.0;
+		price = 12.0;
 		dateTime = LocalDateTime.of(2023, 10, 27, 19, 06, 50);
 		numAvailableSeats = BusRecorrido.MAX_NUM_SEATS;
 		connection = new Connection("Valladolid", "Palencia", 30);
@@ -57,6 +57,7 @@ class BusRecorridoTest {
 		int numAvailableSeats = 1;
 
 		Recorrido recorrido = new BusRecorrido(id, connection, price, dateTime, numAvailableSeats);
+		
 		assertNotNull(recorrido);
 		assertEquals(id, recorrido.getID());
 		assertEquals(connection, recorrido.getConnection());
@@ -318,7 +319,7 @@ class BusRecorridoTest {
 	}
 
 	@Test
-	void testEqualsValido() {
+	void testEquals() {
 		Recorrido same = recorrido.clone();
 		Recorrido different = new BusRecorrido("dif", connection, price, dateTime, numAvailableSeats);
 		assertEquals(recorrido, recorrido);
@@ -338,7 +339,7 @@ class BusRecorridoTest {
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConTransportsDiferentes() {
-		Recorrido other = new TrainRecorrido(id, connection, price, dateTime, numAvailableSeats);
+		Recorrido other = new TrainRecorrido(id, connection, price, dateTime, TrainRecorrido.MAX_NUM_SEATS);
 		assertNotEquals(recorrido, other);
 	}
 

@@ -2,10 +2,23 @@ package uva.tds.practica3_grupo6;
 
 import java.time.LocalDateTime;
 
+/**
+ * A child of {@link Recorrido} who represent the routes in which the transport
+ * is {@link Transport#TRAIN}. The limit of seats for this type of route is
+ * {@link BusRecorrido#MAX_NUM_SEATS}. This type of routes have a discount of
+ * {@link TrainRecorrido#DISCOUNT} of the original price, can consult both with
+ * the next getters:
+ * <ul>
+ * <li><code>{@link TrainRecorrido#getPrice()}</code> - The price of the route
+ * </li>
+ * <li><code>{@link TrainRecorrido#getPriceWithDiscount()}</code> - The
+ * price with the discount</li>
+ * </ul>
+ */
 public class TrainRecorrido extends Recorrido {
 
 	/**
-	 * Maximum number of seats the route can have 
+	 * Maximum number of seats the route can have
 	 */
 	public static final int MAX_NUM_SEATS = 250;
 	/**
@@ -15,6 +28,21 @@ public class TrainRecorrido extends Recorrido {
 
 	public TrainRecorrido(String id, Connection connection, double price, LocalDateTime dateTime, int numSeats) {
 		super(id, connection, Transport.TRAIN, price, dateTime, numSeats);
+		checkNumSeats(numSeats);
+	}
+
+	/**
+	 * Check if the numbers of seats is over the limit
+	 * 
+	 * @param numSeats to check
+	 * 
+	 * @throws IllegalArgumentException if the number of seats is more than
+	 *                                  {@link TrainRecorrido#MAX_NUM_SEATS}
+	 */
+	private void checkNumSeats(int numSeats) {
+		if (numSeats > MAX_NUM_SEATS)
+			throw new IllegalArgumentException(
+					"numSeats is more than the limit of " + MAX_NUM_SEATS + " for transport " + getTransport());
 	}
 
 	/**
@@ -23,9 +51,8 @@ public class TrainRecorrido extends Recorrido {
 	 * 
 	 * @return price with the discount
 	 */
-	@Override
-	public double getPrice() {
-		return DISCOUNT * super.getPrice();
+	public double getPriceWithDiscount() {
+		return (1 - DISCOUNT) * super.getPrice();
 	}
 
 	/**
@@ -34,15 +61,14 @@ public class TrainRecorrido extends Recorrido {
 	 * @param numSeats to decrease
 	 * 
 	 * @throws IllegalArgumentException if the number of seats is less than 1 or
-	 *                                  more than {@link TrainRecorrido#MAX_NUM_SEATS}
+	 *                                  more than
+	 *                                  {@link TrainRecorrido#MAX_NUM_SEATS}
 	 * @throws IllegalStateException    if the number of seats to decremented is
 	 *                                  greater than the number of available sites
 	 */
 	@Override
 	public void decreaseAvailableSeats(int numSeats) {
-		if (numSeats > MAX_NUM_SEATS)
-			throw new IllegalArgumentException(
-					"numSeats is more than the limit of " + MAX_NUM_SEATS + " for transport " + getTransport());
+		checkNumSeats(numSeats);
 		super.decreaseAvailableSeats(numSeats);
 	}
 
@@ -52,15 +78,14 @@ public class TrainRecorrido extends Recorrido {
 	 * @param numSeats to increase
 	 * 
 	 * @throws IllegalArgumentException if the number of seats is less than 1 or
-	 *                                  more than {@link TrainRecorrido#MAX_NUM_SEATS}
+	 *                                  more than
+	 *                                  {@link TrainRecorrido#MAX_NUM_SEATS}
 	 * @throws IllegalStateException    if the number of seats exceeds the total
 	 *                                  number of seats
 	 */
 	@Override
 	public void increaseAvailableSeats(int numSeats) {
-		if (numSeats > MAX_NUM_SEATS)
-			throw new IllegalArgumentException(
-					"numSeats is more than the limit of " + MAX_NUM_SEATS + " for transport " + getTransport());
+		checkNumSeats(numSeats);
 		super.increaseAvailableSeats(numSeats);
 	}
 
@@ -69,7 +94,7 @@ public class TrainRecorrido extends Recorrido {
 		TrainRecorrido clone = new TrainRecorrido(getID(), getConnection(), getPrice(), getDateTime(), getTotalSeats());
 		int decreased;
 		if ((decreased = getTotalSeats() - getNumAvailableSeats()) != 0)
-			clone.decreaseAvailableSeats(decreased);			
+			clone.decreaseAvailableSeats(decreased);
 		return clone;
 	}
 
@@ -79,9 +104,6 @@ public class TrainRecorrido extends Recorrido {
 			return true;
 		}
 		if (!super.equals(obj)) {
-			return false;
-		}
-		if (!(obj instanceof TrainRecorrido)) {
 			return false;
 		}
 		return true;

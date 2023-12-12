@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
  * @author hugcubi
  * @author migudel
  * 
- * @version 28/10/2023
+ * @version 12/12/2023
  */
 class TrainRecorridoTest {
 	/**
@@ -26,29 +26,13 @@ class TrainRecorridoTest {
 	 * double values
 	 */
 	private static final double ERROR_MARGIN = 0.00001;
-	/**
-	 * Type of transport bus
-	 */
-	private static final Transport BUS = Transport.BUS;
-	/**
-	 * Type of transport train
-	 */
-	private static final Transport TRAIN = Transport.TRAIN;
 
 	private String id;
-	private String origin;
-	private String destination;
-	private Transport transport;
+	private Connection connection;
 	private double price;
-	private LocalDate date;
-	private LocalTime time;
+	private LocalDateTime dateTime;
 	private int numAvailableSeats;
-	private int duration;
 	private Recorrido recorrido;
-	private Recorrido sameRecorrido;
-	private Recorrido differentRecorrido;
-	private Recorrido busRecorrido;
-	private Recorrido trainRecorrido;
 	private LocalDate newDate;
 	private LocalTime newTime;
 	private LocalDateTime newDateTime;
@@ -56,245 +40,116 @@ class TrainRecorridoTest {
 	@BeforeEach
 	void setUp() {
 		id = "c12345";
-		origin = "Valladolid";
-		destination = "Palencia";
-		transport = BUS;
-		price = 0.0;
-		date = LocalDate.of(2023, 10, 27);
-		time = LocalTime.of(19, 06, 50);
-		numAvailableSeats = 20;
-		duration = 30;
-		recorrido = new Recorrido(id, origin, destination, transport, price, date, time, numAvailableSeats, duration);
-		sameRecorrido = new Recorrido(id, origin, destination, transport, price, date, time, numAvailableSeats,
-				duration);
-		differentRecorrido = new Recorrido("dif", destination, origin, transport, price, date, time, numAvailableSeats,
-				duration);
+		price = 12.0;
+		dateTime = LocalDateTime.of(2023, 10, 27, 19, 06, 50);
+		numAvailableSeats = TrainRecorrido.MAX_NUM_SEATS;
+		connection = new Connection("Valladolid", "Palencia", 30);
+		recorrido = new TrainRecorrido(id, connection, price, dateTime, numAvailableSeats);
 		newDate = LocalDate.of(2025, 12, 30);
 		newTime = LocalTime.of(16, 20, 37);
 		newDateTime = LocalDateTime.of(2030, 5, 6, 19, 15, 13);
-		busRecorrido = new Recorrido("B123", origin, destination, BUS, price, date, time, 50, duration);
-		trainRecorrido = new Recorrido("B123", origin, destination, TRAIN, price, date, time, 250, duration);
 	}
 
 	@Test
-	void testConstructorBusValidoLimiteInferior() {
+	void testConstructorValidoLimiteInferior() {
 		String id = "c";
-		String origin = "V";
-		String destination = "P";
-		String transport = BUS;
 		double price = 0.0;
 		int numAvailableSeats = 1;
-		int duration = 1;
 
-		Recorrido recorrido = new Recorrido(id, origin, destination, transport, price, date, time, numAvailableSeats,
-				duration);
+		TrainRecorrido recorrido =  new TrainRecorrido(id, connection, price, dateTime, numAvailableSeats);
+
 		assertNotNull(recorrido);
 		assertEquals(id, recorrido.getID());
-		assertEquals(origin, recorrido.getOrigin());
-		assertEquals(destination, recorrido.getDestination());
-		assertEquals(transport, recorrido.getTransport());
+		assertEquals(connection, recorrido.getConnection());
+		assertEquals(connection.getOrigin(), recorrido.getOrigin());
+		assertEquals(connection.getDestination(), recorrido.getDestination());
+		assertEquals(connection.getDuration(), recorrido.getDuration());
+		assertEquals(Transport.TRAIN, recorrido.getTransport());
 		assertEquals(price, recorrido.getPrice(), ERROR_MARGIN);
-		assertEquals(date, recorrido.getDate());
-		assertEquals(time, recorrido.getTime());
+		assertEquals(price * (1 - TrainRecorrido.DISCOUNT), recorrido.getPriceWithDiscount(), ERROR_MARGIN);
+		assertEquals(dateTime, recorrido.getDateTime());
 		assertEquals(numAvailableSeats, recorrido.getNumAvailableSeats());
-		assertEquals(duration, recorrido.getDuration());
+		assertNotNull(recorrido.hashCode());
 	}
 
 	@Test
-	void testConstructorTrainValidoLimiteInferior() {
-		String id = "c";
-		String origin = "V";
-		String destination = "P";
-		String transport = TRAIN;
-		double price = 0.0;
-		int numAvailableSeats = 1;
-		int duration = 1;
-
-		Recorrido recorrido = new Recorrido(id, origin, destination, transport, price, date, time, numAvailableSeats,
-				duration);
-
-		recorrido = new Recorrido(id, origin, destination, transport, price, date, time, numAvailableSeats, duration);
-		assertNotNull(recorrido);
-		assertEquals(id, recorrido.getID());
-		assertEquals(origin, recorrido.getOrigin());
-		assertEquals(destination, recorrido.getDestination());
-		assertEquals(transport, recorrido.getTransport());
-		assertEquals(price, recorrido.getPrice(), ERROR_MARGIN);
-		assertEquals(date, recorrido.getDate());
-		assertEquals(time, recorrido.getTime());
-		assertEquals(numAvailableSeats, recorrido.getNumAvailableSeats());
-		assertEquals(duration, recorrido.getDuration());
-	}
-
-	@Test
-	void testConstructorValidoBusLimiteSuperior() {
+	void testConstructorValidoLimiteSuperior() {
 		String id = "c123";
-		String origin = "Valladolid";
-		String destination = "Palencia";
-		String transport = BUS;
-		double price = 25.50;
-		int numAvailableSeats = 50;
-		int duration = 120;
-
-		Recorrido recorrido = new Recorrido(id, origin, destination, transport, price, date, time, numAvailableSeats,
-				duration);
-		assertNotNull(recorrido);
-		assertEquals(id, recorrido.getID());
-		assertEquals(origin, recorrido.getOrigin());
-		assertEquals(destination, recorrido.getDestination());
-		assertEquals(transport, recorrido.getTransport());
-		assertEquals(price, recorrido.getPrice(), ERROR_MARGIN);
-		assertEquals(date, recorrido.getDate());
-		assertEquals(time, recorrido.getTime());
-		assertEquals(numAvailableSeats, recorrido.getNumAvailableSeats());
-		assertEquals(duration, recorrido.getDuration());
-	}
-
-	@Test
-	void testConstructorValidoTrainLimiteSuperior() {
-		String id = "c123";
-		String origin = "Valladolid";
-		String destination = "Palencia";
-		String transport = TRAIN;
 		double price = 25.50;
 		int numAvailableSeats = 250;
-		int duration = 120;
+		
+		TrainRecorrido recorrido =  new TrainRecorrido(id, connection, price, dateTime, numAvailableSeats);
 
-		Recorrido recorrido = new Recorrido(id, origin, destination, transport, price, date, time, numAvailableSeats,
-				duration);
-
-		recorrido = new Recorrido(id, origin, destination, transport, price, date, time, numAvailableSeats, duration);
 		assertNotNull(recorrido);
 		assertEquals(id, recorrido.getID());
-		assertEquals(origin, recorrido.getOrigin());
-		assertEquals(destination, recorrido.getDestination());
-		assertEquals(transport, recorrido.getTransport());
+		assertEquals(connection, recorrido.getConnection());
+		assertEquals(connection.getOrigin(), recorrido.getOrigin());
+		assertEquals(connection.getDestination(), recorrido.getDestination());
+		assertEquals(connection.getDuration(), recorrido.getDuration());
+		assertEquals(Transport.TRAIN, recorrido.getTransport());
 		assertEquals(price, recorrido.getPrice(), ERROR_MARGIN);
-		assertEquals(date, recorrido.getDate());
-		assertEquals(time, recorrido.getTime());
+		assertEquals(price * (1 - TrainRecorrido.DISCOUNT), recorrido.getPriceWithDiscount(), ERROR_MARGIN);
+		assertEquals(dateTime, recorrido.getDateTime());
 		assertEquals(numAvailableSeats, recorrido.getNumAvailableSeats());
-		assertEquals(duration, recorrido.getDuration());
+		assertNotNull(recorrido.hashCode());
 	}
 
 	@Test
 	void testConstructorNoValidoConIdNull() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(null, origin, destination, transport, price, date, time, numAvailableSeats, duration);
+			new TrainRecorrido(null, connection, price, dateTime, numAvailableSeats);
 		});
 	}
 
 	@Test
 	void testConstructorNoValidoConIdLimiteInferior() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido("", origin, destination, transport, price, date, time, numAvailableSeats, duration);
+			new TrainRecorrido("", connection, price, dateTime, numAvailableSeats);
 		});
 	}
 
 	@Test
-	void testConstructorNoValidoConOriginNull() {
+	void testConstructorNoValidoConConnectionNull() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, null, destination, transport, price, date, time, numAvailableSeats, duration);
-		});
-	}
-
-	@Test
-	void testConstructorNoValidoConOriginLimiteInferior() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, "", destination, transport, price, date, time, numAvailableSeats, duration);
-		});
-	}
-
-	@Test
-	void testConstructorNoValidoConDestinationNull() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, null, transport, price, date, time, numAvailableSeats, duration);
-		});
-	}
-
-	@Test
-	void testConstructorNoValidoConDestinationLimiteInferior() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, "", transport, price, date, time, numAvailableSeats, duration);
-		});
-	}
-
-	@Test
-	void testConstructorNoValidoConOrigenYDestinoIguales() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, origin, transport, price, date, time, numAvailableSeats, duration);
-		});
-	}
-
-	@Test
-	void testConstructorNoValidoConTransportNull() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, destination, null, price, date, time, numAvailableSeats, duration);
-		});
-	}
-
-	@Test
-	void testConstructorNoValidoConTransportValorDiferente() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, destination, "boat", price, date, time, numAvailableSeats, duration);
+			new TrainRecorrido(id, null, price, dateTime, numAvailableSeats);
 		});
 	}
 
 	@Test
 	void testConstructorNoValidoConPriceLimiteInferior() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, destination, transport, -0.1, date, time, numAvailableSeats, duration);
+			new TrainRecorrido(id, connection, -0.1, dateTime, numAvailableSeats);
 		});
 	}
 
 	@Test
-	void testConstructorNoValidoConDateNull() {
+	void testConstructorNoValidoConDateTimeNull() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, destination, transport, price, null, time, numAvailableSeats, duration);
+			new TrainRecorrido(id, connection, price, null, numAvailableSeats);
 		});
 	}
 
 	@Test
-	void testConstructorNoValidoConTimeNull() {
+	void testConstructorNoValidoConNumAvailableSeatsLimiteInferior() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, destination, transport, price, date, null, numAvailableSeats, duration);
+			new TrainRecorrido(id, connection, price, dateTime, 0);
 		});
 	}
-
+	
 	@Test
-	void testConstructorNoValidoConNumAvailableSeatsLimiteInferiorTipoBus() {
+	void testConstructorNoValidoConNumAvailableSeatsLimiteSuperior() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, destination, BUS, price, date, time, 0, duration);
+			new TrainRecorrido(id, connection, price, dateTime, 251);
 		});
 	}
-
+	
 	@Test
-	void testConstructorNoValidoConNumAvailableSeatsLimiteSuperiorTipoBus() {
+	void testSetTransportNull() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, destination, BUS, price, date, time, 51, duration);
+			recorrido.setTransport(null);
 		});
 	}
-
-	@Test
-	void testConstructorNoValidoConNumAvailableSeatsLimiteInferiorTipoTrain() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, destination, TRAIN, price, date, time, 0, duration);
-		});
-	}
-
-	@Test
-	void testConstructorNoValidoConNumAvailableSeatsLimiteSuperiorTipoTrain() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, destination, TRAIN, price, date, time, 251, duration);
-		});
-	}
-
-	@Test
-	void testConstructorNoValidoConDurationLimiteInferior() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			new Recorrido(id, origin, destination, transport, price, date, time, numAvailableSeats, 0);
-		});
-	}
-
+	
 	@Test
 	void testUpdateDateValido() {
 		assertNotEquals(newDate, recorrido.getDate());
@@ -387,238 +242,131 @@ class TrainRecorridoTest {
 			recorrido.updateDateTime(recorrido.getDateTime());
 		});
 	}
-
+	
 	@Test
-	void testDecreaseAvailableSeatsBusValidoLimiteInferior() {
+	void testDecreaseAvailableSeatsValidoLimiteInferior() {
 		int numSeats = 1;
-		assertEquals(busRecorrido.getTotalSeats(), busRecorrido.getNumAvailableSeats());
-		busRecorrido.decreaseAvailableSeats(numSeats);
-		assertEquals(busRecorrido.getTotalSeats() - numSeats, busRecorrido.getNumAvailableSeats());
+		assertEquals(recorrido.getTotalSeats(), recorrido.getNumAvailableSeats());
+		recorrido.decreaseAvailableSeats(numSeats);
+		assertEquals(recorrido.getTotalSeats() - numSeats, recorrido.getNumAvailableSeats());
 	}
 
 	@Test
-	void testDecreaseAvailableSeatsTrainValidoLimiteInferior() {
-		int numSeats = 1;
-		assertEquals(trainRecorrido.getTotalSeats(), trainRecorrido.getNumAvailableSeats());
-		trainRecorrido.decreaseAvailableSeats(numSeats);
-		assertEquals(trainRecorrido.getTotalSeats() - numSeats, trainRecorrido.getNumAvailableSeats());
-	}
-
-	@Test
-	void testDecreaseAvailableSeatsBusValidoLimiteSuperior() {
-		int numSeats = 50;
-		assertEquals(busRecorrido.getTotalSeats(), busRecorrido.getNumAvailableSeats());
-		busRecorrido.decreaseAvailableSeats(numSeats);
-		assertEquals(busRecorrido.getTotalSeats() - numSeats, busRecorrido.getNumAvailableSeats());
-	}
-
-	@Test
-	void testDecreaseAvailableSeatsTrainValidoLimiteSuperior() {
+	void testDecreaseAvailableSeatsValidoLimiteSuperior() {
 		int numSeats = 250;
-		assertEquals(trainRecorrido.getTotalSeats(), trainRecorrido.getNumAvailableSeats());
-		trainRecorrido.decreaseAvailableSeats(numSeats);
-		assertEquals(trainRecorrido.getTotalSeats() - numSeats, trainRecorrido.getNumAvailableSeats());
+		assertEquals(recorrido.getTotalSeats(), recorrido.getNumAvailableSeats());
+		recorrido.decreaseAvailableSeats(numSeats);
+		assertEquals(recorrido.getTotalSeats() - numSeats, recorrido.getNumAvailableSeats());
 	}
 
 	@Test
-	void testDecreaseAvailableSeatsConNumSeatsLimiteInferiorBus() {
+	void testDecreaseAvailableSeatsConNumSeatsLimiteInferior() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			busRecorrido.decreaseAvailableSeats(0);
+			recorrido.decreaseAvailableSeats(0);
 		});
 	}
 
 	@Test
-	void testDecreaseAvailableSeatsConNumSeatsLimiteInferiorTrain() {
+	void testDecreaseAvailableSeatsConNumSeatsLimiteSuperior() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			trainRecorrido.decreaseAvailableSeats(0);
+			recorrido.decreaseAvailableSeats(251);
 		});
 	}
 
 	@Test
-	void testDecreaseAvailableSeatsConNumSeatsLimiteSuperiorBus() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			busRecorrido.decreaseAvailableSeats(51);
-		});
-	}
-
-	@Test
-	void testDecreaseAvailableSeatsConNumSeatsLimiteSuperiorTrain() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			trainRecorrido.decreaseAvailableSeats(251);
-		});
-	}
-
-	@Test
-	void testDecreaseAvailableSeatsConNumSeatsMayorQueNumAivailableSeatsBus() {
-		busRecorrido.decreaseAvailableSeats(45);
+	void testDecreaseAvailableSeatsConNumSeatsMayorQueNumAivailableSeats() {
+		recorrido.decreaseAvailableSeats(245);
 		assertThrows(IllegalStateException.class, () -> {
-			busRecorrido.decreaseAvailableSeats(6);
+			recorrido.decreaseAvailableSeats(6);
 		});
 	}
 
-	@Test
-	void testDecreaseAvailableSeatsConNumSeatsMayorQueNumAivailableSeatsTrain() {
-		trainRecorrido.decreaseAvailableSeats(245);
-		assertThrows(IllegalStateException.class, () -> {
-			trainRecorrido.decreaseAvailableSeats(6);
-		});
-	}
 
 	@Test
-	void testIncreaseAvailableSeatsBusValidoLimiteInferior() {
+	void testIncreaseAvailableSeatsValidoLimiteInferior() {
 		int numSeats = 1;
-		busRecorrido.decreaseAvailableSeats(numSeats);
-		assertEquals(busRecorrido.getTotalSeats() - numSeats, busRecorrido.getNumAvailableSeats());
-		busRecorrido.increaseAvailableSeats(numSeats);
-		assertEquals(busRecorrido.getTotalSeats(), busRecorrido.getNumAvailableSeats());
+		recorrido.decreaseAvailableSeats(numSeats);
+		assertEquals(recorrido.getTotalSeats() - numSeats, recorrido.getNumAvailableSeats());
+		recorrido.increaseAvailableSeats(numSeats);
+		assertEquals(recorrido.getTotalSeats(), recorrido.getNumAvailableSeats());
 	}
 
-	@Test
-	void testIncreaseAvailableSeatsTrainValidoLimiteInferior() {
-		int numSeats = 1;
-		trainRecorrido.decreaseAvailableSeats(numSeats);
-		assertEquals(trainRecorrido.getTotalSeats() - numSeats, trainRecorrido.getNumAvailableSeats());
-		trainRecorrido.increaseAvailableSeats(numSeats);
-		assertEquals(trainRecorrido.getTotalSeats(), trainRecorrido.getNumAvailableSeats());
-	}
 
 	@Test
-	void testIncreaseAvailableSeatsBusValidoLimiteSuperior() {
-		int numSeats = 50;
-		busRecorrido.decreaseAvailableSeats(numSeats);
-		assertEquals(busRecorrido.getTotalSeats() - numSeats, busRecorrido.getNumAvailableSeats());
-		busRecorrido.increaseAvailableSeats(numSeats);
-		assertEquals(busRecorrido.getTotalSeats(), busRecorrido.getNumAvailableSeats());
-	}
-
-	@Test
-	void testIncreaseAvailableSeatsTrainValidoLimiteSuperior() {
+	void testIncreaseAvailableSeatsValidoLimiteSuperior() {
 		int numSeats = 250;
-		trainRecorrido.decreaseAvailableSeats(numSeats);
-		assertEquals(trainRecorrido.getTotalSeats() - numSeats, trainRecorrido.getNumAvailableSeats());
-		trainRecorrido.increaseAvailableSeats(numSeats);
-		assertEquals(trainRecorrido.getTotalSeats(), trainRecorrido.getNumAvailableSeats());
+		recorrido.decreaseAvailableSeats(numSeats);
+		assertEquals(recorrido.getTotalSeats() - numSeats, recorrido.getNumAvailableSeats());
+		recorrido.increaseAvailableSeats(numSeats);
+		assertEquals(recorrido.getTotalSeats(), recorrido.getNumAvailableSeats());
 	}
 
 	@Test
-	void testIncreaseAvailableSeatsConNumSeatsLimiteInferiorBus() {
+	void testIncreaseAvailableSeatsConNumSeatsLimiteInferior() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			busRecorrido.increaseAvailableSeats(0);
+			recorrido.increaseAvailableSeats(0);
 		});
 	}
 
 	@Test
-	void testIncreaseAvailableSeatsConNumSeatsLimiteInferiorTrain() {
+	void testIncreaseAvailableSeatsConNumSeatsLimiteSuperior() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			trainRecorrido.increaseAvailableSeats(0);
+			recorrido.increaseAvailableSeats(251);
 		});
 	}
-
+	
 	@Test
-	void testIncreaseAvailableSeatsConNumSeatsLimiteSuperiorBus() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			busRecorrido.increaseAvailableSeats(51);
-		});
-	}
-
-	@Test
-	void testIncreaseAvailableSeatsConNumSeatsLimiteSuperiorTrain() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			trainRecorrido.increaseAvailableSeats(251);
-		});
-	}
-
-	@Test
-	void testIncreaseAvailableSeatsConNumSeatsMayorQueNumAivailableSeatsBus() {
-		busRecorrido.decreaseAvailableSeats(5);
+	void testIncreaseAvailableSeatsConNumSeatsMayorQueNumAivailableSeats() {
+		recorrido.decreaseAvailableSeats(5);
 		assertThrows(IllegalStateException.class, () -> {
-			busRecorrido.increaseAvailableSeats(6);
+			recorrido.increaseAvailableSeats(6);
 		});
 	}
-
-	@Test
-	void testIncreaseAvailableSeatsConNumSeatsMayorQueNumAivailableSeatsTrain() {
-		busRecorrido.decreaseAvailableSeats(5);
-		assertThrows(IllegalStateException.class, () -> {
-			trainRecorrido.increaseAvailableSeats(6);
-		});
-	}
-
+	
 	@Test
 	void testEqualsValido() {
+		Recorrido same = recorrido.clone();
+		Recorrido different = new TrainRecorrido("dif", connection, price, dateTime, numAvailableSeats);
 		assertEquals(recorrido, recorrido);
-		assertEquals(recorrido, sameRecorrido);
-		assertNotEquals(recorrido, true);
-		assertNotEquals(recorrido, differentRecorrido);
-	}
-
-	@Test
-	void testEqualsNoValidoConNull() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			recorrido.equals(null);
-		});
+		assertEquals(recorrido, same);
+		assertNotEquals(recorrido, null);
+		assertNotEquals(recorrido, different);
 	}
 
 	@Test
 	@Tag("Cobertura")
-	void testEqualsConIDsDiferentes() {
-		Recorrido other = new Recorrido("other", origin, destination, transport, price, date, time, numAvailableSeats,
-				duration);
-		assertNotEquals(recorrido, other);
-	}
-
-	@Test
-	@Tag("Cobertura")
-	void testEqualsConOriginsDiferentes() {
-		Recorrido other = new Recorrido(id, "Pamplona", destination, transport, price, date, time, numAvailableSeats,
-				duration);
-		assertNotEquals(recorrido, other);
-	}
-
-	@Test
-	@Tag("Cobertura")
-	void testEqualsConDestinationsDiferentes() {
-		Recorrido other = new Recorrido(id, origin, "Pamplona", transport, price, date, time, numAvailableSeats,
-				duration);
+	void testEqualsConConnectionsDiferentes() {
+		Connection c = new Connection("diferent", "diferent2", 12);
+		Recorrido other = new TrainRecorrido(id, c, price, dateTime, numAvailableSeats);
 		assertNotEquals(recorrido, other);
 	}
 
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConTransportsDiferentes() {
-		Recorrido other = new Recorrido(id, origin, destination, TRAIN, price, date, time, numAvailableSeats, duration);
+		Recorrido recorrido = new TrainRecorrido(id, connection, price, dateTime, BusRecorrido.MAX_NUM_SEATS);
+		Recorrido other = new BusRecorrido(id, connection, price, dateTime, BusRecorrido.MAX_NUM_SEATS);
 		assertNotEquals(recorrido, other);
 	}
 
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConPricesDiferentes() {
-		Recorrido other = new Recorrido(id, origin, destination, transport, 26.9, date, time, numAvailableSeats,
-				duration);
+		Recorrido other = new TrainRecorrido(id, connection, 32.69, dateTime, numAvailableSeats);
 		assertNotEquals(recorrido, other);
 	}
 
 	@Test
 	@Tag("Cobertura")
-	void testEqualsConDateDiferentes() {
-		Recorrido other = new Recorrido(id, origin, destination, transport, price, newDate, time, numAvailableSeats,
-				duration);
-		assertNotEquals(recorrido, other);
-	}
-
-	@Test
-	@Tag("Cobertura")
-	void testEqualsConTimesDiferentes() {
-		Recorrido other = new Recorrido(id, origin, destination, transport, price, date, newTime, numAvailableSeats,
-				duration);
+	void testEqualsConDateTimeDiferentes() {
+		Recorrido other = new TrainRecorrido(id, connection, price, newDateTime, numAvailableSeats);
 		assertNotEquals(recorrido, other);
 	}
 
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConNumAvailableSeatsDiferentDiferentes() {
-		Recorrido other = new Recorrido(id, origin, destination, transport, price, date, time, numAvailableSeats,
-				duration);
+		Recorrido other = recorrido.clone();
 		other.decreaseAvailableSeats(2);
 		assertNotEquals(recorrido, other);
 	}
@@ -626,36 +374,18 @@ class TrainRecorridoTest {
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConTotalSeatsDiferentes() {
-		Recorrido other = new Recorrido(id, origin, destination, transport, price, date, time, 12, duration);
+		Recorrido other = new TrainRecorrido(id, connection, price, dateTime, 32);
 		assertNotEquals(recorrido, other);
 	}
 
 	@Test
-	@Tag("Cobertura")
-	void testEqualsConDurationDiferentes() {
-		Recorrido other = new Recorrido(id, origin, destination, transport, price, date, time, numAvailableSeats, 360);
-		assertNotEquals(recorrido, other);
-	}
-
-	@Test
-	void testCloneBus() {
+	void testClone() {
 		// Comprobar con numSeas y numAvailableSeats no iguales
-		busRecorrido.decreaseAvailableSeats(5);
+		recorrido.decreaseAvailableSeats(5);
 
-		Recorrido clone = busRecorrido.clone();
+		Recorrido clone = recorrido.clone();
 
-		assertEquals(busRecorrido, clone);
-		assertNotSame(busRecorrido, clone);
-	}
-
-	@Test
-	void testCloneTrain() {
-		// Comprobar con numSeas y numAvailableSeats no iguales
-		trainRecorrido.decreaseAvailableSeats(5);
-
-		Recorrido clone = trainRecorrido.clone();
-
-		assertEquals(trainRecorrido, clone);
-		assertNotSame(trainRecorrido, clone);
+		assertEquals(recorrido, clone);
+		assertNotSame(recorrido, clone);
 	}
 }
