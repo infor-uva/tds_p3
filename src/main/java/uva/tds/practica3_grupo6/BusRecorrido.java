@@ -6,6 +6,12 @@ import java.time.LocalDateTime;
  * A child of {@link Recorrido} who represent the routes in which the transport
  * is {@link Transport#BUS}. The limit of seats for this type of route is
  * {@link BusRecorrido#MAX_NUM_SEATS}
+ * 
+ * @author diebomb
+ * @author hugcubi
+ * @author migudel
+ * 
+ * @version 12/12/23
  */
 public class BusRecorrido extends Recorrido {
 
@@ -94,24 +100,6 @@ public class BusRecorrido extends Recorrido {
 		if ((decreased = getTotalSeats() - getNumAvailableSeats()) != 0)
 			clone.decreaseAvailableSeats(decreased);
 		return clone;
-	}
-
-	/**
-	 * Compare if two BusRecorridos are the same
-	 * 
-	 * @param obj Recorrido to compare
-	 * 
-	 * @return if are the same
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (!super.equals(obj)) {
-			return false;
-		}
-		return true;
 	}
 
 }

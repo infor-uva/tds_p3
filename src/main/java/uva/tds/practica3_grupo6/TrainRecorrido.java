@@ -14,6 +14,12 @@ import java.time.LocalDateTime;
  * <li><code>{@link TrainRecorrido#getPriceWithDiscount()}</code> - The
  * price with the discount</li>
  * </ul>
+ * 
+ * @author diebomb
+ * @author hugcubi
+ * @author migudel
+ * 
+ * @version 12/12/23
  */
 public class TrainRecorrido extends Recorrido {
 
@@ -96,17 +102,6 @@ public class TrainRecorrido extends Recorrido {
 		if ((decreased = getTotalSeats() - getNumAvailableSeats()) != 0)
 			clone.decreaseAvailableSeats(decreased);
 		return clone;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (!super.equals(obj)) {
-			return false;
-		}
-		return true;
 	}
 
 }

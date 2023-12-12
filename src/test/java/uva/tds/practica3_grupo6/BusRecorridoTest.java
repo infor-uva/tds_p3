@@ -32,7 +32,7 @@ class BusRecorridoTest {
 	private double price;
 	private LocalDateTime dateTime;
 	private int numAvailableSeats;
-	private Recorrido recorrido;
+	private BusRecorrido recorrido;
 	private LocalDate newDate;
 	private LocalTime newTime;
 	private LocalDateTime newDateTime;
@@ -56,7 +56,7 @@ class BusRecorridoTest {
 		double price = 0.0;
 		int numAvailableSeats = 1;
 
-		Recorrido recorrido = new BusRecorrido(id, connection, price, dateTime, numAvailableSeats);
+		BusRecorrido recorrido = new BusRecorrido(id, connection, price, dateTime, numAvailableSeats);
 		
 		assertNotNull(recorrido);
 		assertEquals(id, recorrido.getID());
@@ -77,7 +77,7 @@ class BusRecorridoTest {
 		double price = 25.50;
 		int numAvailableSeats = 50;
 
-		Recorrido recorrido = new BusRecorrido(id, connection, price, dateTime, numAvailableSeats);
+		BusRecorrido recorrido = new BusRecorrido(id, connection, price, dateTime, numAvailableSeats);
 		assertNotNull(recorrido);
 		assertEquals(id, recorrido.getID());
 		assertEquals(connection, recorrido.getConnection());
@@ -320,8 +320,8 @@ class BusRecorridoTest {
 
 	@Test
 	void testEquals() {
-		Recorrido same = recorrido.clone();
-		Recorrido different = new BusRecorrido("dif", connection, price, dateTime, numAvailableSeats);
+		BusRecorrido same = recorrido.clone();
+		BusRecorrido different = new BusRecorrido("dif", connection, price, dateTime, numAvailableSeats);
 		assertEquals(recorrido, recorrido);
 		assertEquals(recorrido, same);
 		assertNotEquals(recorrido, null);
@@ -332,35 +332,35 @@ class BusRecorridoTest {
 	@Tag("Cobertura")
 	void testEqualsConConnectionsDiferentes() {
 		Connection c = new Connection("diferent", "diferent2", 12);
-		Recorrido other = new BusRecorrido(id, c, price, dateTime, numAvailableSeats);
+		BusRecorrido other = new BusRecorrido(id, c, price, dateTime, numAvailableSeats);
 		assertNotEquals(recorrido, other);
 	}
 
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConTransportsDiferentes() {
-		Recorrido other = new TrainRecorrido(id, connection, price, dateTime, TrainRecorrido.MAX_NUM_SEATS);
+		TrainRecorrido other = new TrainRecorrido(id, connection, price, dateTime, TrainRecorrido.MAX_NUM_SEATS);
 		assertNotEquals(recorrido, other);
 	}
 
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConPricesDiferentes() {
-		Recorrido other = new BusRecorrido(id, connection, 32.69, dateTime, numAvailableSeats);
+		BusRecorrido other = new BusRecorrido(id, connection, 32.69, dateTime, numAvailableSeats);
 		assertNotEquals(recorrido, other);
 	}
 
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConDateTimeDiferentes() {
-		Recorrido other = new BusRecorrido(id, connection, price, newDateTime, numAvailableSeats);
+		BusRecorrido other = new BusRecorrido(id, connection, price, newDateTime, numAvailableSeats);
 		assertNotEquals(recorrido, other);
 	}
 
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConNumAvailableSeatsDiferentDiferentes() {
-		Recorrido other = recorrido.clone();
+		BusRecorrido other = recorrido.clone();
 		other.decreaseAvailableSeats(2);
 		assertNotEquals(recorrido, other);
 	}
@@ -368,7 +368,7 @@ class BusRecorridoTest {
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConTotalSeatsDiferentes() {
-		Recorrido other = new BusRecorrido(id, connection, price, dateTime, 32);
+		BusRecorrido other = new BusRecorrido(id, connection, price, dateTime, 32);
 		assertNotEquals(recorrido, other);
 	}
 
@@ -377,7 +377,7 @@ class BusRecorridoTest {
 		// Comprobar con numSeas y numAvailableSeats no iguales
 		recorrido.decreaseAvailableSeats(5);
 
-		Recorrido clone = recorrido.clone();
+		BusRecorrido clone = recorrido.clone();
 
 		assertEquals(recorrido, clone);
 		assertNotSame(recorrido, clone);

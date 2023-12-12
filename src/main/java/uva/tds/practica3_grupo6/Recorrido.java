@@ -145,7 +145,7 @@ public abstract class Recorrido {
 	 * 
 	 * @throws IllegalArgumentException if numSeats is less than 1
 	 */
-	private void checkNumSeats(int numSeats) {
+	private void checkNumSeatsIsPositive(int numSeats) {
 		if (numSeats < 1)
 			throw new IllegalArgumentException("the num of seats is less than 1");
 	}
@@ -158,7 +158,7 @@ public abstract class Recorrido {
 	 * @throws IllegalArgumentException if numSeats is less than 1
 	 */
 	public void setTotalSeats(int numSeats) {
-		checkNumSeats(numSeats);
+		checkNumSeatsIsPositive(numSeats);
 		this.totalSeats = numSeats;
 	}
 	
@@ -170,7 +170,7 @@ public abstract class Recorrido {
 	 * @throws IllegalArgumentException if numSeats is less than 1
 	 */
 	public void setNumAvailableSeats(int numSeats) {
-		checkNumSeats(numSeats);
+		checkNumSeatsIsPositive(numSeats);
 		this.numAvailableSeats = numSeats;
 	}
 
