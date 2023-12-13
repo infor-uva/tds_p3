@@ -149,7 +149,7 @@ public class SistemaPersistencia {
 		} catch (IllegalStateException e2) {
 			throw e2;
 		}
-		if (tmp.size() > 0)
+		if (!tmp.isEmpty())
 			throw new IllegalStateException("the route has associated tickets");
 		database.eliminarRecorrido(id);
 	}
@@ -233,8 +233,7 @@ public class SistemaPersistencia {
 			throw new IllegalArgumentException("La fecha es nula\n");
 		if (database.getRecorridos(fecha) == null)
 			throw new IllegalStateException("Para la fecha no hay recorridos disponibles\n");
-		ArrayList<Recorrido> listaRecorridos = database.getRecorridos(fecha);
-		return listaRecorridos;
+		return database.getRecorridos(fecha);
 	}
 
 	/**
