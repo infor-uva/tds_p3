@@ -90,6 +90,14 @@ public class System {
 	 * List of routes registered in the system
 	 */
 	private List<Recorrido> routes;
+	
+	/**
+	 * Lista de excepciones
+	 */
+	private static final String EXCEPTION_NOT_ROUTE = "the route isn't in the system\n";
+	private static final String EXCEPTION_NOT_ROUTE_ID = "no route in the system with this id\n";
+	private static final String LOCALIZADOR_NULL = "El localizador no puede ser null\n";
+	private static final String LOCALIZADOR_VACIO = "El localizador no puede ser vacio\n";
 
 	/**
 	 * Instance the System
@@ -129,8 +137,8 @@ public class System {
 	public void removeRecorrido(String id) {
 		Recorrido route;
 		if ((route = getRecorrido(id)) == null)
-			throw new IllegalStateException("the route isn't in the system");
-		if (getAssociatedBilletesToRoute(id).size() != 0)
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE);
+		if (!getAssociatedBilletesToRoute(id).isEmpty())
 			throw new IllegalStateException("the route has associated tickets");
 		routes.remove(route);
 
@@ -282,7 +290,7 @@ public class System {
 		Recorrido route;
 		List<Billete> list = new ArrayList<>();
 		if ((route = getRecorrido(id)) == null)
-			throw new IllegalStateException("the route isn't in the system");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE);
 		for (Billete ticket : tickets) {
 			if (ticket.getRecorrido().equals(route))
 				list.add(ticket);
@@ -305,7 +313,7 @@ public class System {
 	public LocalDate getDateOfRecorrido(String id) {
 		Recorrido r;
 		if ((r = getRecorrido(id)) == null)
-			throw new IllegalStateException("no route in the system with this id");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		return r.getDate();
 	}
 
@@ -324,7 +332,7 @@ public class System {
 	public LocalTime getTimeOfRecorrido(String id) {
 		Recorrido r;
 		if ((r = getRecorrido(id)) == null)
-			throw new IllegalStateException("no route in the system with this id");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		return r.getTime();
 	}
 
@@ -343,7 +351,7 @@ public class System {
 	public LocalDateTime getDateTimeOfRecorrido(String id) {
 		Recorrido r;
 		if ((r = getRecorrido(id)) == null)
-			throw new IllegalStateException("no route in the system with this id");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		return r.getDateTime();
 	}
 
@@ -361,7 +369,7 @@ public class System {
 	public void updateRecorridoDate(String id, LocalDate newDate) {
 		Recorrido route;
 		if ((route = getRecorrido(id)) == null)
-			throw new IllegalStateException("the route isn't in the system");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE);
 		if (newDate == null)
 			throw new IllegalArgumentException("newDate is null");
 		if (route.getDate().equals(newDate))
@@ -383,7 +391,7 @@ public class System {
 	public void updateRecorridoTime(String id, LocalTime newTime) {
 		Recorrido route;
 		if ((route = getRecorrido(id)) == null)
-			throw new IllegalStateException("the route isn't in the system");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE);
 		if (newTime == null)
 			throw new IllegalArgumentException("newTime is null");
 		if (route.getTime().equals(newTime))
@@ -405,7 +413,7 @@ public class System {
 	public void updateRecorridoDateTime(String id, LocalDateTime newDateTime) {
 		Recorrido route;
 		if ((route = getRecorrido(id)) == null)
-			throw new IllegalStateException("the route isn't in the system");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE);
 		if (newDateTime == null)
 			throw new IllegalArgumentException("newDateTime is null");
 		if (route.getDateTime().equals(newDateTime))
@@ -429,7 +437,7 @@ public class System {
 	public void updateRecorrido(String id, LocalDate newDate, LocalTime newTime) {
 		Recorrido route;
 		if ((route = getRecorrido(id)) == null)
-			throw new IllegalStateException("the route isn't in the system");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE);
 		if (newDate == null)
 			throw new IllegalArgumentException("newDateTime is null");
 		if (newTime == null)
@@ -468,7 +476,7 @@ public class System {
 		if (recorrido == null)
 			throw new IllegalArgumentException("El recorrido no puede ser null");
 		if (localizador == null)
-			throw new IllegalArgumentException("El localizador no puede ser null");
+			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (numBilletesReservar > recorrido.getNumAvailableSeats())
 			throw new IllegalStateException(
 					"No se puede reservar si el número de billetes es mayor a los asientos disponibles");
@@ -476,7 +484,7 @@ public class System {
 			throw new IllegalStateException(
 					"No se puede reservar si el número de asientos disponibles es menor a la mitad del número total de asientos");
 		if (localizador.equals(""))
-			throw new IllegalArgumentException("El localizador no puede ser vacio");
+			throw new IllegalArgumentException(LOCALIZADOR_VACIO);
 		for (Billete billetes : this.tickets) {
 			if (billetes.getLocalizador().equals(localizador))
 				throw new IllegalStateException("Ese localizador ya ha sido utilizado");
@@ -484,7 +492,7 @@ public class System {
 		if (!routes.contains(recorrido))
 			throw new IllegalStateException("El recorrido no existe en el sistema");
 
-		List<Billete> billetesReservados = new ArrayList<Billete>();
+		List<Billete> billetesReservados = new ArrayList<>();
 		for (int i = 0; i < numBilletesReservar; i++) {
 			Billete billete = new Billete(localizador, recorrido, user, ESTADO_RESERVADO);
 			billetesReservados.add(billete);
@@ -514,9 +522,9 @@ public class System {
 	 */
 	public void anularReserva(String localizador, int numBilletesAnular) {
 		if (localizador == null)
-			throw new IllegalArgumentException("El localizador no puede ser null");
+			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (localizador.equals(""))
-			throw new IllegalArgumentException("El localizador no puede ser vacio");
+			throw new IllegalArgumentException(LOCALIZADOR_VACIO);
 		if (numBilletesAnular < 1)
 			throw new IllegalArgumentException("No se puede reservar si el número de billetes es menor que 1");
 		List<Billete> packBilletes = new ArrayList<>();
@@ -557,9 +565,9 @@ public class System {
 	 */
 	public void devolverBilletes(String localizador, int numBilletesDevolver) {
 		if (localizador == null)
-			throw new IllegalArgumentException("El localizador no puede ser null");
+			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (localizador.equals(""))
-			throw new IllegalArgumentException("El localizador no puede ser vacio");
+			throw new IllegalArgumentException(LOCALIZADOR_VACIO);
 		if (numBilletesDevolver < 1)
 			throw new IllegalArgumentException("No se puede reservar si el número de billetes es menor que 1");
 		List<Billete> packBilletes = new ArrayList<>();
@@ -609,9 +617,9 @@ public class System {
 	 */
 	public List<Billete> comprarBilletes(String localizador, Usuario usr, Recorrido recorrido, int numBilletes) {
 		if (localizador == null)
-			throw new IllegalArgumentException("El localizador es nulo\n");
+			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (localizador.isEmpty())
-			throw new IllegalArgumentException("El localizador esta vacio\n");
+			throw new IllegalArgumentException(LOCALIZADOR_VACIO);
 		for (Billete tiket : tickets) {
 			if (tiket.getLocalizador().equals(localizador)) {
 				throw new IllegalArgumentException("El localizador ya a sido usado\n");
@@ -655,15 +663,15 @@ public class System {
 	 */
 	private List<Billete> getBilletes(String locator) {
 		if (locator == null)
-			throw new IllegalArgumentException("locator is null");
+			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (locator.isBlank() || locator.length() > 8)
 			throw new IllegalArgumentException("locator must be between 1 and 8 characters longs");
-		List<Billete> tickets = new ArrayList<>();
+		List<Billete> ticketsTemp = new ArrayList<>();
 		for (Billete ticket : this.tickets) {
 			if (ticket.getLocalizador().equals(locator))
-				tickets.add(ticket);
+				ticketsTemp.add(ticket);
 		}
-		return tickets;
+		return ticketsTemp;
 	}
 
 	/**
@@ -680,10 +688,11 @@ public class System {
 	 *                                  with that locator
 	 */
 	public List<Billete> comprarBilletesReservados(String locator) {
-		List<Billete> tickets;
-		if ((tickets = getBilletes(locator)).isEmpty())
+		List<Billete> ticketsTemp;
+		ticketsTemp = getBilletes(locator);
+		if (ticketsTemp.isEmpty())
 			throw new IllegalStateException("the is no tickets for this locator: " + locator);
-		for (Billete ticket : tickets) {
+		for (Billete ticket : ticketsTemp) {
 			try {
 				ticket.setComprado();
 			} catch (IllegalStateException e) {
@@ -691,7 +700,7 @@ public class System {
 				throw new IllegalStateException("the are no tickets booked with that locator");
 			}
 		}
-		return tickets;
+		return ticketsTemp;
 
 	}
 }
