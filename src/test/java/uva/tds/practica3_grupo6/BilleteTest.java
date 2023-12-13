@@ -137,7 +137,7 @@ class BilleteTest {
 		b2.setComprado();
 		assertNotEquals(ticket,b2);
 
-		assertNotEquals(ticket,false);
+		assertNotEquals(false, ticket);
 	}
 
 	@Test
