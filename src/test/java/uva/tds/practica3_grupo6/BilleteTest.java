@@ -50,7 +50,7 @@ class BilleteTest {
 	}
 
 	@Test
-	public void testLocalizadorValidoConEstadoComprado() {
+	void testLocalizadorValidoConEstadoComprado() {
 		Billete billete = new Billete("ABC12345", recorrido, user, ESTADO_COMPRADO);
 		assertEquals("ABC12345", billete.getLocalizador());
 		assertEquals(user, billete.getUsuario());
@@ -59,7 +59,7 @@ class BilleteTest {
 	}
 
 	@Test
-	public void testLocalizadorValidoConEstadoReservado() {
+	void testLocalizadorValidoConEstadoReservado() {
 		Billete billete = new Billete("ABC12345", recorrido, user, ESTADO_RESERVADO);
 		assertEquals("ABC12345", billete.getLocalizador());
 		assertEquals(user, billete.getUsuario());
@@ -68,7 +68,7 @@ class BilleteTest {
 	}
 
 	@Test
-	public void testLocalizadorInvalidoDemasiadoCorto() {
+	void testLocalizadorInvalidoDemasiadoCorto() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			new Billete("", recorrido, user, ESTADO_COMPRADO);
 		});
@@ -76,7 +76,7 @@ class BilleteTest {
 	}
 
 	@Test
-	public void testLocalizadorInvalidoDemasiadoLargo() {
+	void testLocalizadorInvalidoDemasiadoLargo() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			new Billete("123456789", recorrido, user, ESTADO_COMPRADO);
 		});
@@ -84,7 +84,7 @@ class BilleteTest {
 	}
 
 	@Test
-	public void testUsuarioNull() {
+	void testUsuarioNull() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			new Billete("1234567890", recorrido, null, ESTADO_COMPRADO);
 		});
@@ -92,7 +92,7 @@ class BilleteTest {
 	}
 
 	@Test
-	public void testRecorridoNull() {
+	void testRecorridoNull() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			new Billete("1234567890", null, user, ESTADO_COMPRADO);
 		});
