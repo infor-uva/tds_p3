@@ -142,6 +142,31 @@ class TrainRecorridoTest {
 			new TrainRecorrido(id, connection, price, dateTime, 251);
 		});
 	}
+
+	@Test
+	void testConstructorCopiaValido() {
+		TrainRecorrido recorridoCopia = new TrainRecorrido(recorrido);
+		assertNotNull(recorridoCopia);
+		assertEquals(recorrido.getID(), recorridoCopia.getID());
+		assertEquals(recorrido.getConnection(), recorridoCopia.getConnection());
+		assertEquals(recorrido.getOrigin(), recorridoCopia.getOrigin());
+		assertEquals(recorrido.getDestination(), recorridoCopia.getDestination());
+		assertEquals(recorrido.getDuration(), recorridoCopia.getDuration());
+		assertEquals(recorrido.getTransport(), recorridoCopia.getTransport());
+		assertEquals(recorrido.getPrice(), recorridoCopia.getPrice(), ERROR_MARGIN);
+		assertEquals(recorrido.getDateTime(), recorridoCopia.getDateTime());
+		assertEquals(recorrido.getNumAvailableSeats(), recorridoCopia.getNumAvailableSeats());
+		assertEquals(recorrido.hashCode(), recorridoCopia.hashCode());
+		assertEquals(recorrido, recorridoCopia);
+		assertNotSame(recorrido, recorridoCopia);
+	}
+
+	@Test
+	void testConstructorCopiaConNull() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			new BusRecorrido(null);
+		});
+	}
 	
 	@Test
 	void testSetTransportNull() {
@@ -330,7 +355,7 @@ class TrainRecorridoTest {
 	
 	@Test
 	void testEqualsValido() {
-		TrainRecorrido same = (TrainRecorrido) Recorrido.copyOf(recorrido);
+		TrainRecorrido same = new TrainRecorrido(recorrido);
 		TrainRecorrido different = new TrainRecorrido("dif", connection, price, dateTime, numAvailableSeats);
 		assertEquals(recorrido, recorrido);
 		assertEquals(recorrido, same);
@@ -385,15 +410,8 @@ class TrainRecorridoTest {
 	
 	@Test
 	void testCopyOfValido() {
-		TrainRecorrido copy = (TrainRecorrido) Recorrido.copyOf(recorrido);
+		TrainRecorrido copy = new TrainRecorrido(recorrido);
 		assertEquals(recorrido, copy);
 		assertNotSame(recorrido, copy);
-	}
-
-	@Test
-	void testCopyOfConNull() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			Recorrido.copyOf(null);
-		});
 	}
 }

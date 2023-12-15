@@ -32,9 +32,37 @@ public class TrainRecorrido extends Recorrido {
 	 */
 	public static final double DISCOUNT = 0.1;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param id
+	 * @param connection
+	 * @param price
+	 * @param dateTime
+	 * @param numSeats
+	 * 
+	 * @throws IllegalArgumentException if id is null
+	 * @throws IllegalArgumentException if id have less than 1 character
+	 * @throws IllegalArgumentException if price is less than 0
+	 * @throws IllegalArgumentException if dateTime is null
+	 * @throws IllegalArgumentException if numSeats is less than 1 or more than
+	 *                                  {@link TrainRecorrido#MAX_NUM_SEATS}
+	 */
 	public TrainRecorrido(String id, Connection connection, double price, LocalDateTime dateTime, int numSeats) {
 		super(id, connection, Transport.TRAIN, price, dateTime, numSeats);
 		checkNumSeats(numSeats);
+	}
+
+	/**
+	 * Create a copy of an existing TrainRecorrido or transform a other type of
+	 * recorrido in TrainRecorrido with the same attribute values
+	 * 
+	 * @param r Recorrido to copy or convert
+	 * 
+	 * @throws IllegalArgumentException if r is null
+	 */
+	public TrainRecorrido(Recorrido r) {
+		super(r);
 	}
 
 	/**

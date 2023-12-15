@@ -83,6 +83,25 @@ public abstract class Recorrido {
 	}
 
 	/**
+	 * Create a copy of an existing Recorrido with the same attribute values
+	 * 
+	 * @param r Recorrido to copy
+	 * 
+	 * @throws IllegalArgumentException if r is null
+	 */
+	protected Recorrido(Recorrido r) {
+		if (r == null)
+			throw new IllegalArgumentException("r is null");
+		setId(r.getID());
+		setConnection(r.getConnection());
+		setTransport(r.getTransport());
+		updateDateTime(r.getDateTime());
+		setPrice(r.getPrice());
+		setTotalSeats(r.getTotalSeats());
+		setNumAvailableSeats(r.getNumAvailableSeats());
+	}
+
+	/**
 	 * Set the id
 	 * 
 	 * @param id to set
@@ -90,22 +109,22 @@ public abstract class Recorrido {
 	 * @throws IllegalArgumentException if id is null
 	 * @throws IllegalArgumentException if id have less than 1 character
 	 */
-	public void setId(String id) {
+	protected void setId(String id) {
 		if (id == null)
 			throw new IllegalArgumentException("id is null");
 		if (id.isEmpty())
 			throw new IllegalArgumentException("id is empty");
 		this.id = id;
 	}
-	
+
 	/**
 	 * Set the transport for this route
-	 *  
+	 * 
 	 * @param transport to set
 	 * 
 	 * @throws IllegalArgumentException if transport is null
 	 */
-	public void setTransport(Transport transport) {
+	protected void setTransport(Transport transport) {
 		if (transport == null)
 			throw new IllegalArgumentException("transport is null");
 		this.transport = transport;
@@ -118,7 +137,7 @@ public abstract class Recorrido {
 	 * 
 	 * @throws IllegalArgumentException if id is null
 	 */
-	public void setConnection(Connection connection) {
+	protected void setConnection(Connection connection) {
 		if (connection == null)
 			throw new IllegalArgumentException("the connection is null");
 		this.connection = connection;
@@ -131,12 +150,12 @@ public abstract class Recorrido {
 	 * 
 	 * @throws IllegalArgumentException if price is less than 0
 	 */
-	public void setPrice(double price) {
+	protected void setPrice(double price) {
 		if (price < 0)
 			throw new IllegalArgumentException("price is less than 0");
 		this.price = price;
 	}
-	
+
 	/**
 	 * Check if the number of seats is more than 0
 	 * 
@@ -144,11 +163,11 @@ public abstract class Recorrido {
 	 * 
 	 * @throws IllegalArgumentException if numSeats is less than 1
 	 */
-	private void checkNumSeatsIsPositive(int numSeats) {
+	private void checkNumSeatsIfPositive(int numSeats) {
 		if (numSeats < 1)
 			throw new IllegalArgumentException("the num of seats is less than 1");
 	}
-	
+
 	/**
 	 * Set the total seats for the route
 	 * 
@@ -157,10 +176,10 @@ public abstract class Recorrido {
 	 * @throws IllegalArgumentException if numSeats is less than 1
 	 */
 	public void setTotalSeats(int numSeats) {
-		checkNumSeatsIsPositive(numSeats);
+		checkNumSeatsIfPositive(numSeats);
 		this.totalSeats = numSeats;
 	}
-	
+
 	/**
 	 * Set the number of available seats for the route
 	 * 
@@ -168,8 +187,8 @@ public abstract class Recorrido {
 	 * 
 	 * @throws IllegalArgumentException if numSeats is less than 1
 	 */
-	public void setNumAvailableSeats(int numSeats) {
-		checkNumSeatsIsPositive(numSeats);
+	protected void setNumAvailableSeats(int numSeats) {
+		checkNumSeatsIfPositive(numSeats);
 		this.numAvailableSeats = numSeats;
 	}
 
@@ -389,7 +408,6 @@ public abstract class Recorrido {
 		this.numAvailableSeats += numSeats;
 	}
 
-	
 	@Override
 	public int hashCode() {
 		return Objects.hash(connection, dateTime, id, numAvailableSeats, price, totalSeats, transport);
@@ -412,23 +430,5 @@ public abstract class Recorrido {
 				&& numAvailableSeats == other.numAvailableSeats
 				&& Double.doubleToLongBits(price) == Double.doubleToLongBits(other.price)
 				&& transport == other.transport;
-	}
-
-	public static Recorrido copyOf(Recorrido r) {
-		if (r == null)
-			throw new IllegalArgumentException("r is null");
-		Recorrido copy = null;
-		if (r instanceof BusRecorrido) {
-			BusRecorrido bus = (BusRecorrido) r;
-			copy = new BusRecorrido(bus.getID(), bus.getConnection(), bus.getPrice(), bus.getDateTime(),
-					bus.getTotalSeats());
-		} else {
-			//  Train recorrido
-			TrainRecorrido train = (TrainRecorrido) r;
-			copy = new TrainRecorrido(train.getID(), train.getConnection(), train.getPrice(), train.getDateTime(),
-					train.getTotalSeats());
-		}
-		copy.numAvailableSeats = r.numAvailableSeats;
-		return copy;
 	}
 }

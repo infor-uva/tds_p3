@@ -30,7 +30,7 @@ class ConnectionTest {
 		assertEquals(origin, c.getOrigin());
 		assertEquals(destination, c.getDestination());
 		assertEquals(duration, c.getDuration());
-		assertNotNull(c.hashCode());
+		assertNotEquals(0, c.hashCode());
 	}
 	
 	@Test

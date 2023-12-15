@@ -139,6 +139,31 @@ class BusRecorridoTest {
 			new BusRecorrido(id, connection, price, dateTime, 51);
 		});
 	}
+
+	@Test
+	void testConstructorCopiaValido() {
+		BusRecorrido recorridoCopia = new BusRecorrido(recorrido);
+		assertNotNull(recorridoCopia);
+		assertEquals(recorrido.getID(), recorridoCopia.getID());
+		assertEquals(recorrido.getConnection(), recorridoCopia.getConnection());
+		assertEquals(recorrido.getOrigin(), recorridoCopia.getOrigin());
+		assertEquals(recorrido.getDestination(), recorridoCopia.getDestination());
+		assertEquals(recorrido.getDuration(), recorridoCopia.getDuration());
+		assertEquals(recorrido.getTransport(), recorridoCopia.getTransport());
+		assertEquals(recorrido.getPrice(), recorridoCopia.getPrice(), ERROR_MARGIN);
+		assertEquals(recorrido.getDateTime(), recorridoCopia.getDateTime());
+		assertEquals(recorrido.getNumAvailableSeats(), recorridoCopia.getNumAvailableSeats());
+		assertEquals(recorrido.hashCode(), recorridoCopia.hashCode());
+		assertEquals(recorrido, recorridoCopia);
+		assertNotSame(recorrido, recorridoCopia);
+	}
+
+	@Test
+	void testConstructorCopiaConNull() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			new BusRecorrido(null);
+		});
+	}
 	
 	@Test
 	void testSetTransportNull() {
@@ -325,7 +350,7 @@ class BusRecorridoTest {
 
 	@Test
 	void testEquals() {
-		BusRecorrido same = (BusRecorrido) Recorrido.copyOf(recorrido);
+		BusRecorrido same = new BusRecorrido(recorrido);
 		BusRecorrido different = new BusRecorrido("dif", connection, price, dateTime, numAvailableSeats);
 		assertEquals(recorrido, recorrido);
 		assertEquals(recorrido, same);
@@ -365,7 +390,7 @@ class BusRecorridoTest {
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConNumAvailableSeatsDifferentDiferentes() {
-		BusRecorrido other = (BusRecorrido) Recorrido.copyOf(recorrido);
+		BusRecorrido other = new BusRecorrido(recorrido);
 		other.decreaseAvailableSeats(2);
 		assertNotEquals(recorrido, other);
 	}
@@ -375,19 +400,5 @@ class BusRecorridoTest {
 	void testEqualsConTotalSeatsDiferentes() {
 		BusRecorrido other = new BusRecorrido(id, connection, price, dateTime, 32);
 		assertNotEquals(recorrido, other);
-	}
-
-	@Test
-	void testCopyOfValido() {
-		BusRecorrido copy = (BusRecorrido) Recorrido.copyOf(recorrido);
-		assertEquals(recorrido, copy);
-		assertNotSame(recorrido, copy);
-	}
-	
-	@Test
-	void testCopyOfConNull() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			Recorrido.copyOf(null);
-		});
 	}
 }

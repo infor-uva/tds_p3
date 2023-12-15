@@ -53,10 +53,10 @@
 	</target>
 	<target name="sonarqube" depends="obtenerInformeCobertura">
 		<exec dir="." executable="${executable}">
-			<arg line="${arglineIni}mvn clean verify sonar:sonar \
-  					-Dsonar.projectKey=tds-practica3-grupo6 \
-  					-Dsonar.projectName='tds-practica3-grupo6' \
-  					-Dsonar.host.url=http://localhost:9000 \
+			<arg line="${arglineIni}mvn clean verify sonar:sonar 
+  					-Dsonar.projectKey=tds-practica3-grupo6
+  					-Dsonar.projectName='tds-practica3-grupo6'
+  					-Dsonar.host.url=http://localhost:9000
   					-Dsonar.token=sqp_4d891e2fbe0d52627c7a68137751a6e06e6d2841${arglineEnd}" />
 		</exec>
 	</target>

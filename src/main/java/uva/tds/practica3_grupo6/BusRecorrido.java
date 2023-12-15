@@ -42,6 +42,18 @@ public class BusRecorrido extends Recorrido {
 	}
 
 	/**
+	 * Create a copy of an existing BusRecorrido or transform a other type of
+	 * recorrido in BusRecorrido with the same attribute values
+	 * 
+	 * @param r Recorrido to copy or convert
+	 * 
+	 * @throws IllegalArgumentException if r is null
+	 */
+	public BusRecorrido(Recorrido r) {
+		super(r);
+	}
+
+	/**
 	 * Decrease the number of available seats
 	 * 
 	 * @param numSeats to decrease
