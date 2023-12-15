@@ -68,7 +68,7 @@ class BusRecorridoTest {
 		assertEquals(price, recorrido.getPrice(), ERROR_MARGIN);
 		assertEquals(dateTime, recorrido.getDateTime());
 		assertEquals(numAvailableSeats, recorrido.getNumAvailableSeats());
-		assertNotNull(recorrido.hashCode());
+		assertNotEquals(0, recorrido.hashCode());
 	}
 
 	@Test
@@ -88,7 +88,7 @@ class BusRecorridoTest {
 		assertEquals(price, recorrido.getPrice(), ERROR_MARGIN);
 		assertEquals(dateTime, recorrido.getDateTime());
 		assertEquals(numAvailableSeats, recorrido.getNumAvailableSeats());
-		assertNotNull(recorrido.hashCode());
+		assertNotEquals(0, recorrido.hashCode());
 	}
 
 	@Test
@@ -163,8 +163,9 @@ class BusRecorridoTest {
 
 	@Test
 	void testUpdateDateConDateActual() {
+		LocalDate date = recorrido.getDate();
 		assertThrows(IllegalStateException.class, () -> {
-			recorrido.updateDate(recorrido.getDate());
+			recorrido.updateDate(date);
 		});
 	}
 
@@ -184,8 +185,9 @@ class BusRecorridoTest {
 
 	@Test
 	void testUpdateTimeConTimeActual() {
+		LocalTime time = recorrido.getTime();
 		assertThrows(IllegalStateException.class, () -> {
-			recorrido.updateTime(recorrido.getTime());
+			recorrido.updateTime(time);
 		});
 	}
 
@@ -221,8 +223,10 @@ class BusRecorridoTest {
 
 	@Test
 	void testUpdateDateTimeConDateYTimeActual() {
+		LocalDate date = recorrido.getDate();
+		LocalTime time = recorrido.getTime();
 		assertThrows(IllegalStateException.class, () -> {
-			recorrido.updateDateTime(recorrido.getDate(), recorrido.getTime());
+			recorrido.updateDateTime(date, time);
 		});
 	}
 
@@ -235,8 +239,9 @@ class BusRecorridoTest {
 
 	@Test
 	void testUpdateDateTimeConDateTimeActual() {
+		LocalDateTime dateTime = recorrido.getDateTime();
 		assertThrows(IllegalStateException.class, () -> {
-			recorrido.updateDateTime(recorrido.getDateTime());
+			recorrido.updateDateTime(dateTime);
 		});
 	}
 
@@ -271,7 +276,7 @@ class BusRecorridoTest {
 	}
 	
 	@Test
-	void testDecreaseAvailableSeatsConNumSeatsMayorQueNumAivailableSeats() {
+	void testDecreaseAvailableSeatsConNumSeatsMayorQueNumAvailableSeats() {
 		recorrido.decreaseAvailableSeats(45);
 		assertThrows(IllegalStateException.class, () -> {
 			recorrido.decreaseAvailableSeats(6);
@@ -311,7 +316,7 @@ class BusRecorridoTest {
 	}
 	
 	@Test
-	void testIncreaseAvailableSeatsConNumSeatsMayorQueNumAivailableSeats() {
+	void testIncreaseAvailableSeatsConNumSeatsMayorQueNumAvailableSeats() {
 		recorrido.decreaseAvailableSeats(5);
 		assertThrows(IllegalStateException.class, () -> {
 			recorrido.increaseAvailableSeats(6);
@@ -320,7 +325,7 @@ class BusRecorridoTest {
 
 	@Test
 	void testEquals() {
-		BusRecorrido same = recorrido.clone();
+		BusRecorrido same = (BusRecorrido) Recorrido.copyOf(recorrido);
 		BusRecorrido different = new BusRecorrido("dif", connection, price, dateTime, numAvailableSeats);
 		assertEquals(recorrido, recorrido);
 		assertEquals(recorrido, same);
@@ -331,7 +336,7 @@ class BusRecorridoTest {
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConConnectionsDiferentes() {
-		Connection c = new Connection("diferent", "diferent2", 12);
+		Connection c = new Connection("different", "different2", 12);
 		BusRecorrido other = new BusRecorrido(id, c, price, dateTime, numAvailableSeats);
 		assertNotEquals(recorrido, other);
 	}
@@ -353,14 +358,14 @@ class BusRecorridoTest {
 	@Test
 	@Tag("Cobertura")
 	void testEqualsConDateTimeDiferentes() {
-		BusRecorrido other = new BusRecorrido(id, connection, price, newDateTime, numAvailableSeats);
+		BusRecorrido other = new BusRecorrido(id, connection, price, newDateTime, BusRecorrido.MAX_NUM_SEATS);
 		assertNotEquals(recorrido, other);
 	}
 
 	@Test
 	@Tag("Cobertura")
-	void testEqualsConNumAvailableSeatsDiferentDiferentes() {
-		BusRecorrido other = recorrido.clone();
+	void testEqualsConNumAvailableSeatsDifferentDiferentes() {
+		BusRecorrido other = (BusRecorrido) Recorrido.copyOf(recorrido);
 		other.decreaseAvailableSeats(2);
 		assertNotEquals(recorrido, other);
 	}
@@ -373,13 +378,16 @@ class BusRecorridoTest {
 	}
 
 	@Test
-	void testClone() {
-		// Comprobar con numSeas y numAvailableSeats no iguales
-		recorrido.decreaseAvailableSeats(5);
-
-		BusRecorrido clone = recorrido.clone();
-
-		assertEquals(recorrido, clone);
-		assertNotSame(recorrido, clone);
+	void testCopyOfValido() {
+		BusRecorrido copy = (BusRecorrido) Recorrido.copyOf(recorrido);
+		assertEquals(recorrido, copy);
+		assertNotSame(recorrido, copy);
+	}
+	
+	@Test
+	void testCopyOfConNull() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			Recorrido.copyOf(null);
+		});
 	}
 }

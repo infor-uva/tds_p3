@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * @author hugcubi
  * @author migudel
  * 
- * @version 12/12/23
+ * @version 13/12/23
  */
 public class BusRecorrido extends Recorrido {
 
@@ -86,20 +86,4 @@ public class BusRecorrido extends Recorrido {
 		checkNumSeats(numSeats);
 		super.increaseAvailableSeats(numSeats);
 	}
-
-	/**
-	 * Create a copy of this instance of BusRecorrido with the same values of the
-	 * attributes but not are the same object.
-	 * 
-	 * @return clone of the instance
-	 */
-	@Override
-	public BusRecorrido clone() {
-		BusRecorrido clone = new BusRecorrido(getID(), getConnection(), getPrice(), getDateTime(), getTotalSeats());
-		int decreased;
-		if ((decreased = getTotalSeats() - getNumAvailableSeats()) != 0)
-			clone.decreaseAvailableSeats(decreased);
-		return clone;
-	}
-
 }

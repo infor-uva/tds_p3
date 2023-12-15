@@ -19,7 +19,7 @@ import java.util.Objects;
  * @author hugcubi
  * @author migudel
  * 
- * @version 11/12/23
+ * @version 13/12/23
  */
 public abstract class Recorrido {
 
@@ -71,12 +71,11 @@ public abstract class Recorrido {
 	 * @throws IllegalArgumentException if dateTime is null
 	 * @throws IllegalArgumentException if numSeats is less than 1
 	 */
-	public Recorrido(String id, Connection connection, Transport transport, double price, LocalDateTime dateTime,
+	protected Recorrido(String id, Connection connection, Transport transport, double price, LocalDateTime dateTime,
 			int numSeats) {
 		setId(id);
-		setConecction(connection);
+		setConnection(connection);
 		setTransport(transport);
-		// TODO Preguntar si se puede usar esto, tengo que usar un setter o ambos
 		updateDateTime(dateTime);
 		setPrice(price);
 		setTotalSeats(numSeats);
@@ -119,7 +118,7 @@ public abstract class Recorrido {
 	 * 
 	 * @throws IllegalArgumentException if id is null
 	 */
-	public void setConecction(Connection connection) {
+	public void setConnection(Connection connection) {
 		if (connection == null)
 			throw new IllegalArgumentException("the connection is null");
 		this.connection = connection;
@@ -390,14 +389,6 @@ public abstract class Recorrido {
 		this.numAvailableSeats += numSeats;
 	}
 
-	/**
-	 * Create a copy of this instance of Recorrido with the same values of the
-	 * attributes but not are the same object.
-	 * 
-	 * @return clone of the instance
-	 */
-	public abstract Recorrido clone();
-
 	
 	@Override
 	public int hashCode() {
@@ -421,5 +412,23 @@ public abstract class Recorrido {
 				&& numAvailableSeats == other.numAvailableSeats
 				&& Double.doubleToLongBits(price) == Double.doubleToLongBits(other.price)
 				&& transport == other.transport;
+	}
+
+	public static Recorrido copyOf(Recorrido r) {
+		if (r == null)
+			throw new IllegalArgumentException("r is null");
+		Recorrido copy = null;
+		if (r instanceof BusRecorrido) {
+			BusRecorrido bus = (BusRecorrido) r;
+			copy = new BusRecorrido(bus.getID(), bus.getConnection(), bus.getPrice(), bus.getDateTime(),
+					bus.getTotalSeats());
+		} else {
+			//  Train recorrido
+			TrainRecorrido train = (TrainRecorrido) r;
+			copy = new TrainRecorrido(train.getID(), train.getConnection(), train.getPrice(), train.getDateTime(),
+					train.getTotalSeats());
+		}
+		copy.numAvailableSeats = r.numAvailableSeats;
+		return copy;
 	}
 }

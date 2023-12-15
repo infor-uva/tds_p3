@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
  * @author hugcubi
  * @author migudel
  * 
- * @version 12/12/23
+ * @version 13/12/23
  */
 public class TrainRecorrido extends Recorrido {
 
@@ -94,14 +94,4 @@ public class TrainRecorrido extends Recorrido {
 		checkNumSeats(numSeats);
 		super.increaseAvailableSeats(numSeats);
 	}
-
-	@Override
-	public TrainRecorrido clone() {
-		TrainRecorrido clone = new TrainRecorrido(getID(), getConnection(), getPrice(), getDateTime(), getTotalSeats());
-		int decreased;
-		if ((decreased = getTotalSeats() - getNumAvailableSeats()) != 0)
-			clone.decreaseAvailableSeats(decreased);
-		return clone;
-	}
-
 }
