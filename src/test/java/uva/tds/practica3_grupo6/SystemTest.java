@@ -1158,7 +1158,9 @@ class SystemTest {
 		system.reservarBilletes(localizadorA, user, recorrido, numBilletesReservar);
 		system.reservarBilletes(localizadorB, user, recorrido, numBilletesReservar);
 		
+		int numAsientosAntes = recorrido.getNumAvailableSeats();
 		system.anularReserva(localizadorA, numBilletesAnular);
+		assertEquals(numAsientosAntes + numBilletesAnular, recorrido.getNumAvailableSeats());
 	}
 	
 	@Test
@@ -1171,8 +1173,9 @@ class SystemTest {
 		system.addRecorrido(recorrido);
 		system.comprarBilletes(localizadorA, user, recorrido, numBilletesComprar);
 		system.comprarBilletes(localizadorB, user, recorrido, numBilletesDevolver);
-		
+		int numAsientosAntes = recorrido.getNumAvailableSeats();
 		system.devolverBilletes(localizadorA, numBilletesDevolver);
+		assertEquals(numAsientosAntes + numBilletesDevolver, recorrido.getNumAvailableSeats());
 	}
 
 }
