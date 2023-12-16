@@ -6,8 +6,13 @@ import java.time.LocalTime;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -27,7 +32,8 @@ import javax.persistence.Table;
  * @version 13/12/23
  */
 @Entity
-@Table(name="RECORRIDO")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "TRANSPORT")
 public abstract class Recorrido {
 
 	/**
@@ -40,12 +46,15 @@ public abstract class Recorrido {
 	 * Connection from the start of the route to the destination and the time that
 	 * lasts
 	 */
+	@Column(name="CONNECTION")
+	@ManyToOne
+	@JoinColumn(name="CONNECTION_ID", referencedColumnName = "ID")
 	private Connection connection;
 	/**
 	 * The transport will be used in the route
 	 */
 	@Column(name="TRANSPORT")
-	private Transport transport;
+	private TransportType transport;
 	/**
 	 * The price of the route
 	 */
@@ -85,7 +94,7 @@ public abstract class Recorrido {
 	 * @throws IllegalArgumentException if dateTime is null
 	 * @throws IllegalArgumentException if numSeats is less than 1
 	 */
-	protected Recorrido(String id, Connection connection, Transport transport, double price, LocalDateTime dateTime,
+	protected Recorrido(String id, Connection connection, TransportType transport, double price, LocalDateTime dateTime,
 			int numSeats) {
 		setId(id);
 		setConnection(connection);
@@ -138,7 +147,7 @@ public abstract class Recorrido {
 	 * 
 	 * @throws IllegalArgumentException if transport is null
 	 */
-	protected void setTransport(Transport transport) {
+	protected void setTransport(TransportType transport) {
 		if (transport == null)
 			throw new IllegalArgumentException("transport is null");
 		this.transport = transport;
@@ -256,7 +265,7 @@ public abstract class Recorrido {
 	 * 
 	 * @return transport
 	 */
-	public Transport getTransport() {
+	public TransportType getTransport() {
 		return transport;
 	}
 

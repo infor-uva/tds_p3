@@ -4,12 +4,21 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="CONNECTION")
 public class Connection {
 
+	/**
+	 * The id of the connection
+	 */
+	@Id
+	@Column(name="ID")
+	@GeneratedValue
+	private int id;
 	/**
 	 * The origin of the route (where the route start)
 	 */

@@ -64,7 +64,7 @@ class BusRecorridoTest {
 		assertEquals(connection.getOrigin(), recorrido.getOrigin());
 		assertEquals(connection.getDestination(), recorrido.getDestination());
 		assertEquals(connection.getDuration(), recorrido.getDuration());
-		assertEquals(Transport.BUS, recorrido.getTransport());
+		assertEquals(TransportType.BUS, recorrido.getTransport());
 		assertEquals(price, recorrido.getPrice(), ERROR_MARGIN);
 		assertEquals(dateTime, recorrido.getDateTime());
 		assertEquals(numAvailableSeats, recorrido.getNumAvailableSeats());
@@ -84,7 +84,7 @@ class BusRecorridoTest {
 		assertEquals(connection.getOrigin(), recorrido.getOrigin());
 		assertEquals(connection.getDestination(), recorrido.getDestination());
 		assertEquals(connection.getDuration(), recorrido.getDuration());
-		assertEquals(Transport.BUS, recorrido.getTransport());
+		assertEquals(TransportType.BUS, recorrido.getTransport());
 		assertEquals(price, recorrido.getPrice(), ERROR_MARGIN);
 		assertEquals(dateTime, recorrido.getDateTime());
 		assertEquals(numAvailableSeats, recorrido.getNumAvailableSeats());

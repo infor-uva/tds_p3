@@ -2,9 +2,12 @@ package uva.tds.practica3_grupo6;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 /**
  * A child of {@link Recorrido} who represent the routes in which the transport
- * is {@link Transport#TRAIN}. The limit of seats for this type of route is
+ * is {@link TransportType#TRAIN}. The limit of seats for this type of route is
  * {@link BusRecorrido#MAX_NUM_SEATS}. This type of routes have a discount of
  * {@link TrainRecorrido#DISCOUNT} of the original price, can consult both with
  * the next getters:
@@ -21,6 +24,8 @@ import java.time.LocalDateTime;
  * 
  * @version 13/12/23
  */
+@Entity
+@DiscriminatorValue("TRAIN")
 public class TrainRecorrido extends Recorrido {
 
 	/**
@@ -49,7 +54,7 @@ public class TrainRecorrido extends Recorrido {
 	 *                                  {@link TrainRecorrido#MAX_NUM_SEATS}
 	 */
 	public TrainRecorrido(String id, Connection connection, double price, LocalDateTime dateTime, int numSeats) {
-		super(id, connection, Transport.TRAIN, price, dateTime, numSeats);
+		super(id, connection, TransportType.TRAIN, price, dateTime, numSeats);
 		checkNumSeats(numSeats);
 	}
 

@@ -2,9 +2,12 @@ package uva.tds.practica3_grupo6;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 /**
  * A child of {@link Recorrido} who represent the routes in which the transport
- * is {@link Transport#BUS}. The limit of seats for this type of route is
+ * is {@link TransportType#BUS}. The limit of seats for this type of route is
  * {@link BusRecorrido#MAX_NUM_SEATS}
  * 
  * @author diebomb
@@ -13,6 +16,8 @@ import java.time.LocalDateTime;
  * 
  * @version 13/12/23
  */
+@Entity
+@DiscriminatorValue("BUS")
 public class BusRecorrido extends Recorrido {
 
 	/**
@@ -37,7 +42,7 @@ public class BusRecorrido extends Recorrido {
 	 *                                  {@link BusRecorrido#MAX_NUM_SEATS}
 	 */
 	public BusRecorrido(String id, Connection connection, double price, LocalDateTime dateTime, int numSeats) {
-		super(id, connection, Transport.BUS, price, dateTime, numSeats);
+		super(id, connection, TransportType.BUS, price, dateTime, numSeats);
 		checkNumSeats(numSeats);
 	}
 
