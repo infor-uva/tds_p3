@@ -30,8 +30,6 @@ import org.junit.jupiter.api.Test;
 class SistemaPersistenciaTest {
 
 	private static final double ERROR_MARGIN = 0.00001;
-	private static final String BUS = Recorrido.BUS;
-	private static final String TRAIN = Recorrido.TRAIN;
 	private static final String ESTADO_RESERVADO = Billete.ESTADO_RESERVADO;
 	private static final String ESTADO_COMPRADO = Billete.ESTADO_COMPRADO;
 
@@ -41,16 +39,12 @@ class SistemaPersistenciaTest {
 	private Usuario differentUser;
 	private String id;
 	private String idLI;
-	private String origin;
-	private String destination;
-	private String transport;
+	private Connection connection;
 	private double price;
-	private LocalDate date;
-	private LocalTime time;
-	private int duration;
-	private Recorrido recorrido;
-	private Recorrido recorridoLI;
-	private Recorrido differentRecorrido;
+	private LocalDateTime dateTime;
+	private BusRecorrido recorrido;
+	private BusRecorrido recorridoLI;
+	private TrainRecorrido differentRecorrido;
 	private int numSeats;
 	private LocalDateTime newDateTime;
 	private LocalDate newDate;
@@ -69,20 +63,15 @@ class SistemaPersistenciaTest {
 		user = new Usuario(nif, nombre);
 		differentUser = new Usuario("79105889B", nombre);
 		id = "c12345";
-		idLI = "c";
-		origin = "Valladolid";
-		destination = "Galicia";
-		transport = BUS;
-		date = LocalDate.of(2023, 10, 27);
-		time = LocalTime.of(19, 06, 50);
+		connection = new Connection("Valladolid", "Palencia", 30);
+		dateTime = LocalDateTime.of(2023, 10, 27, 19, 06, 50);
 		price = 1.0;
 		numSeats = 50;
-		duration = 250;
-		recorrido = new Recorrido(id, origin, destination, transport, price, date, time, numSeats, duration);
-		recorridoLI = new Recorrido(idLI, origin, destination, transport, price, date, time, numSeats, duration);
-		transport = TRAIN;
-		differentRecorrido = new Recorrido("dif", origin, destination, transport, price, date, time, numSeats,
-				duration);
+		recorrido = new BusRecorrido(id, connection, price, dateTime, numSeats);
+		differentRecorrido = new TrainRecorrido("train", connection, price, dateTime, numSeats);
+		idLI = "i";
+		recorridoLI = new BusRecorrido(idLI, connection, price, dateTime, numSeats);
+
 		newDateTime = LocalDateTime.of(2023, 5, 14, 22, 56, 20);
 		newDate = LocalDate.of(2024, 2, 4);
 		newTime = LocalTime.of(12, 2, 4);
@@ -147,9 +136,10 @@ class SistemaPersistenciaTest {
 		EasyMock.replay(database);
 
 		sistema.addRecorrido(recorrido);
-		assertEquals(recorrido, recorrido);
+		Recorrido recorridoCopia = new BusRecorrido(recorrido);
+		assertEquals(recorridoCopia, recorrido);
 		assertThrows(IllegalStateException.class, () -> {
-			sistema.addRecorrido(recorrido);
+			sistema.addRecorrido(recorridoCopia);
 		});
 
 		EasyMock.verify(database);
@@ -217,14 +207,14 @@ class SistemaPersistenciaTest {
 		Billete ticket = new Billete(locator, recorrido, usuario, ESTADO_COMPRADO);
 		returned.add(ticket);
 
-		// addReocorrido
+		// addRecorrido
 		database.addRecorrido(recorrido);
 		EasyMock.expectLastCall();
 		// comprarBilletes
 		EasyMock.expect(database.getBilletes(locator)).andReturn(new ArrayList<>());
 		database.addBillete(ticket);
 		EasyMock.expectLastCall();
-		Recorrido modificado = recorrido.clone();
+		Recorrido modificado = new BusRecorrido(recorrido);
 		modificado.decreaseAvailableSeats(1);
 		database.actualizarRecorrido(modificado);
 		EasyMock.expectLastCall();
@@ -269,7 +259,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete(localizador, recorrido, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall().times(numBilletes);
 		
-		Recorrido clonRecorrido= recorrido.clone();
+		Recorrido clonRecorrido= new BusRecorrido(recorrido);
 		clonRecorrido.decreaseAvailableSeats(numBilletes);
 
 		database.actualizarRecorrido(clonRecorrido);
@@ -305,8 +295,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete(localizador, differentRecorrido, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall().times(numBilletes);
 
-		Recorrido clonRecorrido = new Recorrido("dif", origin, destination, TRAIN, price, date, time, numSeats,
-				duration);
+		Recorrido clonRecorrido = new TrainRecorrido(differentRecorrido);
 		clonRecorrido.decreaseAvailableSeats(numBilletes);
 
 		database.actualizarRecorrido(clonRecorrido);
@@ -410,6 +399,7 @@ class SistemaPersistenciaTest {
 	 */
 	@Test
 	void testGetRecorridosDisponiblesFecha() {
+		LocalDate date = dateTime.toLocalDate();
 		ArrayList<Recorrido> returned = new ArrayList<>();
 		returned.add(recorrido);
 		returned.add(differentRecorrido);
@@ -442,6 +432,7 @@ class SistemaPersistenciaTest {
 	@Tag("Cobertura")
 	@Test
 	void testGetRecorridosDisponiblesFechaSinRecorridos() {
+		LocalDate date = dateTime.toLocalDate();
 		EasyMock.expect(database.getRecorridos(date)).andReturn(null);
 		EasyMock.replay(database);
 		assertThrows(IllegalStateException.class, () -> {
@@ -467,7 +458,7 @@ class SistemaPersistenciaTest {
 		EasyMock.expect(database.getBilletes(locator)).andReturn(new ArrayList<>());
 		database.addBillete(new Billete(locator, recorrido, user, ESTADO_RESERVADO));
 		EasyMock.expectLastCall().times(1);
-		Recorrido modificado = recorrido.clone();
+		Recorrido modificado = new BusRecorrido(recorrido);
 		modificado.decreaseAvailableSeats(1);
 		database.actualizarRecorrido(modificado);
 		EasyMock.expectLastCall().times(1);
@@ -475,7 +466,7 @@ class SistemaPersistenciaTest {
 		EasyMock.expect(database.getBilletes(locator)).andReturn(new ArrayList<>());
 		database.addBillete(new Billete(locator, recorrido, differentUser, ESTADO_COMPRADO));
 		EasyMock.expectLastCall().times(2);
-		Recorrido modificado2 = modificado.clone();
+		Recorrido modificado2 = new BusRecorrido(modificado);
 		modificado2.decreaseAvailableSeats(2);
 		database.actualizarRecorrido(modificado2);
 		EasyMock.expectLastCall().times(1);
@@ -714,8 +705,9 @@ class SistemaPersistenciaTest {
 		EasyMock.replay(database);
 
 		sistema.addRecorrido(recorrido);
+		LocalDate date = recorrido.getDate();
 		assertThrows(IllegalStateException.class, () -> {
-			sistema.updateRecorridoDate(id, recorrido.getDate());
+			sistema.updateRecorridoDate(id, date);
 		});
 
 		EasyMock.verify(database);
@@ -755,7 +747,7 @@ class SistemaPersistenciaTest {
 	}
 
 	@Test
-	void testUpdateRecorridoTimeConRecorridoFueraDelsystem() {
+	void testUpdateRecorridoTimeConRecorridoFueraDelSystem() {
 		EasyMock.expect(database.getRecorrido(id)).andReturn(null);
 		EasyMock.replay(database);
 
@@ -789,8 +781,9 @@ class SistemaPersistenciaTest {
 		EasyMock.replay(database);
 
 		sistema.addRecorrido(recorrido);
+		LocalTime time = recorrido.getTime();
 		assertThrows(IllegalStateException.class, () -> {
-			sistema.updateRecorridoTime(id, recorrido.getTime());
+			sistema.updateRecorridoTime(id, time);
 		});
 
 		EasyMock.verify(database);
@@ -864,8 +857,9 @@ class SistemaPersistenciaTest {
 		EasyMock.replay(database);
 
 		sistema.addRecorrido(recorrido);
+		LocalDateTime dateTime = recorrido.getDateTime();
 		assertThrows(IllegalStateException.class, () -> {
-			sistema.updateRecorridoDateTime(id, recorrido.getDateTime());
+			sistema.updateRecorridoDateTime(id, dateTime);
 		});
 
 		EasyMock.verify(database);
@@ -898,7 +892,7 @@ class SistemaPersistenciaTest {
 	}
 
 	@Test
-	void testUpdateRecorridoConRecorridoFueraDelsystem() {
+	void testUpdateRecorridoConRecorridoFueraDelSystem() {
 		EasyMock.expect(database.getRecorrido(id)).andReturn(null);
 		EasyMock.replay(database);
 
@@ -945,9 +939,11 @@ class SistemaPersistenciaTest {
 		EasyMock.expect(database.getRecorrido(id)).andReturn(recorrido);
 		EasyMock.replay(database);
 
+		LocalTime time = recorrido.getTime();
+		LocalDate date = recorrido.getDate();
 		sistema.addRecorrido(recorrido);
 		assertThrows(IllegalStateException.class, () -> {
-			sistema.updateRecorrido(id, recorrido.getDate(), recorrido.getTime());
+			sistema.updateRecorrido(id, date, time);
 		});
 
 		EasyMock.verify(database);
@@ -966,7 +962,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete("ABC12345", recorrido, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall();
 
-		Recorrido clonRecorrido = recorrido.clone();
+		Recorrido clonRecorrido = new BusRecorrido(recorrido);
 		clonRecorrido.decreaseAvailableSeats(1);
 
 		database.actualizarRecorrido(clonRecorrido);
@@ -995,7 +991,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete("ABC12345", recorrido, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall().times(50);
 
-		Recorrido clonRecorrido = recorrido.clone();
+		Recorrido clonRecorrido = new BusRecorrido(recorrido);
 		clonRecorrido.decreaseAvailableSeats(50);
 
 		database.actualizarRecorrido(clonRecorrido);
@@ -1027,8 +1023,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete(localizador, differentRecorrido, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall();
 
-		Recorrido clonRecorrido = new Recorrido("dif", origin, destination, TRAIN, price, date, time, numSeats,
-				duration);
+		Recorrido clonRecorrido = new BusRecorrido(differentRecorrido);
 		clonRecorrido.decreaseAvailableSeats(1);
 
 		database.actualizarRecorrido(clonRecorrido);
@@ -1055,11 +1050,11 @@ class SistemaPersistenciaTest {
 
 		EasyMock.expect(database.getBilletes(localizador)).andReturn(new ArrayList<>());
 
-		Recorrido rec = new Recorrido("dif", origin, destination, TRAIN, price, date, time, 250, duration);
+		Recorrido rec = new TrainRecorrido("dif", connection, price, dateTime, 250);
 		database.addBillete(new Billete(localizador, rec, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall().times(250);
 
-		Recorrido clonRecorrido = new Recorrido("dif", origin, destination, TRAIN, price, date, time, 250, duration);
+		Recorrido clonRecorrido = new TrainRecorrido(rec);
 		clonRecorrido.decreaseAvailableSeats(250);
 
 		database.actualizarRecorrido(clonRecorrido);
@@ -1114,7 +1109,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete("ABC12345", recorrido, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall().times(49);
 
-		Recorrido clonRecorrido = recorrido.clone();
+		Recorrido clonRecorrido = new BusRecorrido(recorrido);
 		clonRecorrido.decreaseAvailableSeats(49);
 
 		database.actualizarRecorrido(clonRecorrido);
@@ -1135,11 +1130,11 @@ class SistemaPersistenciaTest {
 	@Test
 	void testComprarBilleteTrainInvalidoLimiteSuperiorDemasiadaCompras() {
 		EasyMock.expect(database.getBilletes("ABC12345")).andReturn(new ArrayList<>());
-		Recorrido rec = new Recorrido("dif", origin, destination, TRAIN, price, date, time, 250, duration);
+		Recorrido rec = new TrainRecorrido("dif", connection, price, dateTime, 250);
 		database.addBillete(new Billete("ABC12345", rec, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall().times(249);
 
-		Recorrido clonRecorrido = new Recorrido("dif", origin, destination, TRAIN, price, date, time, 250, duration);
+		Recorrido clonRecorrido = new TrainRecorrido(rec);
 		clonRecorrido.decreaseAvailableSeats(249);
 
 		database.actualizarRecorrido(clonRecorrido);
@@ -1172,7 +1167,7 @@ class SistemaPersistenciaTest {
 
 	@Test
 	void testComprarBilleteLocalizadorYaUsadoMismoRecorrido() {
-		Recorrido rec = new Recorrido("dif", origin, destination, TRAIN, price, date, time, 250, duration);
+		Recorrido rec = new TrainRecorrido("dif", connection, price, dateTime, 250);;
 		Billete tiket = new Billete("ABC12345", rec, user, ESTADO_COMPRADO);
 		ArrayList<Billete> returned = new ArrayList<>();
 		returned.add(tiket);
@@ -1181,7 +1176,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(tiket);
 		EasyMock.expectLastCall().times(2);
 
-		Recorrido clonRecorrido = rec.clone();
+		Recorrido clonRecorrido = new BusRecorrido(rec);
 		clonRecorrido.decreaseAvailableSeats(2);
 
 		database.actualizarRecorrido(clonRecorrido);
@@ -1200,7 +1195,7 @@ class SistemaPersistenciaTest {
 
 	@Test
 	void testComprarBilleteLocalizadorYaUsadoDistinoRecorridoRecorrido() {
-		Recorrido rec = new Recorrido("dif", origin, destination, TRAIN, price, date, time, 250, duration);
+		Recorrido rec = new TrainRecorrido("dif", connection, price, dateTime, 250);
 		Billete tiket = new Billete("ABC12345", rec, user, ESTADO_COMPRADO);
 		ArrayList<Billete> returned = new ArrayList<>();
 		returned.add(tiket);
@@ -1209,7 +1204,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(tiket);
 		EasyMock.expectLastCall().times(2);
 
-		Recorrido clonRecorrido = rec.clone();
+		Recorrido clonRecorrido = new BusRecorrido(rec);
 		clonRecorrido.decreaseAvailableSeats(2);
 
 		database.actualizarRecorrido(clonRecorrido);
@@ -1253,8 +1248,8 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete(localizador, differentRecorrido, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall();
 
-		Recorrido clonRecorridoPrimero = recorrido.clone();
-		Recorrido clonRecorrido = differentRecorrido.clone();
+		Recorrido clonRecorridoPrimero = new BusRecorrido(recorrido);
+		Recorrido clonRecorrido = new TrainRecorrido(differentRecorrido);
 		clonRecorridoPrimero.decreaseAvailableSeats(1);
 		clonRecorrido.decreaseAvailableSeats(1);
 
@@ -1292,7 +1287,7 @@ class SistemaPersistenciaTest {
 		EasyMock.expect(database.getBilletes(locator)).andReturn(new ArrayList<>()).times(1);
 		database.addBillete(new Billete(locator, recorrido, user, ESTADO_RESERVADO));
 		EasyMock.expectLastCall().times(3);
-		Recorrido routeMD = recorrido.clone();
+		Recorrido routeMD = new BusRecorrido(recorrido);
 		routeMD.decreaseAvailableSeats(3);
 		database.actualizarRecorrido(routeMD);
 		EasyMock.expectLastCall().times(1);
@@ -1328,7 +1323,7 @@ class SistemaPersistenciaTest {
 		EasyMock.expect(database.getBilletes(locator)).andReturn(new ArrayList<>()).times(1);
 		database.addBillete(new Billete(locator, recorrido, user, ESTADO_RESERVADO));
 		EasyMock.expectLastCall().times(3);
-		Recorrido routeMD = recorrido.clone();
+		Recorrido routeMD = new BusRecorrido(recorrido);
 		routeMD.decreaseAvailableSeats(3);
 		database.actualizarRecorrido(routeMD);
 		EasyMock.expectLastCall().times(1);
@@ -1403,7 +1398,7 @@ class SistemaPersistenciaTest {
 		EasyMock.expect(database.getBilletes(locator)).andReturn(new ArrayList<>()).times(1);
 		database.addBillete(new Billete(locator, recorrido, user, ESTADO_RESERVADO));
 		EasyMock.expectLastCall().times(2);
-		Recorrido routeMD = recorrido.clone();
+		Recorrido routeMD = new BusRecorrido(recorrido);
 		routeMD.decreaseAvailableSeats(2);
 		database.actualizarRecorrido(routeMD);
 		EasyMock.expectLastCall().times(1);
@@ -1437,7 +1432,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete(localizador, recorrido, user, ESTADO_RESERVADO));
 		EasyMock.expectLastCall().times(numBilletesReservar);
 
-		Recorrido recorridoCopia = recorrido.clone();
+		Recorrido recorridoCopia = new BusRecorrido(recorrido);
 		recorridoCopia.decreaseAvailableSeats(numBilletesReservar);
 		database.actualizarRecorrido(recorridoCopia);
 		EasyMock.expectLastCall();
@@ -1508,7 +1503,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete("ABC12345", recorrido, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall().times(numBilletesComprar);
 
-		Recorrido clonRecorrido = recorrido.clone();
+		Recorrido clonRecorrido = new BusRecorrido(recorrido);
 		clonRecorrido.decreaseAvailableSeats(numBilletesComprar);
 
 		database.actualizarRecorrido(clonRecorrido);
@@ -1541,7 +1536,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete(localizador, recorrido, user, ESTADO_RESERVADO));
 		EasyMock.expectLastCall().times(numBilletesReservar);
 
-		Recorrido recorridoCopia = recorrido.clone();
+		Recorrido recorridoCopia = new BusRecorrido(recorrido);
 		recorridoCopia.decreaseAvailableSeats(numBilletesReservar);
 		database.actualizarRecorrido(recorridoCopia);
 		EasyMock.expectLastCall();
@@ -1555,7 +1550,7 @@ class SistemaPersistenciaTest {
 		EasyMock.expectLastCall();
 		database.addBillete(new Billete(localizador, recorridoCopia, user, ESTADO_RESERVADO));
 		EasyMock.expectLastCall().times(numBilletesReservar - numBilletesAnular);
-		Recorrido recorridoCopiaCopia = recorridoCopia.clone();
+		Recorrido recorridoCopiaCopia = new BusRecorrido(recorridoCopia);
 		recorridoCopiaCopia.increaseAvailableSeats(numBilletesAnular);
 		database.actualizarRecorrido(recorridoCopiaCopia);
 		EasyMock.expectLastCall();
@@ -1585,7 +1580,7 @@ class SistemaPersistenciaTest {
 	}
 
 	@Test
-	void testNoSePuedeAnularReservaSiLocalizadorVacío() {
+	void testNoSePuedeAnularReservaSiLocalizadorVacio() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			sistema.anularReserva("", 1);
 		});
@@ -1624,7 +1619,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete(localizador, recorrido, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall().times(numBilletesComprar);
 
-		Recorrido clonRecorrido = recorrido.clone();
+		Recorrido clonRecorrido = new BusRecorrido(recorrido);;
 		clonRecorrido.decreaseAvailableSeats(numBilletesComprar);
 
 		database.actualizarRecorrido(clonRecorrido);
@@ -1661,7 +1656,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete(localizador, recorrido, user, ESTADO_RESERVADO));
 		EasyMock.expectLastCall().times(numBilletesReservar);
 
-		Recorrido recorridoCopia = recorrido.clone();
+		Recorrido recorridoCopia = new BusRecorrido(recorrido);
 		recorridoCopia.decreaseAvailableSeats(numBilletesReservar);
 		database.actualizarRecorrido(recorridoCopia);
 		EasyMock.expectLastCall();
@@ -1695,7 +1690,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete(localizador, recorrido, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall().times(numBilletesComprar);
 
-		Recorrido recorridoCopia = recorrido.clone();
+		Recorrido recorridoCopia = new BusRecorrido(recorrido);
 		recorridoCopia.decreaseAvailableSeats(numBilletesComprar);
 		database.actualizarRecorrido(recorridoCopia);
 		EasyMock.expectLastCall();
@@ -1712,7 +1707,7 @@ class SistemaPersistenciaTest {
 		EasyMock.expectLastCall();
 		database.addBillete(new Billete(localizador, recorridoCopia, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall().times(numBilletesComprar - numBilletesDevolver);
-		Recorrido recorridoCopiaCopia = recorridoCopia.clone();
+		Recorrido recorridoCopiaCopia = new BusRecorrido(recorridoCopia);
 		recorridoCopiaCopia.increaseAvailableSeats(numBilletesDevolver);
 		database.actualizarRecorrido(recorridoCopiaCopia);
 		EasyMock.expect(database.getRecorrido(recorrido.getID())).andReturn(recorridoCopiaCopia);
@@ -1727,7 +1722,6 @@ class SistemaPersistenciaTest {
 		// Realiza la anulación de la reserva
 		sistema.devolverBilletes(localizador, numBilletesDevolver);
 
-		// TODO Revisar
 		int plazasDisponiblesDespues = database.getRecorrido(recorrido.getID()).getNumAvailableSeats();
 
 		// Verifica que las plazas disponibles aumenten en la cantidad correcta
@@ -1744,7 +1738,7 @@ class SistemaPersistenciaTest {
 	}
 
 	@Test
-	void testNoSePuedeDevolverBilletesSiLocalizadorVacío() {
+	void testNoSePuedeDevolverBilletesSiLocalizadorVacio() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			sistema.devolverBilletes("", 1);
 		});
@@ -1787,7 +1781,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete(localizador, recorrido, user, ESTADO_RESERVADO));
 		EasyMock.expectLastCall().times(numBilletesReservar);
 
-		Recorrido recorridoCopia = recorrido.clone();
+		Recorrido recorridoCopia = new BusRecorrido(recorrido);
 		recorridoCopia.decreaseAvailableSeats(numBilletesReservar);
 		database.actualizarRecorrido(recorridoCopia);
 		EasyMock.expectLastCall();
@@ -1821,7 +1815,7 @@ class SistemaPersistenciaTest {
 		EasyMock.expect(database.getBilletes("ABC12345")).andReturn(new ArrayList<>()).times(1);
 		database.addBillete(new Billete(locator, recorrido, user, ESTADO_COMPRADO));
 		EasyMock.expectLastCall().times(numBilletesComprar);
-		Recorrido clon = recorrido.clone();
+		Recorrido clon = new BusRecorrido(recorrido);
 		clon.decreaseAvailableSeats(numBilletesComprar);
 		database.actualizarRecorrido(clon);
 		EasyMock.expectLastCall();
@@ -1852,7 +1846,7 @@ class SistemaPersistenciaTest {
 		database.addUsuario(user);
 		EasyMock.expectLastCall();
 
-		Recorrido recorridoCopia = recorrido.clone();
+		Recorrido recorridoCopia = new BusRecorrido(recorrido);
 		recorridoCopia.decreaseAvailableSeats(numBilletesComprar);
 		database.actualizarRecorrido(recorridoCopia);
 		EasyMock.expectLastCall();
@@ -1883,7 +1877,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete(localizador, recorrido, user, ESTADO_RESERVADO));
 		EasyMock.expectLastCall().times(numBilletesReservar);
 
-		Recorrido recorridoCopia = recorrido.clone();
+		Recorrido recorridoCopia = new BusRecorrido(recorrido);
 		recorridoCopia.decreaseAvailableSeats(numBilletesReservar);
 		database.actualizarRecorrido(recorridoCopia);
 		EasyMock.expectLastCall();
@@ -1918,7 +1912,7 @@ class SistemaPersistenciaTest {
 		database.addBillete(new Billete(localizador, recorrido, user, ESTADO_RESERVADO));
 		EasyMock.expectLastCall().times(numBilletesReservar);
 
-		Recorrido recorridoCopia = recorrido.clone();
+		Recorrido recorridoCopia = new BusRecorrido(recorrido);
 		recorridoCopia.decreaseAvailableSeats(numBilletesReservar);
 		database.actualizarRecorrido(recorridoCopia);
 		EasyMock.expectLastCall();
@@ -1931,7 +1925,7 @@ class SistemaPersistenciaTest {
 		EasyMock.expect(database.getBilletes(localizador)).andReturn(returned).times(1);
 		database.eliminarBilletes(localizador);
 		EasyMock.expectLastCall();
-		Recorrido recorridoCopiaCopia = recorridoCopia.clone();
+		Recorrido recorridoCopiaCopia = new BusRecorrido(recorridoCopia);
 		recorridoCopiaCopia.increaseAvailableSeats(numBilletesAnular);
 		database.actualizarRecorrido(recorridoCopiaCopia);
 		EasyMock.expectLastCall();
@@ -1958,7 +1952,7 @@ class SistemaPersistenciaTest {
 		database.addUsuario(user);
 		EasyMock.expectLastCall();
 
-		Recorrido recorridoCopia = recorrido.clone();
+		Recorrido recorridoCopia = new BusRecorrido(recorrido);
 		recorridoCopia.decreaseAvailableSeats(numBilletesComprar);
 		database.actualizarRecorrido(recorridoCopia);
 		EasyMock.expectLastCall();
@@ -1970,7 +1964,7 @@ class SistemaPersistenciaTest {
 		EasyMock.expect(database.getBilletes(locator)).andReturn(returned).times(1);
 		database.eliminarBilletes(locator);
 		EasyMock.expectLastCall();
-		Recorrido recorridoCopiaCopia = recorridoCopia.clone();
+		Recorrido recorridoCopiaCopia = new BusRecorrido(recorridoCopia);
 		recorridoCopiaCopia.increaseAvailableSeats(numBilletesDevolver);
 		database.actualizarRecorrido(recorridoCopiaCopia);
 		EasyMock.expectLastCall();
