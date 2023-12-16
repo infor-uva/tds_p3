@@ -94,8 +94,7 @@ public abstract class Recorrido {
 	 * @throws IllegalArgumentException if dateTime is null
 	 * @throws IllegalArgumentException if numSeats is less than 1
 	 */
-	protected Recorrido(String id, Connection connection, TransportType transport, double price, LocalDateTime dateTime,
-			int numSeats) {
+	protected Recorrido(String id, Connection connection, TransportType transport, double price, LocalDateTime dateTime, int numSeats) {
 		setId(id);
 		setConnection(connection);
 		setTransport(transport);

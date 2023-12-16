@@ -23,7 +23,7 @@ import javax.persistence.Table;
  * @version 09/11/23
  */
 @Entity
-@Table(name="BILLETE")
+@Table(name="Billete")
 public class Billete {
 
 	public static final String ESTADO_COMPRADO = "comprado";

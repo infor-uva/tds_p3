@@ -1,12 +1,14 @@
 package uva.tds.practica3_grupo6;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 public class DatabaseManager implements IDatabaseManager {
@@ -21,14 +23,22 @@ public class DatabaseManager implements IDatabaseManager {
 		Session session = getSession();
 		
 		try {
-			session.beginTransaction();
+			Transaction tx=session.beginTransaction();
 			
-			session.persist(recorrido);
+			Connection connection = new Connection("Valladolid", "Palencia", 30);
+		    session.save(connection);
+		    
+		    BusRecorrido recorrido2 = new BusRecorrido("ide", connection, 20, LocalDateTime.of(2023, 10, 27, 19, 06, 50), 40);
+		    session.save(recorrido2);
+		    
+		    session.flush();
+		    tx.commit();
 			
 		} catch(HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
+			
 			session.close();
 		}
 	}
@@ -46,7 +56,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.beginTransaction();
 			session.delete(idRecorrido, getRecorrido(idRecorrido));
 			
-			session.flush();
 		} catch(HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
@@ -68,7 +77,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.beginTransaction();
 			session.refresh(recorrido);
 			
-			session.flush();
 		} catch(HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
@@ -104,8 +112,7 @@ public class DatabaseManager implements IDatabaseManager {
 		
 		try {
 			session.beginTransaction();
-			List<Recorrido> recorridosList = session.createQuery("FROM RECORRIDO", Recorrido.class).list();
-			
+			List<Recorrido> recorridosList = session.createQuery("FROM Recorrido", Recorrido.class).list();
 			lista.addAll(recorridosList);
 			return lista;
 			
@@ -151,7 +158,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.beginTransaction();
 			
 			session.persist(usuario);
-			session.flush();
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
@@ -173,7 +179,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.beginTransaction();
 			session.delete(idUsuario, getUsuario(idUsuario));
 			
-			session.flush();
 		} catch(HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
@@ -195,7 +200,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.beginTransaction();
 			session.refresh(usuario);
 			
-			session.flush();
 		} catch(HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
@@ -233,7 +237,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.beginTransaction();
 			
 			session.persist(billete);
-			session.flush();
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
@@ -255,7 +258,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.beginTransaction();
 			session.delete(localizadorBillete, getRecorrido(localizadorBillete));
 			
-			session.flush();
 		} catch(HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
@@ -276,7 +278,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.beginTransaction();
 			
 			session.refresh(billete);
-			session.flush();
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();

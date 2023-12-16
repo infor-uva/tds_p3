@@ -25,7 +25,7 @@ import javax.persistence.Table;
  * @version 09/10/23
  */
 @Entity
-@Table(name="USUARIO")
+@Table(name="Usuario")
 public class Usuario {
 	
 	@ElementCollection
