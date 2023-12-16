@@ -5,6 +5,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * Class dedicated for the representation of the route.
  * 
@@ -21,11 +26,16 @@ import java.util.Objects;
  * 
  * @version 13/12/23
  */
+@Entity
+@Table(name="RECORRIDO")
 public abstract class Recorrido {
 
 	/**
 	 * Identification of the route
 	 */
+	@Id
+	
+	@Column(name="ID")
 	private String id;
 	/**
 	 * Connection from the start of the route to the destination and the time that
@@ -33,26 +43,31 @@ public abstract class Recorrido {
 	 */
 	private Connection connection;
 	/**
-	 * Type of transport train
+	 * The transport will be used in the route
 	 */
+	@Column(name="TRANSPORT")
 	private Transport transport;
 	/**
 	 * The price of the route
 	 */
+	@Column(name="PRICE")
 	private double price;
 	/**
 	 * DateTime of the route
 	 */
+	@Column(name="DATETIME")
 	private LocalDateTime dateTime;
 	/**
 	 * Number of seats on the route
 	 */
+	@Column(name="TOTALSEATS")
 	private int totalSeats;
 	/**
 	 * Number of available seats on the route
 	 */
+	@Column(name="NUMAVAILABLESEATS")
 	private int numAvailableSeats;
-
+	
 	/**
 	 * Constructor
 	 * 

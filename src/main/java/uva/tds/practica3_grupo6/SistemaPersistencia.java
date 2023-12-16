@@ -80,6 +80,14 @@ public class SistemaPersistencia {
 	 * External dabatabe manager
 	 */
 	private IDatabaseManager database;
+	
+	/**
+	 * Lista de Excepciones
+	 */
+	
+	private static final String EXCEPTION_NOT_ROUTE_ID = "the id's route isn't in the system\n";
+	private static final String LOCALIZADOR_NULL = "El localizador no puede ser null\n";
+	private static final String LOCALIZADOR_VACIO = "El localizador no puede ser vacio\n";
 
 	/**
 	 * Instance the System
@@ -149,7 +157,7 @@ public class SistemaPersistencia {
 		} catch (IllegalStateException e2) {
 			throw e2;
 		}
-		if (tmp.size() > 0)
+		if (!tmp.isEmpty())
 			throw new IllegalStateException("the route has associated tickets");
 		database.eliminarRecorrido(id);
 	}
@@ -233,8 +241,7 @@ public class SistemaPersistencia {
 			throw new IllegalArgumentException("La fecha es nula\n");
 		if (database.getRecorridos(fecha) == null)
 			throw new IllegalStateException("Para la fecha no hay recorridos disponibles\n");
-		ArrayList<Recorrido> listaRecorridos = database.getRecorridos(fecha);
-		return listaRecorridos;
+		return database.getRecorridos(fecha);
 	}
 
 	/**
@@ -271,7 +278,7 @@ public class SistemaPersistencia {
 		checkID(id);
 		Recorrido route;
 		if ((route = database.getRecorrido(id)) == null)
-			throw new IllegalStateException("the id's route isn't in the system");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		return route.getDate();
 	}
 
@@ -291,7 +298,7 @@ public class SistemaPersistencia {
 		checkID(id);
 		Recorrido route;
 		if ((route = database.getRecorrido(id)) == null)
-			throw new IllegalStateException("the id's route isn't in the system");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		return route.getTime();
 	}
 
@@ -311,7 +318,7 @@ public class SistemaPersistencia {
 		checkID(id);
 		Recorrido route;
 		if ((route = database.getRecorrido(id)) == null)
-			throw new IllegalStateException("the id's route isn't in the system");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		return route.getDateTime();
 	}
 
@@ -331,7 +338,7 @@ public class SistemaPersistencia {
 		checkID(id);
 		Recorrido route;
 		if ((route = database.getRecorrido(id)) == null)
-			throw new IllegalStateException("the id's route isn't in the system");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		try {
 			route.updateDate(newDate);
 		} catch (IllegalArgumentException e1) {
@@ -357,7 +364,7 @@ public class SistemaPersistencia {
 		checkID(id);
 		Recorrido route;
 		if ((route = database.getRecorrido(id)) == null)
-			throw new IllegalStateException("the id's route isn't in the system");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		try {
 			route.updateTime(newTime);
 		} catch (IllegalArgumentException e1) {
@@ -383,7 +390,7 @@ public class SistemaPersistencia {
 		checkID(id);
 		Recorrido route;
 		if ((route = database.getRecorrido(id)) == null)
-			throw new IllegalStateException("the id's route isn't in the system");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		try {
 			route.updateDateTime(newDateTime);
 		} catch (IllegalArgumentException e1) {
@@ -411,7 +418,7 @@ public class SistemaPersistencia {
 		checkID(id);
 		Recorrido route;
 		if ((route = database.getRecorrido(id)) == null)
-			throw new IllegalStateException("the id's route isn't in the system");
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		try {
 			route.updateDateTime(newDate, newTime);
 		} catch (IllegalArgumentException e1) {
@@ -448,13 +455,13 @@ public class SistemaPersistencia {
 		if(recorrido == null)
 			throw new IllegalArgumentException("El recorrido no puede ser null");
 		if(localizador == null)
-			throw new IllegalArgumentException("El localizador no puede ser null");
+			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (numBilletesReservar > recorrido.getNumAvailableSeats())
 			throw new IllegalStateException("No se puede reservar si el número de billetes es mayor a los asientos disponibles");
 		if (recorrido.getNumAvailableSeats() < recorrido.getTotalSeats()/2)
 			throw new IllegalStateException("No se puede reservar si el número de asientos disponibles es menor a la mitad del número total de asientos");
 		if (localizador.equals(""))
-			throw new IllegalArgumentException("El localizador no puede ser vacio");
+			throw new IllegalArgumentException(LOCALIZADOR_VACIO);
 		if (!database.getBilletes(localizador).isEmpty()) {
 			throw new IllegalStateException("El localizador ya ha sido utilizado");
 		}
@@ -490,14 +497,14 @@ public class SistemaPersistencia {
 	 */
 	public void anularReserva(String localizador, int numBilletesAnular) {
 		if(localizador == null)
-			throw new IllegalArgumentException("El localizador no puede ser null");
+			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (localizador.equals(""))
-			throw new IllegalArgumentException("El localizador no puede ser vacio");
+			throw new IllegalArgumentException(LOCALIZADOR_VACIO);
 		if (numBilletesAnular < 1)
 			throw new IllegalArgumentException("No se puede reservar si el número de billetes es menor que 1");	
 		
 		ArrayList<Billete> billetes = database.getBilletes(localizador);
-		if(billetes.size() < 1 || 
+		if(billetes.isEmpty() || 
 		!billetes.get(0).getEstado().equals(ESTADO_RESERVADO)) {
 			throw new IllegalStateException("No hay tickets reservados con ese localizador");
 		}
@@ -538,9 +545,9 @@ public class SistemaPersistencia {
 	 */
 	public void devolverBilletes(String localizador, int numBilletesDevolver) {
 		if(localizador == null)
-			throw new IllegalArgumentException("El localizador no puede ser null");
+			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (localizador.equals(""))
-			throw new IllegalArgumentException("El localizador no puede ser vacio");
+			throw new IllegalArgumentException(LOCALIZADOR_VACIO);
 		if (numBilletesDevolver < 1)
 			throw new IllegalArgumentException("No se puede devolver si el número de billetes es menor que 1");	
 		
@@ -597,7 +604,7 @@ public class SistemaPersistencia {
 	 */
 	public List<Billete> comprarBilletes(String localizador, Usuario usr, Recorrido recorrido, int numBilletes) {
 		if(localizador==null)
-			throw new IllegalArgumentException("EL localizador es nulo\n");
+			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (usr == null)
 			throw new IllegalArgumentException("El usuario es null\n");
 		if (recorrido == null)
@@ -639,12 +646,13 @@ public class SistemaPersistencia {
 	 */
 	public List<Billete> comprarBilletesReservados(String locator) {
 		if (locator == null)
-			throw new IllegalArgumentException("locator is null");
+			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (locator.isBlank() || locator.length() > 8)
 			throw new IllegalArgumentException("locator must be between 1 and 8 characters longs");
 
 		List<Billete> tickets;
-		if ((tickets = database.getBilletes(locator)).isEmpty())
+		tickets = database.getBilletes(locator);
+		if (tickets.isEmpty())
 			throw new IllegalStateException("the is no tickets for this locator: " + locator);
 		for (Billete ticket : tickets) {
 			try {
