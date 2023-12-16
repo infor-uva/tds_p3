@@ -2,19 +2,28 @@ package uva.tds.practica3_grupo6;
 
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="CONNECTION")
 public class Connection {
 
 	/**
 	 * The origin of the route (where the route start)
 	 */
+	@Column(name="ORIGIN")
 	private String origin;
 	/**
 	 * The destination of the route (where the route ends)
 	 */
+	@Column(name="DESTINATION")
 	private String destination;
 	/**
 	 * Duration of the connection in minutes
 	 */
+	@Column(name="DURATION")
 	private int duration;
 
 	/**

@@ -34,7 +34,6 @@ public abstract class Recorrido {
 	 * Identification of the route
 	 */
 	@Id
-	
 	@Column(name="ID")
 	private String id;
 	/**
