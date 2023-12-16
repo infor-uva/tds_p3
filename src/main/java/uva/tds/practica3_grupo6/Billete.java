@@ -30,13 +30,12 @@ public class Billete {
 	public static final String ESTADO_RESERVADO = "reservado";
 	
 	@Id
-	@Column(name="LOCALIZADOR")
 	private String localizador;
 	@ManyToOne()
     @JoinColumn(name = "RECORRIDO_ID", referencedColumnName = "ID")
 	private Recorrido recorrido;
 	@ManyToOne()
-    @JoinColumn(name = "USUARIO_ID", referencedColumnName = "ID")
+    @JoinColumn(name = "USUARIO_ID", referencedColumnName = "NIF")
 	private Usuario usuario;
 	@Column(name="ESTADO")
 	private String estado;

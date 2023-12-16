@@ -3,8 +3,11 @@ package uva.tds.practica3_grupo6;
 import java.util.*;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -24,11 +27,12 @@ import javax.persistence.Table;
 @Entity
 @Table(name="USUARIO")
 public class Usuario {
+	
+	@ElementCollection
 	private final List<Character> letrasNif = new ArrayList<>(Arrays.asList('T', 'R', 'W', 'A', 'G', 'M', 'Y', 'F', 'P',
 			'D', 'X', 'B', 'N', 'J', 'Z', 'S', 'Q', 'V', 'H', 'L', 'C', 'K', 'E'));
 	
 	@Id
-	@Column(name="NIF")
 	private String nif;
 	@Column(name="NAME")
 	private String nombre;

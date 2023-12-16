@@ -50,10 +50,8 @@ class SistemaPersistenciaTest {
 	private LocalDate newDate;
 	private LocalTime newTime;
 
-	@Mock
 	private IDatabaseManager database;
 
-	@TestSubject
 	private SistemaPersistencia sistema;
 
 	@BeforeEach
@@ -76,7 +74,7 @@ class SistemaPersistenciaTest {
 		newDate = LocalDate.of(2024, 2, 4);
 		newTime = LocalTime.of(12, 2, 4);
 
-		database = EasyMock.mock(IDatabaseManager.class);
+		database = new DatabaseManager(); 
 
 		sistema = new SistemaPersistencia(database);
 	}
@@ -97,21 +95,11 @@ class SistemaPersistenciaTest {
 	 */
 	@Test
 	void testAddRecorridoValido() {
-		ArrayList<Recorrido> returned = new ArrayList<>();
-		returned.add(recorrido);
-
-		database.addRecorrido(recorrido);
-		EasyMock.expectLastCall();
-		EasyMock.expect(database.getRecorridos()).andReturn(returned).times(1);
-		EasyMock.replay(database);
-
 		sistema.addRecorrido(recorrido);
 		List<Recorrido> recorridos = sistema.getRecorridos();
 		List<Recorrido> recorridosCheck = new ArrayList<>();
 		recorridosCheck.add(recorrido);
 		assertEquals(recorridosCheck, recorridos);
-
-		EasyMock.verify(database);
 	}
 
 	@Test

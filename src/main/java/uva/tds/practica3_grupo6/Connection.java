@@ -16,7 +16,6 @@ public class Connection {
 	 * The id of the connection
 	 */
 	@Id
-	@Column(name="ID")
 	@GeneratedValue
 	private int id;
 	/**

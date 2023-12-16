@@ -8,6 +8,8 @@ import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -40,20 +42,18 @@ public abstract class Recorrido {
 	 * Identification of the route
 	 */
 	@Id
-	@Column(name="ID")
 	private String id;
 	/**
 	 * Connection from the start of the route to the destination and the time that
 	 * lasts
 	 */
-	@Column(name="CONNECTION")
 	@ManyToOne
 	@JoinColumn(name="CONNECTION_ID", referencedColumnName = "ID")
 	private Connection connection;
 	/**
 	 * The transport will be used in the route
 	 */
-	@Column(name="TRANSPORT")
+	@Enumerated(EnumType.STRING)
 	private TransportType transport;
 	/**
 	 * The price of the route

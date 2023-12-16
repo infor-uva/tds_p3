@@ -24,7 +24,7 @@ public class DatabaseManager implements IDatabaseManager {
 			session.beginTransaction();
 			
 			session.persist(recorrido);
-			session.flush();
+			
 		} catch(HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();

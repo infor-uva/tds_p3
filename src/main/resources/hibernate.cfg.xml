@@ -7,7 +7,7 @@
 
 	<session-factory>
 		<property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
-		<property name="connection.url">jdbc:hsqldb:hsql://localhost:8080/</property>
+		<property name="connection.url">jdbc:hsqldb:hsql://localhost:8000</property>
 		<property name="connection.username">sa</property>
 		<property name="connection.password"></property>
 
@@ -29,8 +29,13 @@
 		<!-- Drop and re-create the database schema on startup -->
 		<property name="hbm2ddl.auto">create</property>
 		
-		<mapping class="uva.tds.cartas." />
-		<mapping class="uva.tds.cartas.Deck" />
+		<mapping class="uva.tds.practica3_grupo6.Usuario" />
+		<mapping class="uva.tds.practica3_grupo6.Connection" />
+		<mapping class="uva.tds.practica3_grupo6.Recorrido" />
+		<mapping class="uva.tds.practica3_grupo6.BusRecorrido" />
+		<mapping class="uva.tds.practica3_grupo6.TrainRecorrido" />
+		<mapping class="uva.tds.practica3_grupo6.Billete" />
+
 
 	</session-factory>
 </hibernate-configuration>
