@@ -238,7 +238,7 @@ public class System {
 		double precioTotal = 0;
 		for (Billete tiket : tickets) {
 			if (tiket.getUsuario().getNif().equals(nif)) {
-				if (tiket.getRecorrido().getTransport().equals(TRAIN)) {
+				if (tiket.getRecorrido() instanceof TrainRecorrido) {
 					double precioDescuento = tiket.getRecorrido().getPrice() * 0.9;
 					precioTotal += precioDescuento;
 				} else

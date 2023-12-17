@@ -2,12 +2,14 @@ package uva.tds.practica3_grupo6;
 
 import java.util.*;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -25,7 +27,7 @@ import javax.persistence.Table;
  * @version 09/10/23
  */
 @Entity
-@Table(name="Usuario")
+@Table(name="USUARIO")
 public class Usuario {
 	
 	@ElementCollection
@@ -36,6 +38,18 @@ public class Usuario {
 	private String nif;
 	@Column(name="NAME")
 	private String nombre;
+	
+	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+	private List<Billete> billetes;
+	
+	/**
+	 * Constructor sin parametros
+	 * 
+	 * Ponemos unos valores aleatorios
+	 */
+	public Usuario() {
+		
+	}
 	/**
 	 * Constructor
 	 * 
@@ -93,6 +107,7 @@ public class Usuario {
 		}
 		this.nif = nif;
 		this.nombre = nombre;
+		billetes = new ArrayList<>();
 	}
 
 	/**
@@ -113,6 +128,13 @@ public class Usuario {
 		return this.nombre;
 	}
 
+	public void addBilletes(Billete ticket) {
+		this.billetes.add(ticket);
+	}
+	
+	public void removeBilletes(Billete ticket) {
+		this.billetes.remove(ticket);
+	}
 	/**
 	 * Compare if two Usuarios are the same
 	 * 
@@ -124,14 +146,14 @@ public class Usuario {
 	 */
 	@Override
 	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
 		if (o == null) {
 			throw new IllegalArgumentException("El objeto es nulo\n");
 		}
 		if (getClass() != o.getClass()) {
 			return false;
-		}
-		if (this == o) {
-			return true;
 		}
 		Usuario user = (Usuario) o;
 		return Objects.equals(nif, user.getNif()) && Objects.equals(nombre, user.getNombre());

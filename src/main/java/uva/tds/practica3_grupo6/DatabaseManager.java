@@ -11,52 +11,70 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
+
 public class DatabaseManager implements IDatabaseManager {
 
 	@Override
-	public void addRecorrido(Recorrido recorrido) {
-		if (recorrido == null)
+	public void addRecorrido(Recorrido rec) {
+		if (rec == null) {
 			throw new IllegalArgumentException();
-		if (getRecorrido(recorrido.getID())!= null)
-			throw new IllegalArgumentException("El recorrido con ese id ya existe");
-		
+		}
+
+		if (getRecorrido(rec.getID()) != null) {
+			throw new IllegalArgumentException("El recorrido con ese numero ya existe");
+		}
+
 		Session session = getSession();
-		
+
 		try {
-			Transaction tx=session.beginTransaction();
-			
-			Connection connection = new Connection("Valladolid", "Palencia", 30);
-		    session.save(connection);
-		    
-		    BusRecorrido recorrido2 = new BusRecorrido("ide", connection, 20, LocalDateTime.of(2023, 10, 27, 19, 06, 50), 40);
-		    session.save(recorrido2);
-		    
-		    session.flush();
-		    tx.commit();
-			
-		} catch(HibernateException e) {
+			session.beginTransaction();
+			if (rec instanceof BusRecorrido bus) {
+				session.persist(bus);
+			}
+			if (rec instanceof TrainRecorrido train) {
+				session.persist(train);
+			}
+			if(session.get(Connection.class, rec.getConnection().getId())==null) {
+				session.persist(rec.getConnection());
+			}
+			else {
+				Connection conexion = session.get(Connection.class, rec.getConnection().getId());
+				conexion.addRecorrido(rec);
+				session.save(conexion);
+			}
+			session.flush();
+
+		} catch (HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
-			
 			session.close();
 		}
 	}
 
 	@Override
 	public void eliminarRecorrido(String idRecorrido) {
-		if (idRecorrido == null)
+		if (idRecorrido == null) {
 			throw new IllegalArgumentException();
-		if (getRecorrido(idRecorrido) == null)
-			throw new IllegalArgumentException("El recorrido con ese id no existe");
-		
+		}
+
+		if (getRecorrido(idRecorrido) == null) {
+			throw new IllegalStateException("El recorrido con ese numero no existe");
+		}
+
 		Session session = getSession();
-		
+
 		try {
 			session.beginTransaction();
-			session.delete(idRecorrido, getRecorrido(idRecorrido));
+			Recorrido rec = session.get(Recorrido.class, idRecorrido);
+			Connection conexion = session.get(Connection.class, rec.getConnection().getId());
+			conexion.deleteRecorrido(rec);
+			session.save(conexion);
+			session.delete(rec);
 			
-		} catch(HibernateException e) {
+			session.flush();
+
+		} catch (HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
@@ -76,6 +94,7 @@ public class DatabaseManager implements IDatabaseManager {
 		try {
 			session.beginTransaction();
 			session.refresh(recorrido);
+			session.flush();
 			
 		} catch(HibernateException e) {
 			e.printStackTrace();
@@ -89,17 +108,17 @@ public class DatabaseManager implements IDatabaseManager {
 	@Override
 	public Recorrido getRecorrido(String idRecorrido) {
 		Session session = getSession();
-		
+
 		try {
 			session.beginTransaction();
-			
-			Recorrido recorrido = session.get(Recorrido.class, idRecorrido);
-			return recorrido;
-			
+
+			Recorrido rec = session.get(Recorrido.class, idRecorrido);
+			return rec;
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
-		}finally {
+		} finally {
 			session.close();
 		}
 		return null;
@@ -112,7 +131,7 @@ public class DatabaseManager implements IDatabaseManager {
 		
 		try {
 			session.beginTransaction();
-			List<Recorrido> recorridosList = session.createQuery("FROM Recorrido", Recorrido.class).list();
+			List<Recorrido> recorridosList = session.createQuery("FROM Recorrido", Recorrido.class).getResultList();
 			lista.addAll(recorridosList);
 			return lista;
 			
@@ -132,8 +151,10 @@ public class DatabaseManager implements IDatabaseManager {
 		
 		try {
 			session.beginTransaction();
-			List<Recorrido> recorridosList = session.createQuery("FROM RECORRIDO WHERE DATE = :fecha", Recorrido.class).setParameter("fecha", fecha).list();
-			lista.addAll(recorridosList);
+			List<Recorrido> recorridosList = session.createQuery("FROM Recorrido", Recorrido.class).getResultList();
+			for(Recorrido s: recorridosList) {
+				if(fecha.equals(s.getDate()))lista.add(s);
+			}
 			return lista;
 			
 		} catch (Exception e) {
@@ -158,6 +179,7 @@ public class DatabaseManager implements IDatabaseManager {
 			session.beginTransaction();
 			
 			session.persist(usuario);
+			session.flush();
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
@@ -178,6 +200,7 @@ public class DatabaseManager implements IDatabaseManager {
 		try {
 			session.beginTransaction();
 			session.delete(idUsuario, getUsuario(idUsuario));
+			session.flush();
 			
 		} catch(HibernateException e) {
 			e.printStackTrace();
@@ -199,6 +222,7 @@ public class DatabaseManager implements IDatabaseManager {
 		try {
 			session.beginTransaction();
 			session.refresh(usuario);
+			session.flush();
 			
 		} catch(HibernateException e) {
 			e.printStackTrace();
@@ -237,6 +261,17 @@ public class DatabaseManager implements IDatabaseManager {
 			session.beginTransaction();
 			
 			session.persist(billete);
+			
+			Usuario user = session.get(Usuario.class, billete.getUsuario().getNif());
+			user.addBilletes(billete);
+			session.save(user);
+			
+			Recorrido rec= session.get(Recorrido.class, billete.getRecorrido().getID());
+			rec.addBilletes(billete);
+			rec.decreaseAvailableSeats(1);
+			session.save(rec);
+			
+			session.flush();
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
@@ -256,7 +291,16 @@ public class DatabaseManager implements IDatabaseManager {
 		
 		try {
 			session.beginTransaction();
-			session.delete(localizadorBillete, getRecorrido(localizadorBillete));
+			Billete ticket = session.get(Billete.class, localizadorBillete);
+			Usuario user = session.get(Usuario.class, ticket.getUsuario().getNif());
+			user.removeBilletes(ticket);
+			session.save(user);
+			Recorrido rec = session.get(Recorrido.class, ticket.getRecorrido().getID());
+			rec.removeBilletes(ticket);
+			rec.increaseAvailableSeats(1);
+			session.save(rec);
+			session.delete(ticket);
+			session.flush();
 			
 		} catch(HibernateException e) {
 			e.printStackTrace();
@@ -278,6 +322,7 @@ public class DatabaseManager implements IDatabaseManager {
 			session.beginTransaction();
 			
 			session.refresh(billete);
+			session.flush();
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
@@ -294,7 +339,7 @@ public class DatabaseManager implements IDatabaseManager {
 		
 		try {
 			session.beginTransaction();
-			List<Billete> recorridosList = session.createQuery("FROM BILLETE", Billete.class).list();
+			List<Billete> recorridosList = session.createQuery("FROM Billete", Billete.class).getResultList();
 			
 			lista.addAll(recorridosList);
 			return lista;
@@ -315,8 +360,10 @@ public class DatabaseManager implements IDatabaseManager {
 		
 		try {
 			session.beginTransaction();
-			List<Billete> recorridosList = session.createQuery("FROM BILLETE WHERE RECORRIDO_ID = :idRecorrido", Billete.class).setParameter("idRecorrido", idRecorrido).list();
-			lista.addAll(recorridosList);
+			List<Billete> recorridosList = session.createQuery("FROM Billete", Billete.class).getResultList();
+			for(Billete s: recorridosList) {
+				if(idRecorrido.equals(s.getRecorrido().getID()))lista.add(s);
+			}
 			return lista;
 			
 		} catch (Exception e) {
@@ -335,8 +382,10 @@ public class DatabaseManager implements IDatabaseManager {
 		
 		try {
 			session.beginTransaction();
-			List<Billete> recorridosList = session.createQuery("FROM BILLETE WHERE USUARIO_ID = :idUsuario", Billete.class).setParameter("idUsuario", idUsuario).list();
-			lista.addAll(recorridosList);
+			List<Billete> recorridosList = session.createQuery("FROM Billete", Billete.class).getResultList();
+			for(Billete s: recorridosList) {
+				if(idUsuario.equals(s.getUsuario().getNif()))lista.add(s);
+			}
 			return lista;
 			
 		} catch (Exception e) {
@@ -368,12 +417,19 @@ public class DatabaseManager implements IDatabaseManager {
 	public void clearDatabase() {
 		Session session = getSession();
 		session.getTransaction().begin();
-		Query query = session.createSQLQuery("Truncate table CARD");
+		Query query = session.createSQLQuery("Truncate table BILLETE");
 		query.executeUpdate();
-		query = session.createSQLQuery("Truncate table CARD");
+		query = session.createSQLQuery("Truncate table USUARIO_LETRASNIF");
 		query.executeUpdate();
+		query = session.createSQLQuery("Truncate table USUARIO");
+		query.executeUpdate();
+		query = session.createSQLQuery("Truncate table RECORRIDO");
+		query.executeUpdate();
+		query = session.createSQLQuery("Truncate table CONNECTION");
+		query.executeUpdate();
+		
+		session.getTransaction().commit();
 		session.close();
-
 	}
 
 }

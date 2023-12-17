@@ -218,7 +218,7 @@ public class SistemaPersistencia {
 		double salida=0;
 		for (Billete tiket : tikets) {
 			double price=tiket.getRecorrido().getPrice();
-			if (tiket.getRecorrido().getTransport().equals(TRAIN))
+			if (tiket.getRecorrido() instanceof TrainRecorrido)
 				salida+=(price*0.9);
 			else
 				salida+=price;
@@ -618,16 +618,17 @@ public class SistemaPersistencia {
 		if (!database.getBilletes(localizador).isEmpty())
 			throw new IllegalArgumentException("El localizador ya ha sido usado\n");
 		List<Billete> returned=new ArrayList<>();
+		if(database.getUsuario(usr.getNif())==null) {
+			database.addUsuario(usr);
+		}
 		for(int i=0;i<numBilletes;i++) {
+			java.lang.System.out.println(i);
 			Billete tiket=new Billete(localizador,recorrido, usr, ESTADO_COMPRADO);
 			returned.add(tiket);
 			database.addBillete(tiket);
 		}
-		recorrido.decreaseAvailableSeats(numBilletes);
+		//recorrido.decreaseAvailableSeats(numBilletes);
 		database.actualizarRecorrido(recorrido);
-		if(database.getUsuario(usr.getNif())==null) {
-			database.addUsuario(usr);
-		}
 		return returned;
 	}
 

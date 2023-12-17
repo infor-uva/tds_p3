@@ -37,6 +37,9 @@ public class TrainRecorrido extends Recorrido {
 	 */
 	public static final double DISCOUNT = 0.1;
 
+	public TrainRecorrido() {
+		super();
+	}
 	/**
 	 * Constructor
 	 * 
@@ -54,7 +57,7 @@ public class TrainRecorrido extends Recorrido {
 	 *                                  {@link TrainRecorrido#MAX_NUM_SEATS}
 	 */
 	public TrainRecorrido(String id, Connection connection, double price, LocalDateTime dateTime, int numSeats) {
-		super(id, connection, TransportType.TRAIN, price, dateTime, numSeats);
+		super(id, connection, price, dateTime, numSeats);
 		checkNumSeats(numSeats);
 	}
 
@@ -81,7 +84,7 @@ public class TrainRecorrido extends Recorrido {
 	private void checkNumSeats(int numSeats) {
 		if (numSeats > MAX_NUM_SEATS)
 			throw new IllegalArgumentException(
-					"numSeats is more than the limit of " + MAX_NUM_SEATS + " for transport " + getTransport());
+					"numSeats is more than the limit of " + MAX_NUM_SEATS + " for transport TRAIN");
 	}
 
 	/**
