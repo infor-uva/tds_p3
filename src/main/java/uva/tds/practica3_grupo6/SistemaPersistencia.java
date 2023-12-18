@@ -64,6 +64,10 @@ public class SistemaPersistencia {
 	 */
 	private final List<Character> letrasNif=new ArrayList<>(Arrays.asList('T','R','W','A','G','M','Y','F','P','D','X','B','N','J','Z','S','Q','V','H','L','C','K','E'));
 	/**
+	 * {@link Recorrido#TRAIN}
+	 */
+	private static final TransportType TRAIN = TransportType.TRAIN;
+	/**
 	 * {@link Billete#ESTADO_RESERVADO}
 	 */
 	private static final String ESTADO_RESERVADO = Billete.ESTADO_RESERVADO;
@@ -214,7 +218,7 @@ public class SistemaPersistencia {
 		double salida=0;
 		for (Billete tiket : tikets) {
 			double price=tiket.getRecorrido().getPrice();
-			if (tiket.getRecorrido() instanceof TrainRecorrido)
+			if (tiket.getRecorrido()instanceof TrainRecorrido)
 				salida+=(price*0.9);
 			else
 				salida+=price;
@@ -235,7 +239,7 @@ public class SistemaPersistencia {
 	public List<Recorrido> getRecorridosDisponiblesFecha(LocalDate fecha) {
 		if(fecha == null)
 			throw new IllegalArgumentException("La fecha es nula\n");
-		if (database.getRecorridos(fecha).isEmpty())
+		if (database.getRecorridos(fecha) == null)
 			throw new IllegalStateException("Para la fecha no hay recorridos disponibles\n");
 		return database.getRecorridos(fecha);
 	}
@@ -337,7 +341,6 @@ public class SistemaPersistencia {
 			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		try {
 			route.updateDate(newDate);
-			database.actualizarRecorrido(route);
 		} catch (IllegalArgumentException e1) {
 			throw e1;
 		} catch (IllegalStateException e2) {
@@ -364,7 +367,6 @@ public class SistemaPersistencia {
 			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		try {
 			route.updateTime(newTime);
-			database.actualizarRecorrido(route);
 		} catch (IllegalArgumentException e1) {
 			throw e1;
 		} catch (IllegalStateException e2) {
@@ -391,7 +393,6 @@ public class SistemaPersistencia {
 			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		try {
 			route.updateDateTime(newDateTime);
-			database.actualizarRecorrido(route);
 		} catch (IllegalArgumentException e1) {
 			throw e1;
 		} catch (IllegalStateException e2) {
@@ -420,16 +421,11 @@ public class SistemaPersistencia {
 			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
 		try {
 			route.updateDateTime(newDate, newTime);
-			database.actualizarRecorrido(route);
 		} catch (IllegalArgumentException e1) {
 			throw e1;
 		} catch (IllegalStateException e2) {
 			throw e2;
 		}
-	}
-	
-	public Recorrido getRecorrido(String localizador) {
-		return database.getRecorrido(localizador);
 	}
 
 	/**
@@ -471,16 +467,13 @@ public class SistemaPersistencia {
 		}
 
 		List<Billete> billetes = new ArrayList<>();
-		if(database.getUsuario(user.getNif())==null) {
-			database.addUsuario(user);
-		}
 		for (int i = 0; i < numBilletesReservar; i++) {
 			Billete ticket = new Billete(localizador, recorrido, user, ESTADO_RESERVADO);
 			billetes.add(ticket);
 			database.addBillete(ticket);
 		}
-		//recorrido.decreaseAvailableSeats(numBilletesReservar);
-		//database.actualizarRecorrido(recorrido);
+		recorrido.decreaseAvailableSeats(numBilletesReservar);
+		database.actualizarRecorrido(recorrido);
 		return billetes;
 
 	}
@@ -525,11 +518,11 @@ public class SistemaPersistencia {
 		database.eliminarBilletes(localizador);
 		if(billetesRestantes > 0) {
 			for (int i = 0; i < billetesRestantes; i++) {
-				database.addBillete(billetes.get(i));
+				database.addBillete(billetes.get(0));
 			}
 		}
-		//recorrido.increaseAvailableSeats(numBilletesAnular);
-		//database.actualizarRecorrido(recorrido);
+		recorrido.increaseAvailableSeats(numBilletesAnular);
+		database.actualizarRecorrido(recorrido);
 
 	}
 
@@ -569,9 +562,14 @@ public class SistemaPersistencia {
 		
 		int billetesRestantes = billetes.size() - numBilletesDevolver;
 		database.eliminarBilletes(localizador);
-		if(billetesRestantes > 0) {
+
+			Billete b = billetes.get(0);
+			Recorrido r = b.getRecorrido();
+			r.increaseAvailableSeats(numBilletesDevolver);
+			database.actualizarRecorrido(r);
+			if(billetesRestantes > 0) {
 			for (int i = 0; i < billetesRestantes; i++) {
-				database.addBillete(billetes.get(i));
+				database.addBillete(b);
 			}
 			
 
@@ -614,24 +612,24 @@ public class SistemaPersistencia {
 		if (numBilletes<1)
 			throw new IllegalArgumentException("El numero de billetes es inferior al minimo\n");
 		if (numBilletes > recorrido.getNumAvailableSeats())
-			throw new IllegalArgumentException("El numero de billetes es superior a las plazas disponibles\n");
+			throw new IllegalStateException("El numero de billetes es superior a las plazas disponibles\n");
 		if (localizador.isEmpty())
 			throw new IllegalArgumentException("EL localizador esta vacio\n");
-		boolean bandera=false;
 		for(Billete b: database.getBilletes(localizador)) {
-			if(b.getEstado().equals(ESTADO_COMPRADO))throw new IllegalArgumentException("El localizador ya ha sido usado\n");
+			if(b.getEstado().equals(ESTADO_COMPRADO))
+				throw new IllegalArgumentException("El localizador ya ha sido usado\n");
 		}
 		List<Billete> returned=new ArrayList<>();
-		if(database.getUsuario(usr.getNif())==null) {
-			database.addUsuario(usr);
-		}
 		for(int i=0;i<numBilletes;i++) {
 			Billete tiket=new Billete(localizador,recorrido, usr, ESTADO_COMPRADO);
 			returned.add(tiket);
 			database.addBillete(tiket);
 		}
-		//recorrido.decreaseAvailableSeats(numBilletes);
-		//database.actualizarRecorrido(recorrido);
+		recorrido.decreaseAvailableSeats(numBilletes);
+		database.actualizarRecorrido(recorrido);
+		if(database.getUsuario(usr.getNif())==null) {
+			database.addUsuario(usr);
+		}
 		return returned;
 	}
 
@@ -661,12 +659,12 @@ public class SistemaPersistencia {
 		for (Billete ticket : tickets) {
 			try {
 				ticket.setComprado();
-				database.actualizarBilletes(ticket);
 			} catch (IllegalStateException e) {
 				// Reescritura de mensaje de error
 				throw new IllegalStateException("the are no tickets booked with that locator");
 			}
 		}
+		database.actualizarBilletes(tickets.get(0));
 		return tickets;
 	}
 }
