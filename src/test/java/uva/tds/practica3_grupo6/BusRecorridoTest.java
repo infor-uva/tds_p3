@@ -64,7 +64,6 @@ class BusRecorridoTest {
 		assertEquals(connection.getOrigin(), recorrido.getOrigin());
 		assertEquals(connection.getDestination(), recorrido.getDestination());
 		assertEquals(connection.getDuration(), recorrido.getDuration());
-		assertEquals(TransportType.BUS, recorrido.getTransport());
 		assertEquals(price, recorrido.getPrice(), ERROR_MARGIN);
 		assertEquals(dateTime, recorrido.getDateTime());
 		assertEquals(numAvailableSeats, recorrido.getNumAvailableSeats());
@@ -84,7 +83,6 @@ class BusRecorridoTest {
 		assertEquals(connection.getOrigin(), recorrido.getOrigin());
 		assertEquals(connection.getDestination(), recorrido.getDestination());
 		assertEquals(connection.getDuration(), recorrido.getDuration());
-		assertEquals(TransportType.BUS, recorrido.getTransport());
 		assertEquals(price, recorrido.getPrice(), ERROR_MARGIN);
 		assertEquals(dateTime, recorrido.getDateTime());
 		assertEquals(numAvailableSeats, recorrido.getNumAvailableSeats());
@@ -149,7 +147,6 @@ class BusRecorridoTest {
 		assertEquals(recorrido.getOrigin(), recorridoCopia.getOrigin());
 		assertEquals(recorrido.getDestination(), recorridoCopia.getDestination());
 		assertEquals(recorrido.getDuration(), recorridoCopia.getDuration());
-		assertEquals(recorrido.getTransport(), recorridoCopia.getTransport());
 		assertEquals(recorrido.getPrice(), recorridoCopia.getPrice(), ERROR_MARGIN);
 		assertEquals(recorrido.getDateTime(), recorridoCopia.getDateTime());
 		assertEquals(recorrido.getNumAvailableSeats(), recorridoCopia.getNumAvailableSeats());
@@ -162,13 +159,6 @@ class BusRecorridoTest {
 	void testConstructorCopiaConNull() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			new BusRecorrido(null);
-		});
-	}
-	
-	@Test
-	void testSetTransportNull() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			recorrido.setTransport(null);
 		});
 	}
 

@@ -218,7 +218,7 @@ public class SistemaPersistencia {
 		double salida=0;
 		for (Billete tiket : tikets) {
 			double price=tiket.getRecorrido().getPrice();
-			if (tiket.getRecorrido().getTransport().equals(TRAIN))
+			if (tiket.getRecorrido()instanceof TrainRecorrido)
 				salida+=(price*0.9);
 			else
 				salida+=price;
@@ -615,8 +615,10 @@ public class SistemaPersistencia {
 			throw new IllegalStateException("El numero de billetes es superior a las plazas disponibles\n");
 		if (localizador.isEmpty())
 			throw new IllegalArgumentException("EL localizador esta vacio\n");
-		if (!database.getBilletes(localizador).isEmpty())
-			throw new IllegalArgumentException("El localizador ya ha sido usado\n");
+		for(Billete b: database.getBilletes(localizador)) {
+			if(b.getEstado().equals(ESTADO_COMPRADO))
+				throw new IllegalArgumentException("El localizador ya ha sido usado\n");
+		}
 		List<Billete> returned=new ArrayList<>();
 		for(int i=0;i<numBilletes;i++) {
 			Billete tiket=new Billete(localizador,recorrido, usr, ESTADO_COMPRADO);

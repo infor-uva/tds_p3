@@ -2,6 +2,7 @@ package uva.tds.practica3_grupo6;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -30,6 +31,9 @@ public class Billete {
 	public static final String ESTADO_RESERVADO = "reservado";
 	
 	@Id
+	@GeneratedValue
+	private int id;
+	@Column(name="LOCALIZADOR")
 	private String localizador;
 	@ManyToOne()
     @JoinColumn(name = "RECORRIDO_ID", referencedColumnName = "ID")
@@ -40,6 +44,9 @@ public class Billete {
 	@Column(name="ESTADO")
 	private String estado;
 
+	public Billete() {
+		
+	}
 	/**
 	 * @param localizador
 	 * @param recorrido

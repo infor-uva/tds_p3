@@ -3,10 +3,14 @@ package uva.tds.practica3_grupo6;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -15,7 +19,9 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
 
 /**
  * Class dedicated for the representation of the route.
@@ -35,7 +41,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "TRANSPORT")
+@DiscriminatorColumn(name = "TRANSPORT", discriminatorType = DiscriminatorType.STRING)
 public abstract class Recorrido {
 
 	/**
@@ -50,11 +56,6 @@ public abstract class Recorrido {
 	@ManyToOne
 	@JoinColumn(name="CONNECTION_ID", referencedColumnName = "ID")
 	private Connection connection;
-	/**
-	 * The transport will be used in the route
-	 */
-	@Enumerated(EnumType.STRING)
-	private TransportType transport;
 	/**
 	 * The price of the route
 	 */
@@ -76,6 +77,12 @@ public abstract class Recorrido {
 	@Column(name="NUMAVAILABLESEATS")
 	private int numAvailableSeats;
 	
+	@OneToMany(mappedBy = "recorrido", cascade = CascadeType.ALL)
+	private List<Billete> billetes;
+	
+	public Recorrido() {
+		
+	}
 	/**
 	 * Constructor
 	 * 
@@ -94,15 +101,14 @@ public abstract class Recorrido {
 	 * @throws IllegalArgumentException if dateTime is null
 	 * @throws IllegalArgumentException if numSeats is less than 1
 	 */
-	protected Recorrido(String id, Connection connection, TransportType transport, double price, LocalDateTime dateTime,
-			int numSeats) {
+	protected Recorrido(String id, Connection connection, double price, LocalDateTime dateTime, int numSeats) {
 		setId(id);
 		setConnection(connection);
-		setTransport(transport);
 		updateDateTime(dateTime);
 		setPrice(price);
 		setTotalSeats(numSeats);
 		setNumAvailableSeats(numSeats);
+		billetes = new ArrayList<>();
 	}
 
 	/**
@@ -117,11 +123,12 @@ public abstract class Recorrido {
 			throw new IllegalArgumentException("r is null");
 		setId(r.getID());
 		setConnection(r.getConnection());
-		setTransport(r.getTransport());
+		//setTransport(r.getTransport());
 		updateDateTime(r.getDateTime());
 		setPrice(r.getPrice());
 		setTotalSeats(r.getTotalSeats());
 		setNumAvailableSeats(r.getNumAvailableSeats());
+		billetes = new ArrayList<>();
 	}
 
 	/**
@@ -147,11 +154,11 @@ public abstract class Recorrido {
 	 * 
 	 * @throws IllegalArgumentException if transport is null
 	 */
-	protected void setTransport(TransportType transport) {
+	/*protected void setTransport(TransportType transport) {
 		if (transport == null)
 			throw new IllegalArgumentException("transport is null");
 		this.transport = transport;
-	}
+	}*/
 
 	/**
 	 * Set the connection for this route
@@ -164,6 +171,14 @@ public abstract class Recorrido {
 		if (connection == null)
 			throw new IllegalArgumentException("the connection is null");
 		this.connection = connection;
+	}
+	
+	public void addBilletes(Billete ticket) {
+		this.billetes.add(ticket);
+	}
+	
+	public void removeBilletes(Billete ticket) {
+		this.billetes.remove(ticket);
 	}
 
 	/**
@@ -265,9 +280,9 @@ public abstract class Recorrido {
 	 * 
 	 * @return transport
 	 */
-	public TransportType getTransport() {
+	/*public TransportType getTransport() {
 		return transport;
-	}
+	}*/
 
 	/**
 	 * Consult the price of the Recorrido
@@ -433,7 +448,7 @@ public abstract class Recorrido {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(connection, dateTime, id, numAvailableSeats, price, totalSeats, transport);
+		return Objects.hash(connection, dateTime, id, numAvailableSeats, price, totalSeats);
 	}
 
 	/**
@@ -452,6 +467,6 @@ public abstract class Recorrido {
 				&& Objects.equals(id, other.id) && totalSeats == other.totalSeats
 				&& numAvailableSeats == other.numAvailableSeats
 				&& Double.doubleToLongBits(price) == Double.doubleToLongBits(other.price)
-				&& transport == other.transport;
+				&& getClass() == other.getClass();
 	}
 }

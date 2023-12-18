@@ -159,5 +159,7 @@ public interface IDatabaseManager {
 	 *         ninguno
 	 */
 	public ArrayList<Billete> getBilletesDeUsuario(String idUsuario);
+	
+	public void clearDatabase();
 
 }

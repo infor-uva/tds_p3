@@ -9,7 +9,8 @@ import java.util.List;
 
 /**
  * Class dedicated for the management of the different instances of
- * {@link Recorrido}, {@link Billete} and {@link Usuario}.
+ * {@link Recorrido}, {@link Billete} and {@link Usuario} based in external
+ * database.
  * 
  * The management will be based on:
  * <ul>
@@ -56,18 +57,12 @@ import java.util.List;
  * 
  * @version 28/11/23
  */
-public class System {
+public class SistemaPersistenciaSinAislamiento {
 
 	/**
-	 * List of the character indexed by the rest resulted of the division of nif and
-	 * 23
+	 * List of the character indexed by the rest resulted of the division of nif and 23
 	 */
-	private final List<Character> letrasNif = new ArrayList<>(Arrays.asList('T', 'R', 'W', 'A', 'G', 'M', 'Y', 'F', 'P',
-			'D', 'X', 'B', 'N', 'J', 'Z', 'S', 'Q', 'V', 'H', 'L', 'C', 'K', 'E'));
-	/**
-	 * {@link Recorrido#TRAIN}
-	 */
-	private static final TransportType TRAIN = TransportType.TRAIN;
+	private final List<Character> letrasNif=new ArrayList<>(Arrays.asList('T','R','W','A','G','M','Y','F','P','D','X','B','N','J','Z','S','Q','V','H','L','C','K','E'));
 	/**
 	 * {@link Billete#ESTADO_RESERVADO}
 	 */
@@ -76,36 +71,34 @@ public class System {
 	 * {@link Billete#ESTADO_COMPRADO}
 	 */
 	private static final String ESTADO_COMPRADO = Billete.ESTADO_COMPRADO;
-
-	/**
-	 * List of tickets registred in the system
-	 */
-	private List<Billete> tickets;
-	/**
-	 * List of nifs of users registered in the system
-	 */
-	private List<String> users;
-
-	/**
-	 * List of routes registered in the system
-	 */
-	private List<Recorrido> routes;
 	
 	/**
-	 * Lista de excepciones
+	 * External dabatabe manager
 	 */
-	private static final String EXCEPTION_NOT_ROUTE = "the route isn't in the system\n";
-	private static final String EXCEPTION_NOT_ROUTE_ID = "no route in the system with this id\n";
+	private IDatabaseManager database;
+	
+	/**
+	 * Lista de Excepciones
+	 */
+	
+	private static final String EXCEPTION_NOT_ROUTE_ID = "the id's route isn't in the system\n";
 	private static final String LOCALIZADOR_NULL = "El localizador no puede ser null\n";
 	private static final String LOCALIZADOR_VACIO = "El localizador no puede ser vacio\n";
 
 	/**
 	 * Instance the System
 	 */
-	public System() {
-		tickets = new ArrayList<>();
-		users = new ArrayList<>();
-		routes = new ArrayList<>();
+	public SistemaPersistenciaSinAislamiento(IDatabaseManager database) {
+		this.database = database;
+	}
+
+	/**
+	 * Consult the database manager assigned to the system
+	 * 
+	 * @return databasemanager
+	 */
+	public IDatabaseManager getDataBaseManager() {
+		return database;
 	}
 
 	/**
@@ -117,11 +110,29 @@ public class System {
 	 * @throws IllegalStateException    if route is already in the system
 	 */
 	public void addRecorrido(Recorrido route) {
-		if (route == null)
-			throw new IllegalArgumentException("route is null");
-		if (getRecorrido(route.getID()) != null)
-			throw new IllegalStateException("route is already in the system");
-		routes.add(route);
+		try {
+			database.addRecorrido(route);
+		} catch (IllegalArgumentException e1) {
+			throw e1;
+		} catch (IllegalStateException e2) {
+			throw e2;
+		}
+	}
+
+	/**
+	 * Check of the id is not null and have at less one character different of
+	 * spaces
+	 * 
+	 * @param id
+	 * 
+	 * @throws IllegalArgumentException if id is null
+	 * @throws IllegalArgumentException if id is empty
+	 */
+	private void checkID(String id) {
+		if (id == null)
+			throw new IllegalArgumentException("is is null");
+		if (id.isBlank())
+			throw new IllegalArgumentException("is is empty");
 	}
 
 	/**
@@ -130,40 +141,21 @@ public class System {
 	 * @param id of the route
 	 * 
 	 * @throws IllegalArgumentException if the id is null
-	 * @throws IllegalArgumentException if the id is empty
+	 * @throws IllegalArgumentException if id is empty
 	 * @throws IllegalStateException    if id's route isn't in the system
 	 * @throws IllegalStateException    if route has associated tickets
 	 */
 	public void removeRecorrido(String id) {
-		Recorrido route;
-		if ((route = getRecorrido(id)) == null)
-			throw new IllegalStateException(EXCEPTION_NOT_ROUTE);
-		if (!getAssociatedBilletesToRoute(id).isEmpty())
-			throw new IllegalStateException("the route has associated tickets");
-		routes.remove(route);
-
-	}
-
-	/**
-	 * Consult the id's route
-	 * 
-	 * @param id of the route
-	 * 
-	 * @return id's route or null if the route isn't in the system
-	 * 
-	 * @throws IllegalArgumentException if the id is null
-	 * @throws IllegalArgumentException if the id is empty
-	 */
-	private Recorrido getRecorrido(String id) {
-		if (id == null)
-			throw new IllegalArgumentException("id is null");
-		if (id.isEmpty())
-			throw new IllegalArgumentException("id is empty");
-		for (Recorrido route : routes) {
-			if (route.getID().equals(id))
-				return route;
+		checkID(id);
+		List<Billete> tmp;
+		try {
+			tmp = getAssociatedBilletesToRoute(id);
+		} catch (IllegalStateException e2) {
+			throw e2;
 		}
-		return null;
+		if (!tmp.isEmpty())
+			throw new IllegalStateException("the route has associated tickets");
+		database.eliminarRecorrido(id);
 	}
 
 	/**
@@ -172,16 +164,7 @@ public class System {
 	 * @return list of routes in system
 	 */
 	public List<Recorrido> getRecorridos() {
-		return routes;
-	}
-
-	/**
-	 * Consult the list of tickets in system
-	 * 
-	 * @return list of tickets in system
-	 */
-	public List<Billete> getBilletes() {
-		return tickets;
+		return database.getRecorridos();
 	}
 
 	/**
@@ -212,41 +195,31 @@ public class System {
 			throw new IllegalArgumentException("El nif es nulo\n");
 		if (nif.isEmpty())
 			throw new IllegalArgumentException("El nif esta vacio\n");
-		if (nif.length() > 9)
-			throw new IllegalArgumentException("Nif demasiado largo\n");
-		if (nif.length() <= 8)
-			throw new IllegalArgumentException("Nif demasiado corto\n");
-		if (!Character.isLetter(nif.charAt(8)))
-			throw new IllegalArgumentException("Nif no contiene la letra\n");
-		if (nif.charAt(8) == 'U' || nif.charAt(8) == 'I' || nif.charAt(8) == 'O' || nif.charAt(8) == 'Ñ')
-			throw new IllegalArgumentException("Nif contiene la letra erronea\n");
-		String cifras = nif.substring(0, nif.length() - 1);
-		char letra = nif.charAt(8);
-		int numero = Integer.parseInt(cifras);
-		int resto = numero % 23;
-		if (resto != letrasNif.indexOf(letra))
+		if (nif.length()<9)
+			throw new IllegalArgumentException("El nif es demasiado corto\n");
+		if (nif.length()>9)
+			throw new IllegalArgumentException("El nif es demasiado largo\n");
+		if (nif.charAt(8) == 'I' || nif.charAt(8) == 'Ñ' || nif.charAt(8) == 'O' || nif.charAt(8) == 'U')
+			throw new IllegalArgumentException("El nif contiene una letra incorrecta\n");
+		String cifras=nif.substring(0, nif.length()-1);
+		char letra=nif.charAt(8);
+		int numero=Integer.parseInt(cifras);
+		int resto=numero%23;
+		if(resto != letrasNif.indexOf(letra))
 			throw new IllegalArgumentException("La letra del nif no corresponde con las cifras del nif\n");
-		if (!users.contains(nif))
-			throw new IllegalArgumentException("El nif no concuerda con ninguno del sistema\n");
-		boolean encuentraTiket = false;
-		for (Billete tiket : tickets) {
-			if (tiket.getUsuario().getNif().equals(nif))
-				encuentraTiket = true;
+		
+		if(database.getUsuario(nif)==null)
+			throw new IllegalArgumentException("El usuario no esta en el sistema\n");
+		ArrayList<Billete> tikets = database.getBilletesDeUsuario(nif);
+		double salida=0;
+		for (Billete tiket : tikets) {
+			double price=tiket.getRecorrido().getPrice();
+			if (tiket.getRecorrido() instanceof TrainRecorrido)
+				salida+=(price*0.9);
+			else
+				salida+=price;
 		}
-		if (!encuentraTiket)
-			throw new IllegalStateException("El nif no tiene ningun billete asociado\n");
-		double precioTotal = 0;
-		for (Billete tiket : tickets) {
-			if (tiket.getUsuario().getNif().equals(nif)) {
-				if (tiket.getRecorrido() instanceof TrainRecorrido) {
-					double precioDescuento = tiket.getRecorrido().getPrice() * 0.9;
-					precioTotal += precioDescuento;
-				} else
-					precioTotal += tiket.getRecorrido().getPrice();
-			}
-		}
-
-		return precioTotal;
+		return salida;
 	}
 
 	/**
@@ -260,20 +233,11 @@ public class System {
 	 * @throws IllegalStateException    if the date does not have associated route.
 	 */
 	public List<Recorrido> getRecorridosDisponiblesFecha(LocalDate fecha) {
-		if (fecha == null)
+		if(fecha == null)
 			throw new IllegalArgumentException("La fecha es nula\n");
-		boolean asociado = false;
-		List<Recorrido> salida = new ArrayList<>();
-		for (Recorrido route : routes) {
-			if (route.getDate().equals(fecha)) {
-				asociado = true;
-				salida.add(route);
-			}
-		}
-		if (!asociado)
-			throw new IllegalStateException("La fecha no corresponde con ningun recorrido\n");
-
-		return salida;
+		if (database.getRecorridos(fecha).isEmpty())
+			throw new IllegalStateException("Para la fecha no hay recorridos disponibles\n");
+		return database.getRecorridos(fecha);
 	}
 
 	/**
@@ -284,18 +248,14 @@ public class System {
 	 * @return list of tickets
 	 * 
 	 * @throws IllegalArgumentException if the id is null
+	 * @throws IllegalArgumentException if id is empty
 	 * @throws IllegalStateException    if id's route isn't in the system
 	 */
 	public List<Billete> getAssociatedBilletesToRoute(String id) {
-		Recorrido route;
-		List<Billete> list = new ArrayList<>();
-		if ((route = getRecorrido(id)) == null)
-			throw new IllegalStateException(EXCEPTION_NOT_ROUTE);
-		for (Billete ticket : tickets) {
-			if (ticket.getRecorrido().equals(route))
-				list.add(ticket);
-		}
-		return list;
+		checkID(id);
+		if (database.getRecorrido(id) == null)
+			throw new IllegalStateException("the route isn't in the system");
+		return database.getBilletesDeRecorrido(id);
 	}
 
 	/**
@@ -311,10 +271,11 @@ public class System {
 	 *                                  id
 	 */
 	public LocalDate getDateOfRecorrido(String id) {
-		Recorrido r;
-		if ((r = getRecorrido(id)) == null)
+		checkID(id);
+		Recorrido route;
+		if ((route = database.getRecorrido(id)) == null)
 			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
-		return r.getDate();
+		return route.getDate();
 	}
 
 	/**
@@ -330,10 +291,11 @@ public class System {
 	 *                                  id
 	 */
 	public LocalTime getTimeOfRecorrido(String id) {
-		Recorrido r;
-		if ((r = getRecorrido(id)) == null)
+		checkID(id);
+		Recorrido route;
+		if ((route = database.getRecorrido(id)) == null)
 			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
-		return r.getTime();
+		return route.getTime();
 	}
 
 	/**
@@ -349,102 +311,125 @@ public class System {
 	 *                                  id
 	 */
 	public LocalDateTime getDateTimeOfRecorrido(String id) {
-		Recorrido r;
-		if ((r = getRecorrido(id)) == null)
+		checkID(id);
+		Recorrido route;
+		if ((route = database.getRecorrido(id)) == null)
 			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
-		return r.getDateTime();
+		return route.getDateTime();
 	}
 
 	/**
 	 * Update the date of a route
 	 * 
-	 * @param id      of the route
+	 * @param id of the route
 	 * @param newDate
 	 * 
 	 * @throws IllegalArgumentException if id is null
+	 * @throws IllegalArgumentException if id is empty
 	 * @throws IllegalStateException    if id's route isn't in the system
 	 * @throws IllegalArgumentException if newDate is null
 	 * @throws IllegalStateException    if the new date is the already the set
 	 */
 	public void updateRecorridoDate(String id, LocalDate newDate) {
+		checkID(id);
 		Recorrido route;
-		if ((route = getRecorrido(id)) == null)
-			throw new IllegalStateException(EXCEPTION_NOT_ROUTE);
-		if (newDate == null)
-			throw new IllegalArgumentException("newDate is null");
-		if (route.getDate().equals(newDate))
-			throw new IllegalStateException("newDate is already set");
-		route.updateDate(newDate);
+		if ((route = database.getRecorrido(id)) == null)
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
+		try {
+			route.updateDate(newDate);
+			database.actualizarRecorrido(route);
+		} catch (IllegalArgumentException e1) {
+			throw e1;
+		} catch (IllegalStateException e2) {
+			throw e2;
+		}
 	}
 
 	/**
 	 * Update the time of a route
 	 * 
-	 * @param id      of the route
+	 * @param id of the route
 	 * @param newTime
 	 * 
 	 * @throws IllegalArgumentException if id is null
+	 * @throws IllegalArgumentException if id is empty
 	 * @throws IllegalStateException    if id's route isn't in the system
 	 * @throws IllegalArgumentException if newTime is null
 	 * @throws IllegalStateException    if the new time is the already the set
 	 */
 	public void updateRecorridoTime(String id, LocalTime newTime) {
+		checkID(id);
 		Recorrido route;
-		if ((route = getRecorrido(id)) == null)
-			throw new IllegalStateException(EXCEPTION_NOT_ROUTE);
-		if (newTime == null)
-			throw new IllegalArgumentException("newTime is null");
-		if (route.getTime().equals(newTime))
-			throw new IllegalStateException("newTime is already set");
-		route.updateTime(newTime);
+		if ((route = database.getRecorrido(id)) == null)
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
+		try {
+			route.updateTime(newTime);
+			database.actualizarRecorrido(route);
+		} catch (IllegalArgumentException e1) {
+			throw e1;
+		} catch (IllegalStateException e2) {
+			throw e2;
+		}
 	}
 
 	/**
 	 * Update the time and date of a route
 	 * 
-	 * @param id          of the route
+	 * @param id of the route
 	 * @param newDateTime
 	 * 
 	 * @throws IllegalArgumentException if id is null
+	 * @throws IllegalArgumentException if id is empty
 	 * @throws IllegalStateException    if id's route isn't in the system
 	 * @throws IllegalArgumentException if newDateTime is null
 	 * @throws IllegalStateException    if the new Date time is the already the set
 	 */
 	public void updateRecorridoDateTime(String id, LocalDateTime newDateTime) {
+		checkID(id);
 		Recorrido route;
-		if ((route = getRecorrido(id)) == null)
-			throw new IllegalStateException(EXCEPTION_NOT_ROUTE);
-		if (newDateTime == null)
-			throw new IllegalArgumentException("newDateTime is null");
-		if (route.getDateTime().equals(newDateTime))
-			throw new IllegalStateException("newDateTime is already set");
-		route.updateDateTime(newDateTime);
+		if ((route = database.getRecorrido(id)) == null)
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
+		try {
+			route.updateDateTime(newDateTime);
+			database.actualizarRecorrido(route);
+		} catch (IllegalArgumentException e1) {
+			throw e1;
+		} catch (IllegalStateException e2) {
+			throw e2;
+		}
 	}
 
 	/**
 	 * Update the time and date of a route
 	 * 
-	 * @param id      of the route
+	 * @param id of the route
 	 * @param newDate
 	 * @param newTime
 	 * 
 	 * @throws IllegalArgumentException if id is null
+	 * @throws IllegalArgumentException if id is empty
 	 * @throws IllegalStateException    if id's route isn't in the system
 	 * @throws IllegalArgumentException if newDate is null
 	 * @throws IllegalArgumentException if newTime is null
 	 * @throws IllegalStateException    if the new Date time is the already the set
 	 */
 	public void updateRecorrido(String id, LocalDate newDate, LocalTime newTime) {
+		checkID(id);
 		Recorrido route;
-		if ((route = getRecorrido(id)) == null)
-			throw new IllegalStateException(EXCEPTION_NOT_ROUTE);
-		if (newDate == null)
-			throw new IllegalArgumentException("newDateTime is null");
-		if (newTime == null)
-			throw new IllegalArgumentException("newTime is null");
-		if (route.getDateTime().equals(LocalDateTime.of(newDate, newTime)))
-			throw new IllegalStateException("newDateTime is already set");
-		route.updateDateTime(newDate, newTime);
+		if ((route = database.getRecorrido(id)) == null)
+			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
+		try {
+			route.updateDateTime(newDate, newTime);
+			database.actualizarRecorrido(route);
+		} catch (IllegalArgumentException e1) {
+			throw e1;
+		} catch (IllegalStateException e2) {
+			throw e2;
+		}
+	}
+	
+	public Recorrido getRecorrido(String localizador) {
+		return database.getRecorrido(localizador);
 	}
 
 	/**
@@ -464,42 +449,39 @@ public class System {
 	 * @throws IllegalArgumentException if the identifier is empty.
 	 * @throws IllegalArgumentException if a locator that has been used previously
 	 *                                  is passed.
-	 * @throws IllegalStateException    if the route doesn't exist
 	 * @throws IllegalArgumentException if user is null.
 	 * @throws IllegalArgumentException if recorrido is null.
 	 * @throws IllegalArgumentException if recorrido is null.
 	 */
-	public List<Billete> reservarBilletes(String localizador, Usuario user, Recorrido recorrido,
-			int numBilletesReservar) {
-		if (user == null)
+	public List<Billete> reservarBilletes(String localizador, Usuario user, Recorrido recorrido, int numBilletesReservar) {
+		if(user == null)
 			throw new IllegalArgumentException("El usuario no puede ser null");
-		if (recorrido == null)
+		if(recorrido == null)
 			throw new IllegalArgumentException("El recorrido no puede ser null");
-		if (localizador == null)
+		if(localizador == null)
 			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (numBilletesReservar > recorrido.getNumAvailableSeats())
-			throw new IllegalStateException(
-					"No se puede reservar si el número de billetes es mayor a los asientos disponibles");
-		if (recorrido.getNumAvailableSeats() < recorrido.getTotalSeats() / 2)
-			throw new IllegalStateException(
-					"No se puede reservar si el número de asientos disponibles es menor a la mitad del número total de asientos");
+			throw new IllegalStateException("No se puede reservar si el número de billetes es mayor a los asientos disponibles");
+		if (recorrido.getNumAvailableSeats() < recorrido.getTotalSeats()/2)
+			throw new IllegalStateException("No se puede reservar si el número de asientos disponibles es menor a la mitad del número total de asientos");
 		if (localizador.equals(""))
 			throw new IllegalArgumentException(LOCALIZADOR_VACIO);
-		for (Billete billetes : this.tickets) {
-			if (billetes.getLocalizador().equals(localizador))
-				throw new IllegalStateException("Ese localizador ya ha sido utilizado");
+		if (!database.getBilletes(localizador).isEmpty()) {
+			throw new IllegalStateException("El localizador ya ha sido utilizado");
 		}
-		if (!routes.contains(recorrido))
-			throw new IllegalStateException("El recorrido no existe en el sistema");
 
-		List<Billete> billetesReservados = new ArrayList<>();
-		for (int i = 0; i < numBilletesReservar; i++) {
-			Billete billete = new Billete(localizador, recorrido, user, ESTADO_RESERVADO);
-			billetesReservados.add(billete);
+		List<Billete> billetes = new ArrayList<>();
+		if(database.getUsuario(user.getNif())==null) {
+			database.addUsuario(user);
 		}
-		recorrido.decreaseAvailableSeats(numBilletesReservar);
-		tickets.addAll(billetesReservados);
-		return billetesReservados;
+		for (int i = 0; i < numBilletesReservar; i++) {
+			Billete ticket = new Billete(localizador, recorrido, user, ESTADO_RESERVADO);
+			billetes.add(ticket);
+			database.addBillete(ticket);
+		}
+		//recorrido.decreaseAvailableSeats(numBilletesReservar);
+		//database.actualizarRecorrido(recorrido);
+		return billetes;
 
 	}
 
@@ -515,34 +497,39 @@ public class System {
 	 * @throws IllegalStateException    if the locator isn't in the system
 	 * @throws IllegalStateException    if the locator belongs to tickets that are
 	 *                                  not reserved.
-	 * @throws IllegalArgumentException if the number of tickets is less or equal to
+	 * @throws IllegalArgumentException if the number of tickets ir less or equal to
 	 *                                  0
 	 * @throws IllegalStateException    if the number of tickets is more than the
 	 *                                  number of reserved tickets with that locator
 	 */
 	public void anularReserva(String localizador, int numBilletesAnular) {
-		if (localizador == null)
+		if(localizador == null)
 			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (localizador.equals(""))
 			throw new IllegalArgumentException(LOCALIZADOR_VACIO);
 		if (numBilletesAnular < 1)
-			throw new IllegalArgumentException("No se puede reservar si el número de billetes es menor que 1");
-		List<Billete> packBilletes = new ArrayList<>();
-		for (Billete billete : this.tickets) {
-			if (billete.getLocalizador().equals(localizador)) {
-				packBilletes.add(billete);
-				if (!billete.getEstado().equals(ESTADO_RESERVADO))
-					throw new IllegalStateException("El localizador no corresponde con tickets reservados");
+			throw new IllegalArgumentException("No se puede reservar si el número de billetes es menor que 1");	
+		
+		ArrayList<Billete> billetes = database.getBilletes(localizador);
+		if(billetes.isEmpty() || 
+		!billetes.get(0).getEstado().equals(ESTADO_RESERVADO)) {
+			throw new IllegalStateException("No hay tickets reservados con ese localizador");
+		}
+		
+		if(billetes.size() < numBilletesAnular) {
+			throw new IllegalStateException("Hay menos tickets de los que se quieren anular con ese localizador");
+		}
+		
+		Recorrido recorrido = billetes.get(0).getRecorrido();
+		int billetesRestantes = billetes.size() - numBilletesAnular;
+		database.eliminarBilletes(localizador);
+		if(billetesRestantes > 0) {
+			for (int i = 0; i < billetesRestantes; i++) {
+				database.addBillete(billetes.get(i));
 			}
 		}
-		if (packBilletes.isEmpty())
-			throw new IllegalStateException("El localizador no corresponde con tickets reservados");
-		if (packBilletes.size() < numBilletesAnular)
-			throw new IllegalStateException("Hay menos tickets de los que se quieren anular con ese localizador");
-
-		
-		this.tickets.removeAll(packBilletes);
-		packBilletes.get(0).getRecorrido().increaseAvailableSeats(numBilletesAnular);
+		//recorrido.increaseAvailableSeats(numBilletesAnular);
+		//database.actualizarRecorrido(recorrido);
 
 	}
 
@@ -564,30 +551,32 @@ public class System {
 	 *                                  number of tickets with that locator
 	 */
 	public void devolverBilletes(String localizador, int numBilletesDevolver) {
-		if (localizador == null)
+		if(localizador == null)
 			throw new IllegalArgumentException(LOCALIZADOR_NULL);
 		if (localizador.equals(""))
 			throw new IllegalArgumentException(LOCALIZADOR_VACIO);
 		if (numBilletesDevolver < 1)
-			throw new IllegalArgumentException("No se puede reservar si el número de billetes es menor que 1");
-		List<Billete> packBilletes = new ArrayList<>();
-		for (Billete billete : this.tickets) {
-			if (billete.getLocalizador().equals(localizador)) {
-				packBilletes.add(billete);
-				if (!billete.getEstado().equals(ESTADO_COMPRADO))
-					throw new IllegalStateException("El localizador no corresponde con tickets comprados");
-			}
+			throw new IllegalArgumentException("No se puede devolver si el número de billetes es menor que 1");	
+		
+		ArrayList<Billete> billetes = database.getBilletes(localizador);
+		if(billetes.isEmpty() || !billetes.get(0).getEstado().equals(ESTADO_COMPRADO)) {
+			throw new IllegalStateException("No hay tickets comprados con ese localizador");
 		}
-		if (packBilletes.isEmpty())
-			throw new IllegalStateException("El localizador no corresponde con tickets comprados");
+		
+		if(billetes.size() < numBilletesDevolver) {
+			throw new IllegalStateException("Hay menos tickets de los que se quieren devolver con ese localizador");
+		}
+		
+		int billetesRestantes = billetes.size() - numBilletesDevolver;
+		database.eliminarBilletes(localizador);
+		if(billetesRestantes > 0) {
+			for (int i = 0; i < billetesRestantes; i++) {
+				database.addBillete(billetes.get(i));
+			}
+			
 
-		if (packBilletes.size() < numBilletesDevolver)
-			throw new IllegalStateException("Hay menos tickets de los que se quieren anular con ese localizador");
+		}
 
-		Recorrido recorrido = this.tickets.get(0).getRecorrido();
-		this.tickets.removeAll(packBilletes);
-				
-		recorrido.increaseAvailableSeats(numBilletesDevolver);
 
 	}
 
@@ -616,62 +605,34 @@ public class System {
 	 * @throws IllegalArgumentException if a previously used locator is passed
 	 */
 	public List<Billete> comprarBilletes(String localizador, Usuario usr, Recorrido recorrido, int numBilletes) {
-		if (localizador == null)
+		if(localizador==null)
 			throw new IllegalArgumentException(LOCALIZADOR_NULL);
-		if (localizador.isEmpty())
-			throw new IllegalArgumentException(LOCALIZADOR_VACIO);
-		for (Billete tiket : tickets) {
-			if (tiket.getLocalizador().equals(localizador)) {
-				throw new IllegalArgumentException("El localizador ya a sido usado\n");
-			}
-		}
 		if (usr == null)
-			throw new IllegalArgumentException("El usuario es nulo\n");
+			throw new IllegalArgumentException("El usuario es null\n");
 		if (recorrido == null)
-			throw new IllegalArgumentException("El recorrido es nulo\n");
-		if (numBilletes < 1)
-			throw new IllegalArgumentException("El numero de billetes ha de ser superior a 0\n");
-		if (numBilletes > recorrido.getTotalSeats())
-			throw new IllegalArgumentException("El numero es superior a los asientos del vehiculo\n");
+			throw new IllegalArgumentException("El recorrido es null\n");
+		if (numBilletes<1)
+			throw new IllegalArgumentException("El numero de billetes es inferior al minimo\n");
 		if (numBilletes > recorrido.getNumAvailableSeats())
-			throw new IllegalStateException("El numero es superior a los asientos disponibles\n");
-		List<Billete> salida = new ArrayList<>();
-		for (int i = 0; i < numBilletes; i++) {
-			Billete aux = new Billete(localizador, recorrido, usr, ESTADO_COMPRADO);
-			salida.add(aux);
-			tickets.add(aux);
-
+			throw new IllegalArgumentException("El numero de billetes es superior a las plazas disponibles\n");
+		if (localizador.isEmpty())
+			throw new IllegalArgumentException("EL localizador esta vacio\n");
+		boolean bandera=false;
+		for(Billete b: database.getBilletes(localizador)) {
+			if(b.getEstado().equals(ESTADO_COMPRADO))throw new IllegalArgumentException("El localizador ya ha sido usado\n");
 		}
-		recorrido.decreaseAvailableSeats(numBilletes);
-		if (!users.contains(usr.getNif()))
-			users.add(usr.getNif());
-		return salida;
-
-	}
-
-	/**
-	 * Consult and return the list with the ticket which has the same locator. If
-	 * there is no tickets with that locator will be returned a empty list
-	 * 
-	 * @param locator of the ticket(s)
-	 * 
-	 * @return list of tickets (it could be empty)
-	 * 
-	 * @throws IllegalArgumentException if locator is null
-	 * @throws IllegalArgumentException if locator have less than 1 or more than 8
-	 *                                  characters
-	 */
-	private List<Billete> getBilletes(String locator) {
-		if (locator == null)
-			throw new IllegalArgumentException(LOCALIZADOR_NULL);
-		if (locator.isBlank() || locator.length() > 8)
-			throw new IllegalArgumentException("locator must be between 1 and 8 characters longs");
-		List<Billete> ticketsTemp = new ArrayList<>();
-		for (Billete ticket : this.tickets) {
-			if (ticket.getLocalizador().equals(locator))
-				ticketsTemp.add(ticket);
+		List<Billete> returned=new ArrayList<>();
+		if(database.getUsuario(usr.getNif())==null) {
+			database.addUsuario(usr);
 		}
-		return ticketsTemp;
+		for(int i=0;i<numBilletes;i++) {
+			Billete tiket=new Billete(localizador,recorrido, usr, ESTADO_COMPRADO);
+			returned.add(tiket);
+			database.addBillete(tiket);
+		}
+		//recorrido.decreaseAvailableSeats(numBilletes);
+		//database.actualizarRecorrido(recorrido);
+		return returned;
 	}
 
 	/**
@@ -688,19 +649,24 @@ public class System {
 	 *                                  with that locator
 	 */
 	public List<Billete> comprarBilletesReservados(String locator) {
-		List<Billete> ticketsTemp;
-		ticketsTemp = getBilletes(locator);
-		if (ticketsTemp.isEmpty())
+		if (locator == null)
+			throw new IllegalArgumentException(LOCALIZADOR_NULL);
+		if (locator.isBlank() || locator.length() > 8)
+			throw new IllegalArgumentException("locator must be between 1 and 8 characters longs");
+
+		List<Billete> tickets;
+		tickets = database.getBilletes(locator);
+		if (tickets.isEmpty())
 			throw new IllegalStateException("the is no tickets for this locator: " + locator);
-		for (Billete ticket : ticketsTemp) {
+		for (Billete ticket : tickets) {
 			try {
 				ticket.setComprado();
+				database.actualizarBilletes(ticket);
 			} catch (IllegalStateException e) {
 				// Reescritura de mensaje de error
 				throw new IllegalStateException("the are no tickets booked with that locator");
 			}
 		}
-		return ticketsTemp;
-
+		return tickets;
 	}
 }

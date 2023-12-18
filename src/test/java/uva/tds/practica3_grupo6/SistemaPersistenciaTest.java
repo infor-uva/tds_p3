@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
- * Class made for tests the methods of {@link SistemaPersistencia}
+ * Class made for tests the methods of {@link SistemaPersistenciaSinAislamiento}
  * 
  * @author hugcubi
  * @author diebomb
@@ -50,8 +50,10 @@ class SistemaPersistenciaTest {
 	private LocalDate newDate;
 	private LocalTime newTime;
 
+	@Mock
 	private IDatabaseManager database;
 
+	@TestSubject
 	private SistemaPersistencia sistema;
 
 	@BeforeEach
@@ -74,32 +76,42 @@ class SistemaPersistenciaTest {
 		newDate = LocalDate.of(2024, 2, 4);
 		newTime = LocalTime.of(12, 2, 4);
 
-		database = new DatabaseManager(); 
+		database = EasyMock.mock(IDatabaseManager.class);
 
 		sistema = new SistemaPersistencia(database);
 	}
 
 	/**
 	 * FINDME Tests for
-	 * {@link SistemaPersistencia#SistemaPersistencia(IDatabaseManager)}
+	 * {@link SistemaPersistenciaSinAislamiento#SistemaPersistencia(IDatabaseManager)}
 	 */
 	@Test
 	void testConstructor() {
-		SistemaPersistencia sistema = new SistemaPersistencia(database);
+		SistemaPersistenciaSinAislamiento sistema = new SistemaPersistenciaSinAislamiento(database);
 		assertNotNull(sistema);
 		assertEquals(database, sistema.getDataBaseManager());
 	}
 
 	/**
-	 * FINDME Tests for {@link SistemaPersistencia#addRecorrido(Recorrido)}
+	 * FINDME Tests for {@link SistemaPersistenciaSinAislamiento#addRecorrido(Recorrido)}
 	 */
 	@Test
 	void testAddRecorridoValido() {
+		ArrayList<Recorrido> returned = new ArrayList<>();
+		returned.add(recorrido);
+
+		database.addRecorrido(recorrido);
+		EasyMock.expectLastCall();
+		EasyMock.expect(database.getRecorridos()).andReturn(returned).times(1);
+		EasyMock.replay(database);
+
 		sistema.addRecorrido(recorrido);
 		List<Recorrido> recorridos = sistema.getRecorridos();
 		List<Recorrido> recorridosCheck = new ArrayList<>();
 		recorridosCheck.add(recorrido);
 		assertEquals(recorridosCheck, recorridos);
+
+		EasyMock.verify(database);
 	}
 
 	@Test
@@ -230,7 +242,7 @@ class SistemaPersistenciaTest {
 
 	/**
 	 * FINDME Tests for
-	 * {@link SistemaPersistencia#getPrecioTotalBilletesUsuario(String)}
+	 * {@link SistemaPersistenciaSinAislamiento#getPrecioTotalBilletesUsuario(String)}
 	 */
 	@Tag("Cobertura")
 	@Test
@@ -383,7 +395,7 @@ class SistemaPersistenciaTest {
 
 	/**
 	 * FINDME Tests for
-	 * {@link SistemaPersistencia#getRecorridosDisponiblesFecha(LocalDate)}
+	 * {@link SistemaPersistenciaSinAislamiento#getRecorridosDisponiblesFecha(LocalDate)}
 	 */
 	@Test
 	void testGetRecorridosDisponiblesFecha() {
@@ -505,7 +517,7 @@ class SistemaPersistenciaTest {
 	}
 
 	/**
-	 * FINDME Tests for {@link SistemaPersistencia#getDateOfRecorrido(String)}
+	 * FINDME Tests for {@link SistemaPersistenciaSinAislamiento#getDateOfRecorrido(String)}
 	 */
 	@Test
 	void testGetDateOfRecorridoValidoConIDLimiteInferior() {
@@ -547,7 +559,7 @@ class SistemaPersistenciaTest {
 	}
 
 	/**
-	 * FINDME Tests for {@link SistemaPersistencia#getTimeOfRecorrido(String)}
+	 * FINDME Tests for {@link SistemaPersistenciaSinAislamiento#getTimeOfRecorrido(String)}
 	 */
 	@Test
 	void testGetTimeOfRecorridoValidoConIDLimiteInferior() {
@@ -584,7 +596,7 @@ class SistemaPersistenciaTest {
 	}
 
 	/**
-	 * FINDME Tests for {@link SistemaPersistencia#getDateTimeOfRecorrido(String)}
+	 * FINDME Tests for {@link SistemaPersistenciaSinAislamiento#getDateTimeOfRecorrido(String)}
 	 */
 	@Test
 	void testGetDateTimeOfRecorridoValidoConIDLimiteInferior() {
@@ -627,7 +639,7 @@ class SistemaPersistenciaTest {
 
 	/**
 	 * FINDME Tests for
-	 * {@link SistemaPersistencia#updateRecorridoDate(String, LocalDate)}
+	 * {@link SistemaPersistenciaSinAislamiento#updateRecorridoDate(String, LocalDate)}
 	 */
 	@Test
 	void testUpdateRecorridoDateValidoConIDLimiteInferior() {
@@ -703,7 +715,7 @@ class SistemaPersistenciaTest {
 
 	/**
 	 * FINDME Tests for
-	 * {@link SistemaPersistencia#updateRecorridoTime(String, LocalTime)}
+	 * {@link SistemaPersistenciaSinAislamiento#updateRecorridoTime(String, LocalTime)}
 	 */
 	@Test
 	void testUpdateRecorridoTimeValidoConIDLimiteInferior() {
@@ -779,7 +791,7 @@ class SistemaPersistenciaTest {
 
 	/**
 	 * FINDME Tests for
-	 * {@link SistemaPersistencia#updateRecorridoDateTime(String, LocalDateTime)}
+	 * {@link SistemaPersistenciaSinAislamiento#updateRecorridoDateTime(String, LocalDateTime)}
 	 */
 	@Test
 	void testUpdateRecorridoDateTimeValidoConIDLimiteInferior() {
@@ -855,7 +867,7 @@ class SistemaPersistenciaTest {
 
 	/**
 	 * FINDME Tests for
-	 * {@link SistemaPersistencia#updateRecorrido(String, LocalDate, LocalTime)}
+	 * {@link SistemaPersistenciaSinAislamiento#updateRecorrido(String, LocalDate, LocalTime)}
 	 */
 	@Test
 	void testUpdateRecorridoValidoConIDLimiteInferior() {
@@ -939,7 +951,7 @@ class SistemaPersistenciaTest {
 
 	/**
 	 * FINDME Tests for
-	 * {@link SistemaPersistencia#comprarBilletes(String, Usuario, Recorrido, int)}
+	 * {@link SistemaPersistenciaSinAislamiento#comprarBilletes(String, Usuario, Recorrido, int)}
 	 */
 	@Test
 	void testComprarBilletesValidoBusLimiteInferior() {
@@ -1265,7 +1277,7 @@ class SistemaPersistenciaTest {
 
 	/**
 	 * FINDME Tests for
-	 * {@link SistemaPersistencia#comprarBilletesReservados(String)}
+	 * {@link SistemaPersistenciaSinAislamiento#comprarBilletesReservados(String)}
 	 */
 	@Test
 	void testComprarBilletesReservadosValidoLimiteInferior() {
@@ -1408,7 +1420,7 @@ class SistemaPersistenciaTest {
 
 	/**
 	 * FINDME Tests for
-	 * {@link SistemaPersistencia#reservarBilletes(String, Usuario, Recorrido, int)}
+	 * {@link SistemaPersistenciaSinAislamiento#reservarBilletes(String, Usuario, Recorrido, int)}
 	 */
 	@Test
 	void testReservarBilletesExitosamente() {
@@ -1512,7 +1524,7 @@ class SistemaPersistenciaTest {
 	}
 
 	/**
-	 * FINDME Tests for {@link SistemaPersistencia#anularReserva(String, int)}
+	 * FINDME Tests for {@link SistemaPersistenciaSinAislamiento#anularReserva(String, int)}
 	 */
 	@Test
 	void testAnularReservaAumentaPlazasDisponiblesLimiteInferior() {
@@ -1666,7 +1678,7 @@ class SistemaPersistenciaTest {
 	}
 
 	/**
-	 * FINDME Tests for {@link SistemaPersistencia#devolverBilletes(String, int)}
+	 * FINDME Tests for {@link SistemaPersistenciaSinAislamiento#devolverBilletes(String, int)}
 	 */
 	@Test
 	void testDevolverBilletesAumentaPlazasDisponiblesLimiteInferior() {

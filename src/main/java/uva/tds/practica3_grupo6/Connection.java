@@ -1,11 +1,15 @@
 package uva.tds.practica3_grupo6;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -33,7 +37,13 @@ public class Connection {
 	 */
 	@Column(name="DURATION")
 	private int duration;
+	
+	@OneToMany(mappedBy = "connection", cascade = CascadeType.ALL)
+	private List<Recorrido> recorridos;
 
+	public Connection() {
+		
+	}
 	/**
 	 * Constructor for Connection
 	 * 
@@ -64,6 +74,7 @@ public class Connection {
 		this.origin = origin;
 		this.destination = destination;
 		this.duration = duration;
+		recorridos = new ArrayList<>();
 	}
 
 	/**
@@ -82,6 +93,18 @@ public class Connection {
 	 */
 	public int getDuration() {
 		return duration;
+	}
+	
+	public int getId() {
+		return this.id;
+	}
+	
+	public void addRecorrido(Recorrido rec) {
+		this.recorridos.add(rec);
+	}
+	
+	public void deleteRecorrido(Recorrido rec) {
+		this.recorridos.remove(rec);
 	}
 
 	/**
