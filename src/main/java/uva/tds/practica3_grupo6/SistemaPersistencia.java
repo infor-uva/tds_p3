@@ -64,10 +64,6 @@ public class SistemaPersistencia {
 	 */
 	private final List<Character> letrasNif=new ArrayList<>(Arrays.asList('T','R','W','A','G','M','Y','F','P','D','X','B','N','J','Z','S','Q','V','H','L','C','K','E'));
 	/**
-	 * {@link Recorrido#TRAIN}
-	 */
-	private static final TransportType TRAIN = TransportType.TRAIN;
-	/**
 	 * {@link Billete#ESTADO_RESERVADO}
 	 */
 	private static final String ESTADO_RESERVADO = Billete.ESTADO_RESERVADO;
