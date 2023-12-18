@@ -260,16 +260,16 @@ public class DatabaseManager implements IDatabaseManager {
 		try {
 			session.beginTransaction();
 			
-			session.persist(billete);
+			session.save(billete);
 			
 			Usuario user = session.get(Usuario.class, billete.getUsuario().getNif());
 			user.addBilletes(billete);
-			session.update(user);
+			session.save(user);
 			
 			Recorrido rec= session.get(Recorrido.class, billete.getRecorrido().getID());
 			rec.addBilletes(billete);
 			rec.decreaseAvailableSeats(1);
-			session.update(rec);
+			session.save(rec);
 			
 			session.flush();
 		} catch (HibernateException e) {
@@ -296,11 +296,11 @@ public class DatabaseManager implements IDatabaseManager {
 				session.delete(b);
 				Usuario user = session.get(Usuario.class, b.getUsuario().getNif());
 				user.removeBilletes(b);
-				session.update(user);
+				session.save(user);
 				Recorrido rec = session.get(Recorrido.class, b.getRecorrido().getID());
 				rec.removeBilletes(b);
 				rec.increaseAvailableSeats(1);
-				session.update(rec);
+				session.save(rec);
 			}
 			session.flush();
 			

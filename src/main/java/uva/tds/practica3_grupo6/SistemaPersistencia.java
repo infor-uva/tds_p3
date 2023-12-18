@@ -427,6 +427,10 @@ public class SistemaPersistencia {
 			throw e2;
 		}
 	}
+	
+	public Recorrido getRecorrido(String localizador) {
+		return database.getRecorrido(localizador);
+	}
 
 	/**
 	 * Reserva un número de billetes para un recorrido
@@ -476,7 +480,7 @@ public class SistemaPersistencia {
 			database.addBillete(ticket);
 		}
 		//recorrido.decreaseAvailableSeats(numBilletesReservar);
-		database.actualizarRecorrido(recorrido);
+		//database.actualizarRecorrido(recorrido);
 		return billetes;
 
 	}
@@ -521,11 +525,11 @@ public class SistemaPersistencia {
 		database.eliminarBilletes(localizador);
 		if(billetesRestantes > 0) {
 			for (int i = 0; i < billetesRestantes; i++) {
-				database.addBillete(billetes.get(0));
+				database.addBillete(billetes.get(i));
 			}
 		}
 		//recorrido.increaseAvailableSeats(numBilletesAnular);
-		database.actualizarRecorrido(recorrido);
+		//database.actualizarRecorrido(recorrido);
 
 	}
 
@@ -565,14 +569,9 @@ public class SistemaPersistencia {
 		
 		int billetesRestantes = billetes.size() - numBilletesDevolver;
 		database.eliminarBilletes(localizador);
-
-			Billete b = billetes.get(0);
-			Recorrido r = b.getRecorrido();
-			r.increaseAvailableSeats(numBilletesDevolver);
-			database.actualizarRecorrido(r);
-			if(billetesRestantes > 0) {
+		if(billetesRestantes > 0) {
 			for (int i = 0; i < billetesRestantes; i++) {
-				database.addBillete(b);
+				database.addBillete(billetes.get(i));
 			}
 			
 
@@ -618,8 +617,10 @@ public class SistemaPersistencia {
 			throw new IllegalArgumentException("El numero de billetes es superior a las plazas disponibles\n");
 		if (localizador.isEmpty())
 			throw new IllegalArgumentException("EL localizador esta vacio\n");
-		if (!database.getBilletes(localizador).isEmpty())
-			throw new IllegalArgumentException("El localizador ya ha sido usado\n");
+		boolean bandera=false;
+		for(Billete b: database.getBilletes(localizador)) {
+			if(b.getEstado().equals(ESTADO_COMPRADO))throw new IllegalArgumentException("El localizador ya ha sido usado\n");
+		}
 		List<Billete> returned=new ArrayList<>();
 		if(database.getUsuario(usr.getNif())==null) {
 			database.addUsuario(usr);
@@ -630,7 +631,7 @@ public class SistemaPersistencia {
 			database.addBillete(tiket);
 		}
 		//recorrido.decreaseAvailableSeats(numBilletes);
-		database.actualizarRecorrido(recorrido);
+		//database.actualizarRecorrido(recorrido);
 		return returned;
 	}
 
@@ -660,12 +661,12 @@ public class SistemaPersistencia {
 		for (Billete ticket : tickets) {
 			try {
 				ticket.setComprado();
+				database.actualizarBilletes(ticket);
 			} catch (IllegalStateException e) {
 				// Reescritura de mensaje de error
 				throw new IllegalStateException("the are no tickets booked with that locator");
 			}
 		}
-		database.actualizarBilletes(tickets.get(0));
 		return tickets;
 	}
 }

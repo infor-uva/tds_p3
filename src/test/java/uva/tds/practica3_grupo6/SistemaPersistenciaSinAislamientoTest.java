@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
  * 
  * @version 28/11/23
  */
-class SistemaPersistenciaTest {
+class SistemaPersistenciaSinAislamientoTest {
 
 	private static final double ERROR_MARGIN = 0.00001;
 	private static final String ESTADO_RESERVADO = Billete.ESTADO_RESERVADO;
@@ -156,9 +156,10 @@ class SistemaPersistenciaTest {
 		String locator = "T12345";
 		List<Billete> billetes = new ArrayList<>();
 		Usuario usuario = new Usuario("32698478E", "Geronimo");
-		Billete ticket = new Billete(locator, recorrido, usuario, ESTADO_COMPRADO);
 		sistema.addRecorrido(recorrido);
 		sistema.comprarBilletes("T12345", usuario, recorrido, 1);
+		Recorrido rec=sistema.getRecorrido(recorrido.getID());
+		Billete ticket = new Billete(locator, rec, usuario, ESTADO_COMPRADO);
 		billetes.add(ticket);
 		assertEquals(billetes, sistema.getAssociatedBilletesToRoute(id));
 
@@ -307,14 +308,17 @@ class SistemaPersistenciaTest {
 		String locator = "c";
 		sistema.addRecorrido(recorrido);
 		sistema.reservarBilletes(locator, user, recorrido, 1);
-		sistema.comprarBilletes(locator, differentUser, recorrido, 2);
-
 		List<Billete> expected = new ArrayList<>();
-		expected.add(new Billete(locator, recorrido, user, ESTADO_RESERVADO));
-		expected.add(new Billete(locator, recorrido, differentUser, ESTADO_COMPRADO));
-		expected.add(new Billete(locator, recorrido, differentUser, ESTADO_COMPRADO));
+		
+		Recorrido rec=sistema.getRecorrido(recorrido.getID());
+		sistema.comprarBilletes(locator, differentUser, rec, 2);
+		rec=sistema.getRecorrido(rec.getID());		
+		expected.add(new Billete(locator, rec, user, ESTADO_RESERVADO));
+		expected.add(new Billete(locator, rec, differentUser, ESTADO_COMPRADO));
+		expected.add(new Billete(locator, rec, differentUser, ESTADO_COMPRADO));
 
-		assertEquals(expected, sistema.getAssociatedBilletesToRoute(idLI));
+		
+		assertEquals(expected, sistema.getAssociatedBilletesToRoute(id));
 
 	}
 
@@ -406,7 +410,6 @@ class SistemaPersistenciaTest {
 	 */
 	@Test
 	void testGetDateTimeOfRecorridoValidoConIDLimiteInferior() {
-		database.addRecorrido(recorridoLI);
 		sistema.addRecorrido(recorridoLI);
 		assertEquals(recorridoLI.getDateTime(), sistema.getDateTimeOfRecorrido(idLI));
 	}
@@ -840,11 +843,11 @@ class SistemaPersistenciaTest {
 		String locator = "1";
 		sistema.addRecorrido(recorrido);
 		sistema.reservarBilletes(locator, user, recorrido, 3);
-
+		Recorrido rec=sistema.getRecorrido(recorrido.getID());
 		List<Billete> purchasedTicketsCheck = new ArrayList<>();
-		purchasedTicketsCheck.add(new Billete(locator, recorrido, user, ESTADO_COMPRADO));
-		purchasedTicketsCheck.add(new Billete(locator, recorrido, user, ESTADO_COMPRADO));
-		purchasedTicketsCheck.add(new Billete(locator, recorrido, user, ESTADO_COMPRADO));
+		purchasedTicketsCheck.add(new Billete(locator, rec, user, ESTADO_COMPRADO));
+		purchasedTicketsCheck.add(new Billete(locator, rec, user, ESTADO_COMPRADO));
+		purchasedTicketsCheck.add(new Billete(locator, rec, user, ESTADO_COMPRADO));
 		List<Billete> purchasedTickets = sistema.comprarBilletesReservados(locator);
 		assertEquals(purchasedTicketsCheck, purchasedTickets);
 
@@ -856,11 +859,11 @@ class SistemaPersistenciaTest {
 		String locator = "12345678";
 		sistema.addRecorrido(recorrido);
 		sistema.reservarBilletes(locator, user, recorrido, 3);
-
+		Recorrido rec=sistema.getRecorrido(recorrido.getID());
 		List<Billete> buyedTicketsCheck = new ArrayList<>();
-		buyedTicketsCheck.add(new Billete(locator, recorrido, user, ESTADO_COMPRADO));
-		buyedTicketsCheck.add(new Billete(locator, recorrido, user, ESTADO_COMPRADO));
-		buyedTicketsCheck.add(new Billete(locator, recorrido, user, ESTADO_COMPRADO));
+		buyedTicketsCheck.add(new Billete(locator, rec, user, ESTADO_COMPRADO));
+		buyedTicketsCheck.add(new Billete(locator, rec, user, ESTADO_COMPRADO));
+		buyedTicketsCheck.add(new Billete(locator, rec, user, ESTADO_COMPRADO));
 		List<Billete> buyedTickets = sistema.comprarBilletesReservados(locator);
 		assertEquals(buyedTicketsCheck, buyedTickets);
 
@@ -903,7 +906,7 @@ class SistemaPersistenciaTest {
 	void testComprarBilletesReservadosConLocalizadorDeBilletesComprados() {
 		String locator = "12345678";
 		sistema.addRecorrido(recorrido);
-		sistema.reservarBilletes(locator, user, recorrido, 2);
+		sistema.comprarBilletes(locator, user, recorrido, 2);
 		assertThrows(IllegalStateException.class, () -> {
 			sistema.comprarBilletesReservados(locator);
 		});
@@ -922,7 +925,7 @@ class SistemaPersistenciaTest {
 		sistema.addRecorrido(recorrido);
 		List<Billete> reservado = sistema.reservarBilletes("ABC12345", user, recorrido, numBilletesReservar);
 
-		assertEquals(plazasDisponibles - numBilletesReservar, recorrido.getNumAvailableSeats());
+		assertEquals(plazasDisponibles - numBilletesReservar, sistema.getRecorrido(recorrido.getID()).getNumAvailableSeats());
 
 		ArrayList<Billete> listaBilletesComprobacion = new ArrayList<>();
 		for (int i = 0; i < numBilletesReservar; i++) {
@@ -980,8 +983,9 @@ class SistemaPersistenciaTest {
 		int numBilletesComprar = (recorrido.getTotalSeats() / 2) + 1;
 		sistema.addRecorrido(recorrido);
 		sistema.comprarBilletes(localizador, user, recorrido, numBilletesComprar);
+		Recorrido rec=sistema.getRecorrido(recorrido.getID());
 		assertThrows(IllegalStateException.class, () -> {
-			sistema.reservarBilletes(localizador2, user, recorrido, 5);
+			sistema.reservarBilletes(localizador2, user, rec, 5);
 		});
 		
 
@@ -997,12 +1001,12 @@ class SistemaPersistenciaTest {
 		String localizador = "ABC12345";
 		sistema.addRecorrido(recorrido);
 		sistema.reservarBilletes(localizador, user, recorrido, numBilletesReservar);
-		int plazasDisponiblesAntes = recorrido.getNumAvailableSeats();
+		int plazasDisponiblesAntes = sistema.getRecorrido(recorrido.getID()).getNumAvailableSeats();
 
 		// Realiza la anulación de la reserva
 		sistema.anularReserva(localizador, numBilletesAnular);
 
-		int plazasDisponiblesDespues = recorrido.getNumAvailableSeats();
+		int plazasDisponiblesDespues = sistema.getRecorrido(recorrido.getID()).getNumAvailableSeats();
 
 		// Verifica que las plazas disponibles aumenten en la cantidad correcta
 		assertEquals(plazasDisponiblesAntes + numBilletesAnular, plazasDisponiblesDespues);
@@ -1077,7 +1081,8 @@ class SistemaPersistenciaTest {
 		String localizador = "ABC12345";
 		sistema.addRecorrido(recorrido);
 		sistema.comprarBilletes(localizador, user, recorrido, numBilletesComprar);
-		int plazasDisponiblesAntes = recorrido.getNumAvailableSeats();
+		
+		int plazasDisponiblesAntes = database.getRecorrido(recorrido.getID()).getNumAvailableSeats();
 
 		// Realiza la anulación de la reserva
 		sistema.devolverBilletes(localizador, numBilletesDevolver);
