@@ -21,7 +21,7 @@ public class DatabaseManager implements IDatabaseManager {
 		}
 
 		if (getRecorrido(rec.getID()) != null) {
-			throw new IllegalArgumentException("El recorrido con ese numero ya existe");
+			throw new IllegalStateException("El recorrido con ese numero ya existe");
 		}
 
 		Session session = getSession();
@@ -93,7 +93,7 @@ public class DatabaseManager implements IDatabaseManager {
 		
 		try {
 			session.beginTransaction();
-			session.refresh(recorrido);
+			session.update(recorrido);
 			session.flush();
 			
 		} catch(HibernateException e) {
@@ -264,12 +264,12 @@ public class DatabaseManager implements IDatabaseManager {
 			
 			Usuario user = session.get(Usuario.class, billete.getUsuario().getNif());
 			user.addBilletes(billete);
-			session.save(user);
+			session.update(user);
 			
 			Recorrido rec= session.get(Recorrido.class, billete.getRecorrido().getID());
 			rec.addBilletes(billete);
 			rec.decreaseAvailableSeats(1);
-			session.save(rec);
+			session.update(rec);
 			
 			session.flush();
 		} catch (HibernateException e) {
@@ -284,22 +284,24 @@ public class DatabaseManager implements IDatabaseManager {
 	public void eliminarBilletes(String localizadorBillete) {
 		if (localizadorBillete == null)
 			throw new IllegalArgumentException();
-		if (getRecorrido(localizadorBillete) == null)
+		if (getBilletes(localizadorBillete).equals(new ArrayList<>()))
 			throw new IllegalArgumentException("El billete con ese id no existe");
 		
 		Session session = getSession();
 		
 		try {
 			session.beginTransaction();
-			Billete ticket = session.get(Billete.class, localizadorBillete);
-			Usuario user = session.get(Usuario.class, ticket.getUsuario().getNif());
-			user.removeBilletes(ticket);
-			session.save(user);
-			Recorrido rec = session.get(Recorrido.class, ticket.getRecorrido().getID());
-			rec.removeBilletes(ticket);
-			rec.increaseAvailableSeats(1);
-			session.save(rec);
-			session.delete(ticket);
+			List<Billete> listaBilletes = session.createQuery("FROM Billete", Billete.class).getResultList();
+			for(Billete b:listaBilletes) {
+				session.delete(b);
+				Usuario user = session.get(Usuario.class, b.getUsuario().getNif());
+				user.removeBilletes(b);
+				session.update(user);
+				Recorrido rec = session.get(Recorrido.class, b.getRecorrido().getID());
+				rec.removeBilletes(b);
+				rec.increaseAvailableSeats(1);
+				session.update(rec);
+			}
 			session.flush();
 			
 		} catch(HibernateException e) {
@@ -321,7 +323,7 @@ public class DatabaseManager implements IDatabaseManager {
 		try {
 			session.beginTransaction();
 			
-			session.refresh(billete);
+			session.update(billete);
 			session.flush();
 		} catch (HibernateException e) {
 			e.printStackTrace();
@@ -340,8 +342,9 @@ public class DatabaseManager implements IDatabaseManager {
 		try {
 			session.beginTransaction();
 			List<Billete> recorridosList = session.createQuery("FROM Billete", Billete.class).getResultList();
-			
-			lista.addAll(recorridosList);
+			for(Billete b: recorridosList) {
+				if(b.getLocalizador().equals(localizadorBilletes))lista.add(b);
+			}
 			return lista;
 			
 		} catch (Exception e) {
