@@ -192,14 +192,15 @@ public class DatabaseManager implements IDatabaseManager {
 	public void eliminarUsuario(String idUsuario) {
 		if (idUsuario == null)
 			throw new IllegalArgumentException();
-		if (getRecorrido(idUsuario) == null)
+		if (getUsuario(idUsuario) == null)
 			throw new IllegalArgumentException("El usuario con ese id no existe");
 		
 		Session session = getSession();
 		
 		try {
 			session.beginTransaction();
-			session.delete(idUsuario, getUsuario(idUsuario));
+			Usuario user = session.get(Usuario.class, idUsuario);
+			session.delete(idUsuario, user);
 			session.flush();
 			
 		} catch(HibernateException e) {
@@ -214,14 +215,14 @@ public class DatabaseManager implements IDatabaseManager {
 	public void actualizarUsuario(Usuario usuario) {
 		if (usuario == null)
 			throw new IllegalArgumentException();
-		if (getRecorrido(usuario.getNif()) == null)
+		if (getUsuario(usuario.getNif()) == null)
 			throw new IllegalArgumentException("El usuario con ese id no existe");
 		
 		Session session = getSession();
 		
 		try {
 			session.beginTransaction();
-			session.refresh(usuario);
+			session.update(usuario);
 			session.flush();
 			
 		} catch(HibernateException e) {

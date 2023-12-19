@@ -106,17 +106,18 @@ class DatabaseManagerTest2 {
 	void testEliminarUsuario() {
 		 String ID = user.getNif();
 	     databaseManager.addUsuario(user);
-	     databaseManager.eliminarUsuario(ID);
-	     assertNull(databaseManager.getUsuario(ID));
+	     databaseManager.eliminarUsuario(user.getNif());
+	     assertNull(databaseManager.getUsuario(user.getNif()));
 	}
 
 	@Test
 	void testActualizarUsuario() {
 		 String ID = user.getNif();
 	     databaseManager.addUsuario(user);
-	     user.addBilletes(billete);
-	     databaseManager.actualizarUsuario(user);
-	     assertEquals(user,databaseManager.getUsuario(ID));
+	     databaseManager.addRecorrido(recorrido);
+	     Usuario updateUser = new Usuario(ID, "Paco");
+		 databaseManager.actualizarUsuario(updateUser);
+	     assertEquals(updateUser,databaseManager.getUsuario(ID));
 	}
 
 	@Test
@@ -144,31 +145,42 @@ class DatabaseManagerTest2 {
 	@Test
 	void testActualizarBilletes() {
 		String ID = billete.getLocalizador();
+		databaseManager.addRecorrido(recorrido);
+		databaseManager.addUsuario(user);
+		databaseManager.addBillete(billete);
+		billete.setComprado();
+		assertNotEquals(billete,databaseManager.getBilletes(ID));
+		databaseManager.actualizarBilletes(billete);
+		assertEquals(billete, databaseManager.getBilletes(ID));
+	}
+
+
+	@Test
+	void testGetBilletesDeRecorrido() {
+		String ID = recorrido.getID();
 		databaseManager.addBillete(billete);
 		databaseManager.addBillete(billete2);
 		ArrayList<Billete> billetes = new ArrayList<>();
 		billetes.add(billete); billetes.add(billete2);
-		assertEquals(billete, databaseManager.getBilletes(ID));
-	}
-
-	@Test
-	void testGetBilletes() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testGetBilletesDeRecorrido() {
-		fail("Not yet implemented");
+		assertEquals(billete, databaseManager.getBilletesDeRecorrido(ID));
 	}
 
 	@Test
 	void testGetBilletesDeUsuario() {
-		fail("Not yet implemented");
+		String ID = user.getNif();
+		databaseManager.addBillete(billete);
+		databaseManager.addBillete(billete2);
+		ArrayList<Billete> billetes = new ArrayList<>();
+		billetes.add(billete); billetes.add(billete2);
+		assertEquals(billete, databaseManager.getBilletesDeUsuario(ID));
 	}
 
 	@Test
 	void testClearDatabase() {
-		fail("Not yet implemented");
+		 String ID = user.getNif();
+	     databaseManager.addUsuario(user);
+	     databaseManager.clearDatabase();
+	     assertNull(databaseManager.getUsuario(ID));
 	}
 
 }
