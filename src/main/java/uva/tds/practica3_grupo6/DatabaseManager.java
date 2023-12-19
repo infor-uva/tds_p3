@@ -87,7 +87,7 @@ public class DatabaseManager implements IDatabaseManager {
 		if (recorrido == null)
 			throw new IllegalArgumentException();
 		if (getRecorrido(recorrido.getID()) == null)
-			throw new IllegalArgumentException("El recorrido con ese id no existe");
+			throw new IllegalStateException("El recorrido con ese id no existe");
 		
 		Session session = getSession();
 		
@@ -171,7 +171,7 @@ public class DatabaseManager implements IDatabaseManager {
 		if (usuario == null)
 			throw new IllegalArgumentException();
 		if (getUsuario(usuario.getNif()) != null)
-			throw new IllegalArgumentException("El usuario con ese nif ya existe");
+			throw new IllegalStateException("El usuario con ese nif ya existe");
 		
 		Session session = getSession();
 		
@@ -193,7 +193,7 @@ public class DatabaseManager implements IDatabaseManager {
 		if (idUsuario == null)
 			throw new IllegalArgumentException();
 		if (getUsuario(idUsuario) == null)
-			throw new IllegalArgumentException("El usuario con ese id no existe");
+			throw new IllegalStateException("El usuario con ese id no existe");
 		
 		Session session = getSession();
 		
@@ -216,7 +216,7 @@ public class DatabaseManager implements IDatabaseManager {
 		if (usuario == null)
 			throw new IllegalArgumentException();
 		if (getUsuario(usuario.getNif()) == null)
-			throw new IllegalArgumentException("El usuario con ese id no existe");
+			throw new IllegalStateException("El usuario con ese id no existe");
 		
 		Session session = getSession();
 		

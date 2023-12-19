@@ -1,252 +1,299 @@
 package uva.tds.practica3_grupo6;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.ArrayList;
+
 import org.easymock.TestSubject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import antlr.collections.List;
+
 
 class DatabaseManagerTest {
+	
+	private DatabaseManager databaseManager;
+	private Usuario user;
+	private Usuario differentUser;
+	private Billete billete;
+	private Billete billete2;
+	private BusRecorrido recorrido;
+	private BusRecorrido recorridoLI;
+	private TrainRecorrido differentRecorrido;
+	private TrainRecorrido differentFecha;
+	
+    @BeforeEach
+    void setUp() {
+    	String nif = "32698478E";
+		String nombre = "Geronimo";
+		user = new Usuario(nif, nombre);
+		differentUser = new Usuario("79105889B", nombre);
+		String id = "c12345";
+		Connection connection = new Connection("Valladolid", "Palencia", 30);
+		LocalDateTime dateTime = LocalDateTime.of(2023, 10, 27, 19, 06, 50);
+		double price = 1.0;
+		int numSeats = 50;
+		recorrido = new BusRecorrido(id, connection, price, dateTime, numSeats);
+		recorridoLI = new BusRecorrido("c12354", connection, price, dateTime, numSeats);
+		differentFecha = new TrainRecorrido("train123", connection, price, LocalDateTime.of(2023, 9, 26, 13, 02, 50), numSeats);
+		differentRecorrido = new TrainRecorrido("train", connection, price, dateTime, numSeats);
+		billete = new Billete("c321", recorrido, user, "reservado");
+		billete2 = new Billete("321c", recorrido, user, "comprado");
+		databaseManager = new DatabaseManager();
+    }
+
+    @AfterEach
+    void tearDown() {
+        databaseManager.clearDatabase();
+    }
 
 	@Test
-	void test() {
-		fail("Not yet implemented");
+	void testAddRecorrido() {
+        String ID = recorrido.getID();
+        databaseManager.addRecorrido(recorrido);
+        assertEquals(recorrido, databaseManager.getRecorrido(ID));
+     }
+	
+	@Test
+	void testAddRecorridoNull() {
+        assertThrows(IllegalArgumentException.class, () -> {
+			databaseManager.addRecorrido(null);
+		});
+     }
+	
+	@Test
+	void testAddRecorridoYaExistente() {
+        String ID = recorrido.getID();
+        databaseManager.addRecorrido(recorrido);
+        assertEquals(recorrido, databaseManager.getRecorrido(ID));
+        assertThrows(IllegalStateException.class, () -> {
+			databaseManager.addRecorrido(recorrido);
+		});
+     }
+
+	@Test
+	void testEliminarRecorrido() {
+		String ID = recorrido.getID();
+		databaseManager.addRecorrido(recorrido);
+		databaseManager.eliminarRecorrido(ID);
+		assertNull(databaseManager.getRecorrido(ID));
 	}
 	
-	import static org.junit.jupiter.api.Assertions.*;
-
-	import java.time.LocalDate;
-	import java.util.ArrayList;
-
-	import org.junit.jupiter.api.AfterEach;
-	import org.junit.jupiter.api.BeforeEach;
-	import org.junit.jupiter.api.Test;
-
-public class DatabaseManagerTest {
-
-	    private DatabaseManager databaseManager;
-
-	    @BeforeEach
-	    void setUp() {
-	        databaseManager = new DatabaseManager();
-	    }
-
-	    @AfterEach
-	    void tearDown() {
-	        databaseManager.clearDatabase();
-	    }
-
-	    @Test
-	    void testAddRecorrido() {
-	        Recorrido recorrido = new BusRecorrido();
-	        recorrido.setID("123");
-
-	        assertNull(databaseManager.getRecorrido("123"));
-
-	        databaseManager.addRecorrido(recorrido);
-
-	        assertNotNull(databaseManager.getRecorrido("123"));
-	    }
-
-	    @Test
-	    void testEliminarRecorrido() {
-	        Recorrido recorrido = new BusRecorrido();
-	        recorrido.setID("123");
-
-	        databaseManager.addRecorrido(recorrido);
-
-	        assertNotNull(databaseManager.getRecorrido("123"));
-
-	        databaseManager.eliminarRecorrido("123");
-
-	        assertNull(databaseManager.getRecorrido("123"));
-	    }
-
-	    @Test
-	    void testActualizarRecorrido() {
-	        Recorrido recorrido = new BusRecorrido();
-	        recorrido.setID("123");
-
-	        databaseManager.addRecorrido(recorrido);
-
-	        recorrido.setFecha(LocalDate.now());
-
-	        databaseManager.actualizarRecorrido(recorrido);
-
-	        Recorrido recorridoActualizado = databaseManager.getRecorrido("123");
-
-	        assertEquals(LocalDate.now(), recorridoActualizado.getFecha());
-	    }
-
-	    @Test
-	    void testGetRecorrido() {
-	        Recorrido recorrido = new BusRecorrido();
-	        recorrido.setID("123");
-
-	        databaseManager.addRecorrido(recorrido);
-
-	        Recorrido recorridoObtenido = databaseManager.getRecorrido("123");
-
-	        assertEquals(recorrido, recorridoObtenido);
-	    }
-
-	    @Test
-	    void testGetRecorridos() {
-	        databaseManager.addRecorrido(new BusRecorrido("001", LocalDate.now()));
-	        databaseManager.addRecorrido(new TrainRecorrido("002", LocalDate.now()));
-
-	        ArrayList<Recorrido> recorridos = databaseManager.getRecorridos();
-
-	        assertEquals(2, recorridos.size());
-	    }
-
-	    @Test
-	    void testAddUsuario() {
-	        Usuario usuario = new Usuario();
-	        usuario.setNif("12345678A");
-
-	        assertNull(databaseManager.getUsuario("12345678A"));
-
-	        databaseManager.addUsuario(usuario);
-
-	        assertNotNull(databaseManager.getUsuario("12345678A"));
-	    }
-
-	    @Test
-	    void testEliminarUsuario() {
-	        Usuario usuario = new Usuario();
-	        usuario.setNif("12345678A");
-
-	        databaseManager.addUsuario(usuario);
-
-	        assertNotNull(databaseManager.getUsuario("12345678A"));
-
-	        databaseManager.eliminarUsuario("12345678A");
-
-	        assertNull(databaseManager.getUsuario("12345678A"));
-	    }
-
-	    @Test
-	    void testActualizarUsuario() {
-	        Usuario usuario = new Usuario();
-	        usuario.setNif("12345678A");
-
-	        databaseManager.addUsuario(usuario);
-
-	        usuario.setNombre("NuevoNombre");
-
-	        databaseManager.actualizarUsuario(usuario);
-
-	        Usuario usuarioActualizado = databaseManager.getUsuario("12345678A");
-
-	        assertEquals("NuevoNombre", usuarioActualizado.getNombre());
-	    }
-
-	    @Test
-	    void testGetUsuario() {
-	        Usuario usuario = new Usuario();
-	        usuario.setNif("12345678A");
-
-	        databaseManager.addUsuario(usuario);
-
-	        Usuario usuarioObtenido = databaseManager.getUsuario("12345678A");
-
-	        assertEquals(usuario, usuarioObtenido);
-	    }
-
-	    @Test
-	    void testAddBillete() {
-	        Billete billete = new Billete();
-	        billete.setLocalizador("ABC123");
-
-	        assertNull(databaseManager.getBilletes("ABC123"));
-
-	        databaseManager.addBillete(billete);
-
-	        assertNotNull(databaseManager.getBilletes("ABC123"));
-	    }
-
-	    @Test
-	    void testEliminarBilletes() {
-	        Billete billete = new Billete();
-	        billete.setLocalizador("ABC123");
-
-	        databaseManager.addBillete(billete);
-
-	        assertNotNull(databaseManager.getBilletes("ABC123"));
-
-	        databaseManager.eliminarBilletes("ABC123");
-
-	        assertEquals(0, databaseManager.getBilletes("ABC123").size());
-	    }
-
-	    @Test
-	    void testActualizarBilletes() {
-	        Billete billete = new Billete();
-	        billete.setLocalizador("ABC123");
-
-	        databaseManager.addBillete(billete);
-
-	        billete.setPrecio(50.0);
-
-	        databaseManager.actualizarBilletes(billete);
-
-	        Billete billeteActualizado = databaseManager.getBilletes("ABC123").get(0);
-
-	        assertEquals(50.0, billeteActualizado.getPrecio());
-	    }
-
-	    @Test
-	    void testGetBilletes() {
-	        Billete billete1 = new Billete();
-	        billete1.setLocalizador("ABC123");
-	        Billete billete2 = new Billete();
-	        billete2.setLocalizador("XYZ789");
-
-	        databaseManager.addBillete(billete1);
-	        databaseManager.addBillete(billete2);
-
-	        ArrayList<Billete> billetes = databaseManager.getBilletes("ABC123");
-
-	        assertEquals(1, billetes.size());
-	        assertEquals(billete1, billetes.get(0));
-	    }
-
-	    @Test
-	    void testGetBilletesDeRecorrido() {
-	        Billete billete1 = new Billete();
-	        billete1.setLocalizador("ABC123");
-	        billete1.setRecorrido(new BusRecorrido("001", LocalDate.now()));
-
-	        Billete billete2 = new Billete();
-	        billete2.setLocalizador("XYZ789");
-	        billete2.setRecorrido(new TrainRecorrido("002", LocalDate.now()));
-
-	        databaseManager.addBillete(billete1);
-	        databaseManager.addBillete(billete2);
-
-	        ArrayList<Billete> billetes = databaseManager.getBilletesDeRecorrido("001");
-
-	        assertEquals(1, billetes.size());
-	        assertEquals(billete1, billetes.get(0));
-	    }
-
-	    @Test
-	    void testGetBilletesDeUsuario() {
-	        Billete billete1 = new Billete();
-	        billete1.setLocalizador("ABC123");
-	        billete1.setUsuario(new Usuario("12345678A"));
-
-	        Billete billete2 = new Billete();
-	        billete2.setLocalizador("XYZ789");
-	        billete2.setUsuario(new Usuario("87654321B"));
-
-	        databaseManager.addBillete(billete1);
-	        databaseManager.addBillete(billete2);
-
-	        //ArrayList<Billete> billetes =
-	    }
-
+	@Test
+	void testEliminarRecorridoNull() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			databaseManager.eliminarRecorrido(null);
+		});
+	}
+	
+	@Test
+	void testEliminarRecorridoNoExiste() {
+		String ID = "4321";
+		databaseManager.addRecorrido(recorrido);
+		assertThrows(IllegalStateException.class, () -> {
+			databaseManager.eliminarRecorrido(ID);
+		});
+	}
+
+	@Test
+	void testActualizarRecorrido() {
+		String ID = recorrido.getID();
+		databaseManager.addRecorrido(recorrido);
+		recorrido.decreaseAvailableSeats(13);
+		databaseManager.actualizarRecorrido(recorrido);
+		assertEquals(recorrido, databaseManager.getRecorrido(ID));
+	}
+	
+	@Test
+	void testActualizarRecorridoNull() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			databaseManager.actualizarRecorrido(null);
+		});
+	}
+	
+	@Test
+	void testActualizarRecorridoNoExiste() {
+		assertThrows(IllegalStateException.class, () -> {
+			databaseManager.actualizarRecorrido(recorrido);
+		});
+	}
+
+	@Test
+	void testGetRecorridos() {
+		databaseManager.addRecorrido(recorrido);
+		databaseManager.addRecorrido(recorridoLI);
+		databaseManager.addRecorrido(differentRecorrido);
+		ArrayList<Recorrido> recorridos = new ArrayList<>();
+		recorridos.add(recorrido); recorridos.add(recorridoLI); recorridos.add(differentRecorrido);
+		assertEquals(recorridos,databaseManager.getRecorridos());
+	}
+
+	@Test
+	void testGetRecorridosLocalDate() {
+		databaseManager.addRecorrido(recorrido);
+		databaseManager.addRecorrido(recorridoLI);
+		databaseManager.addRecorrido(differentRecorrido);
+		databaseManager.addRecorrido(differentFecha);
+		ArrayList<Recorrido> recorridos = new ArrayList<>();
+		recorridos.add(recorrido); recorridos.add(recorridoLI); recorridos.add(differentRecorrido);
+		assertEquals(recorridos,databaseManager.getRecorridos(LocalDate.of(2023, 10, 27)));
+	}
+
+	@Test
+	void testAddUsuario() {
+        String ID = user.getNif();
+        databaseManager.addUsuario(user);
+        assertEquals(user, databaseManager.getUsuario(ID));
+	}
+	
+	@Test
+	void testAddUsuarioNull() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			databaseManager.addUsuario(null);
+		});
+	}
+	@Test
+	void testAddUsuarioYaExiste() {
+        String ID = user.getNif();
+        databaseManager.addUsuario(user);
+        assertEquals(user, databaseManager.getUsuario(ID));
+        assertThrows(IllegalStateException.class, () -> {
+			databaseManager.addUsuario(user);
+		});
+	}
+
+	@Test
+	void testEliminarUsuario() {
+		 String ID = user.getNif();
+	     databaseManager.addUsuario(user);
+	     databaseManager.eliminarUsuario(user.getNif());
+	     assertNull(databaseManager.getUsuario(user.getNif()));
+	}
+	
+	@Test
+	void testEliminarUsuarioNull() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			databaseManager.eliminarUsuario(null);
+		});
+	}
+	
+	@Test
+	void testEliminarUsuarioNoExiste() {
+		 String ID = user.getNif();
+	     assertThrows(IllegalStateException.class, () -> {
+				databaseManager.eliminarUsuario(ID);
+			});
+	}
+
+	@Test
+	void testActualizarUsuario() {
+		 String ID = user.getNif();
+	     databaseManager.addUsuario(user);
+	     databaseManager.addRecorrido(recorrido);
+	     Usuario updateUser = new Usuario(ID, "Paco");
+		 databaseManager.actualizarUsuario(updateUser);
+	     assertEquals(updateUser,databaseManager.getUsuario(ID));
+	}
+	
+	@Test
+	void testActualizarUsuarioNull() {
+		 assertThrows(IllegalArgumentException.class, () -> {
+				databaseManager.actualizarUsuario(null);
+			});
+	}
+	
+	@Test
+	void testActualizarUsuarioNoExiste() {
+		 assertThrows(IllegalStateException.class, () -> {
+				databaseManager.actualizarUsuario(user);
+			});
+	}
+
+	@Test
+	void testAddBillete() {
+		String ID = billete.getLocalizador();
+		databaseManager.addRecorrido(recorrido);
+		databaseManager.addUsuario(user);
+		databaseManager.addBillete(billete);
+		databaseManager.addBillete(billete2);
+		recorrido.decreaseAvailableSeats(2);
+		ArrayList<Billete> billetes = new ArrayList<>();
+		billetes.add(billete);
+		assertEquals(billetes, databaseManager.getBilletes(ID));
+	}
+
+	@Test
+	void testEliminarBilletes() {
+		String ID = billete.getLocalizador();
+		databaseManager.addRecorrido(recorrido);
+		databaseManager.addUsuario(user);
+		databaseManager.addBillete(billete);
+		databaseManager.addBillete(billete2);
+		recorrido.decreaseAvailableSeats(2);
+		databaseManager.eliminarBilletes(ID);
+		recorrido.increaseAvailableSeats(1);
+		ArrayList<Billete> billetes = new ArrayList<>();
+		billetes.add(billete2);
+		assertEquals(true,databaseManager.getBilletes(ID).isEmpty());
+		assertNotEquals(billete, databaseManager.getBilletes(billete2.getLocalizador()));
+	}
+
+	@Test
+	void testActualizarBilletes() {
+		String ID = billete.getLocalizador();
+		databaseManager.addRecorrido(recorrido);
+		databaseManager.addUsuario(user);
+		databaseManager.addBillete(billete);
+		
+		recorrido.decreaseAvailableSeats(1);
+		
+		ArrayList<Billete> billetes = new ArrayList<>();
+		billetes.add(billete);
+		billete.setComprado();
+		assertNotEquals(billetes,databaseManager.getBilletes(ID));
+		
+		databaseManager.actualizarBilletes(billete);
+		assertEquals(billetes, databaseManager.getBilletes(ID));
+	}
+
+
+	@Test
+	void testGetBilletesDeRecorrido() {
+		String ID = recorrido.getID();
+		databaseManager.addRecorrido(recorrido);
+		databaseManager.addUsuario(user);
+		databaseManager.addBillete(billete);
+		databaseManager.addBillete(billete2);
+		recorrido.decreaseAvailableSeats(2);
+		ArrayList<Billete> billetes = new ArrayList<>();
+		billetes.add(billete); billetes.add(billete2);
+		assertEquals(billetes, databaseManager.getBilletesDeRecorrido(ID));
+	}
+
+	@Test
+	void testGetBilletesDeUsuario() {
+		String ID = user.getNif();
+		databaseManager.addRecorrido(recorrido);
+		databaseManager.addUsuario(user);
+		databaseManager.addBillete(billete);
+		databaseManager.addBillete(billete2);
+		recorrido.decreaseAvailableSeats(2);
+		ArrayList<Billete> billetes = new ArrayList<>();
+		billetes.add(billete); billetes.add(billete2);
+		assertEquals(billetes, databaseManager.getBilletesDeUsuario(ID));
+	}
+
+	@Test
+	void testClearDatabase() {
+		 String ID = user.getNif();
+	     databaseManager.addUsuario(user);
+	     databaseManager.clearDatabase();
+	     assertNull(databaseManager.getUsuario(ID));
+	}
 
 }
