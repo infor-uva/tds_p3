@@ -226,6 +226,13 @@ class DatabaseManagerTest {
 		billetes.add(billete);
 		assertEquals(billetes, databaseManager.getBilletes(ID));
 	}
+	
+	@Test
+	void testAddBilleteNull() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			databaseManager.addBillete(null);
+		});
+	}
 
 	@Test
 	void testEliminarBilletes() {
@@ -241,6 +248,21 @@ class DatabaseManagerTest {
 		billetes.add(billete2);
 		assertEquals(true,databaseManager.getBilletes(ID).isEmpty());
 		assertNotEquals(billete, databaseManager.getBilletes(billete2.getLocalizador()));
+	}
+	
+	@Test
+	void testEliminarBilletesNull() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			databaseManager.eliminarBilletes(null);
+		});
+	}
+	
+	@Test
+	void testEliminarBilletesNoExisten() {
+		String ID = billete.getLocalizador();
+		assertThrows(IllegalStateException.class, () -> {
+			databaseManager.eliminarBilletes(ID);
+		});
 	}
 
 	@Test
@@ -259,6 +281,20 @@ class DatabaseManagerTest {
 		
 		databaseManager.actualizarBilletes(billete);
 		assertEquals(billetes, databaseManager.getBilletes(ID));
+	}
+	
+	@Test
+	void testActualizarBilletesNull() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			databaseManager.actualizarBilletes(null);
+		});
+	}
+	
+	@Test
+	void testActualizarBilletesNoExisten() {
+		assertThrows(IllegalStateException.class, () -> {
+			databaseManager.actualizarBilletes(billete);
+		});
 	}
 
 
@@ -287,7 +323,7 @@ class DatabaseManagerTest {
 		billetes.add(billete); billetes.add(billete2);
 		assertEquals(billetes, databaseManager.getBilletesDeUsuario(ID));
 	}
-
+	
 	@Test
 	void testClearDatabase() {
 		 String ID = user.getNif();

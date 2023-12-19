@@ -286,7 +286,7 @@ public class DatabaseManager implements IDatabaseManager {
 		if (localizadorBillete == null)
 			throw new IllegalArgumentException();
 		if (getBilletes(localizadorBillete).equals(new ArrayList<>()))
-			throw new IllegalArgumentException("El billete con ese id no existe");
+			throw new IllegalStateException("El billete con ese id no existe");
 		
 		Session session = getSession();
 		
@@ -318,6 +318,8 @@ public class DatabaseManager implements IDatabaseManager {
 	public void actualizarBilletes(Billete billete) {
 		if (billete == null)
 			throw new IllegalArgumentException();
+		if (getBilletes(billete.getLocalizador()).equals(new ArrayList<>()))
+			throw new IllegalStateException("El billete con ese id no existe");
 		
 		Session session = getSession();
 		
@@ -368,7 +370,6 @@ public class DatabaseManager implements IDatabaseManager {
 			for(Billete s: recorridosList) {
 				if(idRecorrido.equals(s.getRecorrido().getID()))lista.add(s);
 			}
-			return lista;
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -390,7 +391,6 @@ public class DatabaseManager implements IDatabaseManager {
 			for(Billete s: recorridosList) {
 				if(idUsuario.equals(s.getUsuario().getNif()))lista.add(s);
 			}
-			return lista;
 			
 		} catch (Exception e) {
 			e.printStackTrace();

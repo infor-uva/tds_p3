@@ -1210,6 +1210,17 @@ class SistemaPersistenciaSinAislamientoTest {
 		
 	}
 	
+	@Test
+	@Tag("Cobertura")
+	void testreservarBilletesConUsuarioYaRegistrado() {
+		String locator = "ABC12345";
+		int numBilletesReservar = 3;
+		sistema.addRecorrido(recorrido);
+		sistema.reservarBilletes(locator, user, recorrido, numBilletesReservar);
+		sistema.reservarBilletes("ABC54321", user, recorrido, numBilletesReservar);
+		
+	}
+	
 	@AfterEach
 	void tearDown() {
 		this.database.clearDatabase();
