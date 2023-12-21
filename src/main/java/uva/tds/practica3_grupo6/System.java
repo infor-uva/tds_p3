@@ -54,7 +54,7 @@ import java.util.List;
  * @author diebomb
  * @author migudel
  * 
- * @version 28/11/23
+ * @version 21/12/23
  */
 public class System {
 
@@ -64,10 +64,6 @@ public class System {
 	 */
 	private final List<Character> letrasNif = new ArrayList<>(Arrays.asList('T', 'R', 'W', 'A', 'G', 'M', 'Y', 'F', 'P',
 			'D', 'X', 'B', 'N', 'J', 'Z', 'S', 'Q', 'V', 'H', 'L', 'C', 'K', 'E'));
-	/**
-	 * {@link Recorrido#TRAIN}
-	 */
-	private static final TransportType TRAIN = TransportType.TRAIN;
 	/**
 	 * {@link Billete#ESTADO_RESERVADO}
 	 */
@@ -208,6 +204,45 @@ public class System {
 	 *                                  tickets.
 	 */
 	public double getPrecioTotalBilletesUsuario(String nif) {
+		chechNif(nif);
+		if (!users.contains(nif))
+			throw new IllegalArgumentException("El nif no concuerda con ninguno del sistema\n");
+		boolean encuentraTiket = false;
+		for (Billete tiket : tickets) {
+			if (tiket.getUsuario().getNif().equals(nif))
+				encuentraTiket = true;
+		}
+		if (!encuentraTiket)
+			throw new IllegalStateException("El nif no tiene ningun billete asociado\n");
+		double precioTotal = 0;
+		for (Billete tiket : tickets) {
+			if (tiket.getUsuario().getNif().equals(nif)) {
+				if (tiket.getRecorrido() instanceof TrainRecorrido trainRec) {
+					precioTotal += trainRec.getPriceWithDiscount();
+				} else
+					precioTotal += tiket.getRecorrido().getPrice();
+			}
+		}
+
+		return precioTotal;
+	}
+
+	/**
+	 * Check if the nif has the correct values
+	 * 
+	 * @param nif
+	 * 
+	 * @throws IllegalArgumentException if the NIF is null.
+	 * @throws IllegalArgumentException if the nif is empty
+	 * 
+	 * @throws IllegalArgumentException if the number of NIF digits exceeds 8
+	 * @throws IllegalArgumentException if the number of NIF digits is less than 8
+	 * @throws IllegalArgumentException if the NIF does not end with a letter,
+	 *                                  except {I,Ñ,O,U}
+	 * @throws IllegalArgumentException if the NIF value does not correspond to the
+	 *                                  letter
+	 */
+	private void chechNif(String nif) {
 		if (nif == null)
 			throw new IllegalArgumentException("El nif es nulo\n");
 		if (nif.isEmpty())
@@ -226,27 +261,6 @@ public class System {
 		int resto = numero % 23;
 		if (resto != letrasNif.indexOf(letra))
 			throw new IllegalArgumentException("La letra del nif no corresponde con las cifras del nif\n");
-		if (!users.contains(nif))
-			throw new IllegalArgumentException("El nif no concuerda con ninguno del sistema\n");
-		boolean encuentraTiket = false;
-		for (Billete tiket : tickets) {
-			if (tiket.getUsuario().getNif().equals(nif))
-				encuentraTiket = true;
-		}
-		if (!encuentraTiket)
-			throw new IllegalStateException("El nif no tiene ningun billete asociado\n");
-		double precioTotal = 0;
-		for (Billete tiket : tickets) {
-			if (tiket.getUsuario().getNif().equals(nif)) {
-				if (tiket.getRecorrido() instanceof TrainRecorrido) {
-					double precioDescuento = tiket.getRecorrido().getPrice() * 0.9;
-					precioTotal += precioDescuento;
-				} else
-					precioTotal += tiket.getRecorrido().getPrice();
-			}
-		}
-
-		return precioTotal;
 	}
 
 	/**

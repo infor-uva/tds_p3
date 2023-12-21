@@ -2,6 +2,7 @@ package uva.tds.practica3_grupo6;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
@@ -22,7 +23,7 @@ import org.junit.jupiter.api.Test;
  * @author diebomb
  * @author migudel
  * 
- * @version 28/11/23
+ * @version 21/12/23
  */
 class SistemaPersistenciaSinAislamientoTest {
 
@@ -80,12 +81,12 @@ class SistemaPersistenciaSinAislamientoTest {
 	 * FINDME Tests for
 	 * {@link SistemaPersistencia#SistemaPersistencia(IDatabaseManager)}
 	 */
-	/*@Test
+	@Test
 	void testConstructor() {
-		SistemaPersistencia sistema = new SistemaPersistencia(database);
+		SistemaPersistenciaSinAislamiento sistema = new SistemaPersistenciaSinAislamiento(database);
 		assertNotNull(sistema);
 		assertEquals(database, sistema.getDataBaseManager());
-	}*/
+	}
 
 	/**
 	 * FINDME Tests for {@link SistemaPersistenciaSinAislamiento#addRecorrido(Recorrido)}
@@ -1194,8 +1195,7 @@ class SistemaPersistenciaSinAislamientoTest {
 		sistema.addRecorrido(recorrido);
 		sistema.reservarBilletes(localizador, user, recorrido, numBilletesReservar);
 		sistema.anularReserva(localizador, numBilletesAnular);
-		
-		
+		assertEquals(sistema.getAssociatedBilletesToRoute(recorrido.getID()), new ArrayList<>());
 	}
 	
 	@Test
@@ -1208,6 +1208,7 @@ class SistemaPersistenciaSinAislamientoTest {
 		sistema.comprarBilletes(locator, user, recorrido, numBilletesComprar);
 		sistema.devolverBilletes(locator, numBilletesDevolver);
 		
+		assertEquals(sistema.getAssociatedBilletesToRoute(recorrido.getID()), new ArrayList<>());
 	}
 	
 	@Test
@@ -1218,7 +1219,13 @@ class SistemaPersistenciaSinAislamientoTest {
 		sistema.addRecorrido(recorrido);
 		sistema.reservarBilletes(locator, user, recorrido, numBilletesReservar);
 		sistema.reservarBilletes("ABC54321", user, recorrido, numBilletesReservar);
-		
+		Recorrido recorrido = sistema.getRecorrido(this.recorrido.getID());
+		ArrayList<Billete> b = new ArrayList<>();
+		for (int i = 0; i < numBilletesReservar; i++)
+			b.add(new Billete(locator, recorrido, user, ESTADO_RESERVADO));
+		for (int i = 0; i < numBilletesReservar; i++) 
+			b.add(new Billete("ABC54321", recorrido, user, ESTADO_RESERVADO));
+		assertEquals(sistema.getAssociatedBilletesToRoute(recorrido.getID()), b);
 	}
 	
 	@AfterEach

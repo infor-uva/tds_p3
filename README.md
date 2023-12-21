@@ -38,12 +38,15 @@ Las clases anteriormente mencionadas estarán testeadas mediante le método Test
 
 |Clase|Lineas clase|Lineas de Test|Ratio|
 |--|:--:|:--:|:--:|
-|Billete|33|91|~2.75|
-|Usuario|40|75|~1.88|
-|Recorrido|131|434|~3.31|
-|System|232|646|~2.78|
-|SistemaPersistencia|209|1224|~5.86|
-
+|Billete                            |  35|  87|~2.48|
+|BusRecorrido                       | 124| 221|~1.78|
+|Connection                         |  35|  51|~1.45|
+|DatabaseManager                    | 256| 228|~0.89|
+|SistemaPersistenciaSinAislamiento  | 205| 656|~3.2 |
+|SistemaPersistencia                | 213|1320|~6.19|
+|System                             | 232| 645|~2.78|
+|TrainRecorrido                     | 125| 228|~1.82|
+|Usuario                            |  44|  73|~1.65|
 ## Tiempo utilizado
 ----------------------------------
 ### Diego Bombín Sanz

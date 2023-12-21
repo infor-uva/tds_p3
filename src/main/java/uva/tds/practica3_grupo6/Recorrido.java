@@ -12,15 +12,12 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 
 /**
@@ -37,7 +34,7 @@ import javax.persistence.Table;
  * @author hugcubi
  * @author migudel
  * 
- * @version 13/12/23
+ * @version 21/12/23
  */
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -80,7 +77,7 @@ public abstract class Recorrido {
 	@OneToMany(mappedBy = "recorrido", cascade = CascadeType.ALL)
 	private List<Billete> billetes;
 	
-	public Recorrido() {
+	protected Recorrido() {
 		
 	}
 	/**
@@ -123,7 +120,6 @@ public abstract class Recorrido {
 			throw new IllegalArgumentException("r is null");
 		setId(r.getID());
 		setConnection(r.getConnection());
-		//setTransport(r.getTransport());
 		updateDateTime(r.getDateTime());
 		setPrice(r.getPrice());
 		setTotalSeats(r.getTotalSeats());
@@ -146,20 +142,7 @@ public abstract class Recorrido {
 			throw new IllegalArgumentException("id is empty");
 		this.id = id;
 	}
-
-	/**
-	 * Set the transport for this route
-	 * 
-	 * @param transport to set
-	 * 
-	 * @throws IllegalArgumentException if transport is null
-	 */
-	/*protected void setTransport(TransportType transport) {
-		if (transport == null)
-			throw new IllegalArgumentException("transport is null");
-		this.transport = transport;
-	}*/
-
+	
 	/**
 	 * Set the connection for this route
 	 * 
@@ -274,15 +257,6 @@ public abstract class Recorrido {
 	public Connection getConnection() {
 		return connection;
 	}
-
-	/**
-	 * Consult the transport of the Recorrido
-	 * 
-	 * @return transport
-	 */
-	/*public TransportType getTransport() {
-		return transport;
-	}*/
 
 	/**
 	 * Consult the price of the Recorrido

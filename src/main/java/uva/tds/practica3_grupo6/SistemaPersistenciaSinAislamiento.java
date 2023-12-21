@@ -55,7 +55,7 @@ import java.util.List;
  * @author diebomb
  * @author migudel
  * 
- * @version 28/11/23
+ * @version 21/12/23
  */
 public class SistemaPersistenciaSinAislamiento {
 
@@ -110,13 +110,7 @@ public class SistemaPersistenciaSinAislamiento {
 	 * @throws IllegalStateException    if route is already in the system
 	 */
 	public void addRecorrido(Recorrido route) {
-		try {
-			database.addRecorrido(route);
-		} catch (IllegalArgumentException e1) {
-			throw e1;
-		} catch (IllegalStateException e2) {
-			throw e2;
-		}
+		database.addRecorrido(route);
 	}
 
 	/**
@@ -147,13 +141,7 @@ public class SistemaPersistenciaSinAislamiento {
 	 */
 	public void removeRecorrido(String id) {
 		checkID(id);
-		List<Billete> tmp;
-		try {
-			tmp = getAssociatedBilletesToRoute(id);
-		} catch (IllegalStateException e2) {
-			throw e2;
-		}
-		if (!tmp.isEmpty())
+		if (!getAssociatedBilletesToRoute(id).isEmpty())
 			throw new IllegalStateException("the route has associated tickets");
 		database.eliminarRecorrido(id);
 	}
@@ -214,8 +202,8 @@ public class SistemaPersistenciaSinAislamiento {
 		double salida=0;
 		for (Billete tiket : tikets) {
 			double price=tiket.getRecorrido().getPrice();
-			if (tiket.getRecorrido() instanceof TrainRecorrido)
-				salida+=(price*0.9);
+			if (tiket.getRecorrido() instanceof TrainRecorrido trainRec)
+				salida+=trainRec.getPriceWithDiscount();
 			else
 				salida+=price;
 		}
@@ -335,14 +323,8 @@ public class SistemaPersistenciaSinAislamiento {
 		Recorrido route;
 		if ((route = database.getRecorrido(id)) == null)
 			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
-		try {
-			route.updateDate(newDate);
-			database.actualizarRecorrido(route);
-		} catch (IllegalArgumentException e1) {
-			throw e1;
-		} catch (IllegalStateException e2) {
-			throw e2;
-		}
+		route.updateDate(newDate);
+		database.actualizarRecorrido(route);
 	}
 
 	/**
@@ -362,14 +344,8 @@ public class SistemaPersistenciaSinAislamiento {
 		Recorrido route;
 		if ((route = database.getRecorrido(id)) == null)
 			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
-		try {
-			route.updateTime(newTime);
-			database.actualizarRecorrido(route);
-		} catch (IllegalArgumentException e1) {
-			throw e1;
-		} catch (IllegalStateException e2) {
-			throw e2;
-		}
+		route.updateTime(newTime);
+		database.actualizarRecorrido(route);
 	}
 
 	/**
@@ -389,14 +365,9 @@ public class SistemaPersistenciaSinAislamiento {
 		Recorrido route;
 		if ((route = database.getRecorrido(id)) == null)
 			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
-		try {
-			route.updateDateTime(newDateTime);
-			database.actualizarRecorrido(route);
-		} catch (IllegalArgumentException e1) {
-			throw e1;
-		} catch (IllegalStateException e2) {
-			throw e2;
-		}
+		
+		route.updateDateTime(newDateTime);
+		database.actualizarRecorrido(route);
 	}
 
 	/**
@@ -418,14 +389,8 @@ public class SistemaPersistenciaSinAislamiento {
 		Recorrido route;
 		if ((route = database.getRecorrido(id)) == null)
 			throw new IllegalStateException(EXCEPTION_NOT_ROUTE_ID);
-		try {
-			route.updateDateTime(newDate, newTime);
-			database.actualizarRecorrido(route);
-		} catch (IllegalArgumentException e1) {
-			throw e1;
-		} catch (IllegalStateException e2) {
-			throw e2;
-		}
+		route.updateDateTime(newDate, newTime);
+		database.actualizarRecorrido(route);
 	}
 	
 	public Recorrido getRecorrido(String localizador) {
@@ -520,7 +485,6 @@ public class SistemaPersistenciaSinAislamiento {
 			throw new IllegalStateException("Hay menos tickets de los que se quieren anular con ese localizador");
 		}
 		
-		Recorrido recorrido = billetes.get(0).getRecorrido();
 		int billetesRestantes = billetes.size() - numBilletesAnular;
 		database.eliminarBilletes(localizador);
 		if(billetesRestantes > 0) {
@@ -617,7 +581,6 @@ public class SistemaPersistenciaSinAislamiento {
 			throw new IllegalArgumentException("El numero de billetes es superior a las plazas disponibles\n");
 		if (localizador.isEmpty())
 			throw new IllegalArgumentException("EL localizador esta vacio\n");
-		boolean bandera=false;
 		for(Billete b: database.getBilletes(localizador)) {
 			if(b.getEstado().equals(ESTADO_COMPRADO))throw new IllegalArgumentException("El localizador ya ha sido usado\n");
 		}
@@ -661,11 +624,11 @@ public class SistemaPersistenciaSinAislamiento {
 		for (Billete ticket : tickets) {
 			try {
 				ticket.setComprado();
-				database.actualizarBilletes(ticket);
 			} catch (IllegalStateException e) {
 				// Reescritura de mensaje de error
 				throw new IllegalStateException("the are no tickets booked with that locator");
 			}
+			database.actualizarBilletes(ticket);
 		}
 		return tickets;
 	}

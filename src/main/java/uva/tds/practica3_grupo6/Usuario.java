@@ -7,8 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -24,7 +22,7 @@ import javax.persistence.Table;
  * @author migudel
  * @author hugcubi
  * 
- * @version 09/10/23
+ * @version 21/12/23
  */
 @Entity
 @Table(name="USUARIO")
@@ -149,13 +147,9 @@ public class Usuario {
 		if (this == o) {
 			return true;
 		}
-		if (o == null) {
-			throw new IllegalArgumentException("El objeto es nulo\n");
+		if (o instanceof Usuario user) {
+			return Objects.equals(nif, user.getNif()) && Objects.equals(nombre, user.getNombre());
 		}
-		if (getClass() != o.getClass()) {
-			return false;
-		}
-		Usuario user = (Usuario) o;
-		return Objects.equals(nif, user.getNif()) && Objects.equals(nombre, user.getNombre());
+		return false;
 	}
 }

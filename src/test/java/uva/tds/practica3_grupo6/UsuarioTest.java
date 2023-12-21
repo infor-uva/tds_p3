@@ -12,10 +12,10 @@ import org.junit.jupiter.api.Test;
  * methods
  * 
  * @author diebomb
- * 
  * @author migudel
- * 
  * @author hugcubi
+ * 
+ * @version 21/12/23
  */
 
 class UsuarioTest {
@@ -142,10 +142,8 @@ class UsuarioTest {
 	}
 
 	@Test
-	void testEqualsNoValido() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			user.equals(null);
-		});
+	void testEqualsNull() {
+        assertNotEquals(user, null);
 	}
 	
 	@Tag("Cobertura")

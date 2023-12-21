@@ -6,20 +6,17 @@ import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import org.easymock.TestSubject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-
-import antlr.collections.List;
 
 
 class DatabaseManagerTest {
 	
 	private DatabaseManager databaseManager;
 	private Usuario user;
-	private Usuario differentUser;
+	private Usuario user2;
 	private Billete billete;
 	private Billete billete2;
 	private BusRecorrido recorrido;
@@ -30,9 +27,11 @@ class DatabaseManagerTest {
     @BeforeEach
     void setUp() {
     	String nif = "32698478E";
+    	String nif2 = "32698847T";
 		String nombre = "Geronimo";
+		String nombre2 = "Paco";
 		user = new Usuario(nif, nombre);
-		differentUser = new Usuario("79105889B", nombre);
+		user2 = new Usuario(nif2, nombre2);
 		String id = "c12345";
 		Connection connection = new Connection("Valladolid", "Palencia", 30);
 		LocalDateTime dateTime = LocalDateTime.of(2023, 10, 27, 19, 06, 50);
@@ -171,8 +170,8 @@ class DatabaseManagerTest {
 	void testEliminarUsuario() {
 		 String ID = user.getNif();
 	     databaseManager.addUsuario(user);
-	     databaseManager.eliminarUsuario(user.getNif());
-	     assertNull(databaseManager.getUsuario(user.getNif()));
+	     databaseManager.eliminarUsuario(ID);
+	     assertNull(databaseManager.getUsuario(ID));
 	}
 	
 	@Test
@@ -310,6 +309,21 @@ class DatabaseManagerTest {
 		billetes.add(billete); billetes.add(billete2);
 		assertEquals(billetes, databaseManager.getBilletesDeRecorrido(ID));
 	}
+	
+	@Test
+	@Tag("Cobertura")
+	void testGetBilletesConMasBilletesDeDiferenteRecorrido() {
+		String ID = recorrido.getID();
+		databaseManager.addRecorrido(recorrido);
+		databaseManager.addRecorrido(differentRecorrido);
+		databaseManager.addUsuario(user);
+		databaseManager.addBillete(billete);
+		databaseManager.addBillete(new Billete(ID, differentRecorrido, user, Billete.ESTADO_COMPRADO));
+		recorrido.decreaseAvailableSeats(1);
+		ArrayList<Billete> billetes = new ArrayList<>();
+		billetes.add(billete);
+		assertEquals(billetes, databaseManager.getBilletesDeRecorrido(ID));
+	}
 
 	@Test
 	void testGetBilletesDeUsuario() {
@@ -321,6 +335,21 @@ class DatabaseManagerTest {
 		recorrido.decreaseAvailableSeats(2);
 		ArrayList<Billete> billetes = new ArrayList<>();
 		billetes.add(billete); billetes.add(billete2);
+		assertEquals(billetes, databaseManager.getBilletesDeUsuario(ID));
+	}
+	
+	@Test
+	@Tag("Cobertura")
+	void testGetBilletesConMasBilletesDeDiferenteUsuario() {
+		String ID = user.getNif();
+		databaseManager.addRecorrido(recorrido);
+		databaseManager.addUsuario(user);
+		databaseManager.addUsuario(user2);
+		databaseManager.addBillete(billete);
+		databaseManager.addBillete(new Billete("loc", recorrido, user2, Billete.ESTADO_RESERVADO));
+		recorrido.decreaseAvailableSeats(2);
+		ArrayList<Billete> billetes = new ArrayList<>();
+		billetes.add(billete);
 		assertEquals(billetes, databaseManager.getBilletesDeUsuario(ID));
 	}
 	
