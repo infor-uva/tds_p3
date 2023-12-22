@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -57,13 +56,6 @@ import java.util.List;
  * @version 21/12/23
  */
 public class System {
-
-	/**
-	 * List of the character indexed by the rest resulted of the division of nif and
-	 * 23
-	 */
-	private final List<Character> letrasNif = new ArrayList<>(Arrays.asList('T', 'R', 'W', 'A', 'G', 'M', 'Y', 'F', 'P',
-			'D', 'X', 'B', 'N', 'J', 'Z', 'S', 'Q', 'V', 'H', 'L', 'C', 'K', 'E'));
 	/**
 	 * {@link Billete#ESTADO_RESERVADO}
 	 */
@@ -204,7 +196,7 @@ public class System {
 	 *                                  tickets.
 	 */
 	public double getPrecioTotalBilletesUsuario(String nif) {
-		chechNif(nif);
+		Usuario.checkNIF(nif);
 		if (!users.contains(nif))
 			throw new IllegalArgumentException("El nif no concuerda con ninguno del sistema\n");
 		boolean encuentraTiket = false;
@@ -225,42 +217,6 @@ public class System {
 		}
 
 		return precioTotal;
-	}
-
-	/**
-	 * Check if the nif has the correct values
-	 * 
-	 * @param nif
-	 * 
-	 * @throws IllegalArgumentException if the NIF is null.
-	 * @throws IllegalArgumentException if the nif is empty
-	 * 
-	 * @throws IllegalArgumentException if the number of NIF digits exceeds 8
-	 * @throws IllegalArgumentException if the number of NIF digits is less than 8
-	 * @throws IllegalArgumentException if the NIF does not end with a letter,
-	 *                                  except {I,Ñ,O,U}
-	 * @throws IllegalArgumentException if the NIF value does not correspond to the
-	 *                                  letter
-	 */
-	private void chechNif(String nif) {
-		if (nif == null)
-			throw new IllegalArgumentException("El nif es nulo\n");
-		if (nif.isEmpty())
-			throw new IllegalArgumentException("El nif esta vacio\n");
-		if (nif.length() > 9)
-			throw new IllegalArgumentException("Nif demasiado largo\n");
-		if (nif.length() <= 8)
-			throw new IllegalArgumentException("Nif demasiado corto\n");
-		if (!Character.isLetter(nif.charAt(8)))
-			throw new IllegalArgumentException("Nif no contiene la letra\n");
-		if (nif.charAt(8) == 'U' || nif.charAt(8) == 'I' || nif.charAt(8) == 'O' || nif.charAt(8) == 'Ñ')
-			throw new IllegalArgumentException("Nif contiene la letra erronea\n");
-		String cifras = nif.substring(0, nif.length() - 1);
-		char letra = nif.charAt(8);
-		int numero = Integer.parseInt(cifras);
-		int resto = numero % 23;
-		if (resto != letrasNif.indexOf(letra))
-			throw new IllegalArgumentException("La letra del nif no corresponde con las cifras del nif\n");
 	}
 
 	/**

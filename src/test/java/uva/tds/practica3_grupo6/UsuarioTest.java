@@ -137,19 +137,19 @@ class UsuarioTest {
 	void testEqualsValido() {
 		assertEquals(user, user);
 		assertEquals(user, sameUser);
-		assertNotEquals(true, user);
 		assertNotEquals(user, differentUser);
-	}
+        assertFalse(user.equals(null));
+    }
 
-	@Test
-	void testEqualsNull() {
-        assertNotEquals(user, null);
-	}
-	
 	@Tag("Cobertura")
 	@Test
 	void testEqualNifIgual() {
 		Usuario user2 = new Usuario(nif, "Gonzalo");
 		assertNotEquals(user, user2);
+	}
+	
+	@Test
+	void testHashCode() {
+		assertEquals(sameUser.hashCode(), user.hashCode());
 	}
 }

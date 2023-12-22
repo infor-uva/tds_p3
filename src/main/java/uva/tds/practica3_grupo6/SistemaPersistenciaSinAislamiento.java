@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -59,10 +58,6 @@ import java.util.List;
  */
 public class SistemaPersistenciaSinAislamiento {
 
-	/**
-	 * List of the character indexed by the rest resulted of the division of nif and 23
-	 */
-	private final List<Character> letrasNif=new ArrayList<>(Arrays.asList('T','R','W','A','G','M','Y','F','P','D','X','B','N','J','Z','S','Q','V','H','L','C','K','E'));
 	/**
 	 * {@link Billete#ESTADO_RESERVADO}
 	 */
@@ -179,23 +174,7 @@ public class SistemaPersistenciaSinAislamiento {
 	 *                                  tickets.
 	 */
 	public double getPrecioTotalBilletesUsuario(String nif) {
-		if (nif == null)
-			throw new IllegalArgumentException("El nif es nulo\n");
-		if (nif.isEmpty())
-			throw new IllegalArgumentException("El nif esta vacio\n");
-		if (nif.length()<9)
-			throw new IllegalArgumentException("El nif es demasiado corto\n");
-		if (nif.length()>9)
-			throw new IllegalArgumentException("El nif es demasiado largo\n");
-		if (nif.charAt(8) == 'I' || nif.charAt(8) == 'Ñ' || nif.charAt(8) == 'O' || nif.charAt(8) == 'U')
-			throw new IllegalArgumentException("El nif contiene una letra incorrecta\n");
-		String cifras=nif.substring(0, nif.length()-1);
-		char letra=nif.charAt(8);
-		int numero=Integer.parseInt(cifras);
-		int resto=numero%23;
-		if(resto != letrasNif.indexOf(letra))
-			throw new IllegalArgumentException("La letra del nif no corresponde con las cifras del nif\n");
-		
+		Usuario.checkNIF(nif);
 		if(database.getUsuario(nif)==null)
 			throw new IllegalArgumentException("El usuario no esta en el sistema\n");
 		ArrayList<Billete> tikets = database.getBilletesDeUsuario(nif);
@@ -444,8 +423,6 @@ public class SistemaPersistenciaSinAislamiento {
 			billetes.add(ticket);
 			database.addBillete(ticket);
 		}
-		//recorrido.decreaseAvailableSeats(numBilletesReservar);
-		//database.actualizarRecorrido(recorrido);
 		return billetes;
 
 	}
@@ -492,9 +469,6 @@ public class SistemaPersistenciaSinAislamiento {
 				database.addBillete(billetes.get(i));
 			}
 		}
-		//recorrido.increaseAvailableSeats(numBilletesAnular);
-		//database.actualizarRecorrido(recorrido);
-
 	}
 
 	/**
@@ -537,11 +511,7 @@ public class SistemaPersistenciaSinAislamiento {
 			for (int i = 0; i < billetesRestantes; i++) {
 				database.addBillete(billetes.get(i));
 			}
-			
-
 		}
-
-
 	}
 
 	/**
@@ -593,8 +563,6 @@ public class SistemaPersistenciaSinAislamiento {
 			returned.add(tiket);
 			database.addBillete(tiket);
 		}
-		//recorrido.decreaseAvailableSeats(numBilletes);
-		//database.actualizarRecorrido(recorrido);
 		return returned;
 	}
 

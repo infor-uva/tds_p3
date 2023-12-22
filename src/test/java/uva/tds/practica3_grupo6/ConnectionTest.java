@@ -30,7 +30,6 @@ class ConnectionTest {
 		assertEquals(origin, c.getOrigin());
 		assertEquals(destination, c.getDestination());
 		assertEquals(duration, c.getDuration());
-		assertNotEquals(0, c.hashCode());
 	}
 	
 	@Test
@@ -84,7 +83,7 @@ class ConnectionTest {
 		assertEquals(connection, same);
 		assertEquals(connection, equal);
 		assertNotEquals(connection, different);
-		assertNotEquals(connection, null);
+        assertFalse(connection.equals(null));
 	}
 	
 	@Test
@@ -97,5 +96,11 @@ class ConnectionTest {
 	@Tag("Cobertura")
 	void testEqualsDiferenteDestination() {
 		assertNotEquals(connection, new Connection(origin, "dif", duration));
+	}
+	
+	@Test
+	void testHashCode() {
+		Connection copy = new Connection(origin, destination, duration);
+		assertEquals(copy.hashCode(), connection.hashCode());
 	}
 }

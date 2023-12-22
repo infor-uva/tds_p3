@@ -67,7 +67,6 @@ class BusRecorridoTest {
 		assertEquals(price, recorrido.getPrice(), ERROR_MARGIN);
 		assertEquals(dateTime, recorrido.getDateTime());
 		assertEquals(numAvailableSeats, recorrido.getNumAvailableSeats());
-		assertNotEquals(0, recorrido.hashCode());
 	}
 
 	@Test
@@ -86,7 +85,6 @@ class BusRecorridoTest {
 		assertEquals(price, recorrido.getPrice(), ERROR_MARGIN);
 		assertEquals(dateTime, recorrido.getDateTime());
 		assertEquals(numAvailableSeats, recorrido.getNumAvailableSeats());
-		assertNotEquals(0, recorrido.hashCode());
 	}
 
 	@Test
@@ -344,7 +342,7 @@ class BusRecorridoTest {
 		BusRecorrido different = new BusRecorrido("dif", connection, price, dateTime, numAvailableSeats);
 		assertEquals(recorrido, recorrido);
 		assertEquals(recorrido, same);
-		assertNotEquals(recorrido, null);
+        assertFalse(recorrido.equals(null));
 		assertNotEquals(recorrido, different);
 	}
 
@@ -390,5 +388,10 @@ class BusRecorridoTest {
 	void testEqualsConTotalSeatsDiferentes() {
 		BusRecorrido other = new BusRecorrido(id, connection, price, dateTime, 32);
 		assertNotEquals(recorrido, other);
+	}
+	
+	@Test
+	void testHashCode() {
+		assertEquals(new TrainRecorrido(recorrido).hashCode(), recorrido.hashCode());
 	}
 }

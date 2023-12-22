@@ -8,6 +8,11 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 public class HibernateUtil {
 
 	private static final SessionFactory sessionFactory = buildSessionFactory();
+	
+	/** 
+	 * Don't Use this method is only to hide the public default constructor
+	 */
+	private HibernateUtil() {}
 	 
     // Hibernate 5:
     private static SessionFactory buildSessionFactory() {

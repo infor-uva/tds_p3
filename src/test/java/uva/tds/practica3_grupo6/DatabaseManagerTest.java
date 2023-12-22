@@ -246,7 +246,7 @@ class DatabaseManagerTest {
 		ArrayList<Billete> billetes = new ArrayList<>();
 		billetes.add(billete2);
 		assertEquals(true,databaseManager.getBilletes(ID).isEmpty());
-		assertNotEquals(billete, databaseManager.getBilletes(billete2.getLocalizador()));
+		assertNotEquals(billetes, databaseManager.getBilletes(billete2.getLocalizador()));
 	}
 	
 	@Test

@@ -41,7 +41,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.flush();
 
 		} catch (HibernateException e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -71,7 +70,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.flush();
 
 		} catch (HibernateException e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -93,7 +91,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.flush();
 
 		} catch (HibernateException e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -111,7 +108,6 @@ public class DatabaseManager implements IDatabaseManager {
 			return session.get(Recorrido.class, idRecorrido);
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -130,7 +126,6 @@ public class DatabaseManager implements IDatabaseManager {
 			return lista;
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -145,7 +140,7 @@ public class DatabaseManager implements IDatabaseManager {
 
 		try {
 			session.beginTransaction();
-			ArrayList<Recorrido> recorridosList = new ArrayList<Recorrido>(session.createQuery("FROM Recorrido", Recorrido.class).getResultList());
+			ArrayList<Recorrido> recorridosList = new ArrayList<>(session.createQuery("FROM Recorrido", Recorrido.class).getResultList());
 			for (Recorrido s : recorridosList) {
 				if (fecha.equals(s.getDate()))
 					lista.add(s);
@@ -153,7 +148,6 @@ public class DatabaseManager implements IDatabaseManager {
 			return lista;
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -176,7 +170,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.persist(usuario);
 			session.flush();
 		} catch (HibernateException e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -199,7 +192,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.flush();
 
 		} catch (HibernateException e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -221,7 +213,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.flush();
 
 		} catch (HibernateException e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -237,7 +228,6 @@ public class DatabaseManager implements IDatabaseManager {
 
 			return session.get(Usuario.class, idUsuario);
 		} catch (Exception e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -268,7 +258,6 @@ public class DatabaseManager implements IDatabaseManager {
 
 			session.flush();
 		} catch (HibernateException e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -286,7 +275,7 @@ public class DatabaseManager implements IDatabaseManager {
 
 		try {
 			session.beginTransaction();
-			List<Billete> listaBilletes = session.createQuery("FROM Billete", Billete.class).getResultList();
+			List<Billete> listaBilletes = getBilletes(session);
 			for (Billete b : listaBilletes) {
 				session.delete(b);
 				Usuario user = session.get(Usuario.class, b.getUsuario().getNif());
@@ -300,7 +289,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.flush();
 
 		} catch (HibernateException e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -323,7 +311,6 @@ public class DatabaseManager implements IDatabaseManager {
 			session.update(billete);
 			session.flush();
 		} catch (HibernateException e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -338,7 +325,7 @@ public class DatabaseManager implements IDatabaseManager {
 
 		try {
 			session.beginTransaction();
-			List<Billete> recorridosList = session.createQuery("FROM Billete", Billete.class).getResultList();
+			List<Billete> recorridosList = getBilletes(session);
 			for (Billete b : recorridosList) {
 				if (b.getLocalizador().equals(localizadorBilletes))
 					lista.add(b);
@@ -346,7 +333,6 @@ public class DatabaseManager implements IDatabaseManager {
 			return lista;
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -361,14 +347,13 @@ public class DatabaseManager implements IDatabaseManager {
 
 		try {
 			session.beginTransaction();
-			List<Billete> recorridosList = session.createQuery("FROM Billete", Billete.class).getResultList();
+			List<Billete> recorridosList = getBilletes(session);
 			for (Billete s : recorridosList) {
 				if (idRecorrido.equals(s.getRecorrido().getID()))
 					lista.add(s);
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
@@ -383,19 +368,22 @@ public class DatabaseManager implements IDatabaseManager {
 
 		try {
 			session.beginTransaction();
-			List<Billete> recorridosList = session.createQuery("FROM Billete", Billete.class).getResultList();
+			List<Billete> recorridosList = getBilletes(session);
 			for (Billete s : recorridosList) {
 				if (idUsuario.equals(s.getUsuario().getNif()))
 					lista.add(s);
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
 		}
 		return lista;
+	}
+
+	private List<Billete> getBilletes(Session session) {
+		return session.createQuery("FROM Billete", Billete.class).getResultList();
 	}
 
 	private Session getSession() {
@@ -405,10 +393,9 @@ public class DatabaseManager implements IDatabaseManager {
 			session = factory.getCurrentSession();
 			return session;
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			throw new IllegalStateException(e);
 		}
 
-		return null;
 	}
 
 	/**
