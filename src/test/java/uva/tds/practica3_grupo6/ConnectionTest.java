@@ -2,6 +2,8 @@ package uva.tds.practica3_grupo6;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -83,7 +85,7 @@ class ConnectionTest {
 		assertEquals(connection, same);
 		assertEquals(connection, equal);
 		assertNotEquals(connection, different);
-        assertFalse(connection.equals(null));
+        assertNotEquals(connection, new ArrayList<Connection>());
 	}
 	
 	@Test

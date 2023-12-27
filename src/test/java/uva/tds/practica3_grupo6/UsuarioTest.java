@@ -2,6 +2,8 @@ package uva.tds.practica3_grupo6;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -138,7 +140,7 @@ class UsuarioTest {
 		assertEquals(user, user);
 		assertEquals(user, sameUser);
 		assertNotEquals(user, differentUser);
-        assertFalse(user.equals(null));
+        assertNotEquals(user, new ArrayList<Usuario>());
     }
 
 	@Tag("Cobertura")

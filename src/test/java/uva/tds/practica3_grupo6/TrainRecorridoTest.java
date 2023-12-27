@@ -347,7 +347,7 @@ class TrainRecorridoTest {
 		TrainRecorrido different = new TrainRecorrido("dif", connection, price, dateTime, numAvailableSeats);
 		assertEquals(recorrido, recorrido);
 		assertEquals(recorrido, same);
-        assertFalse(recorrido.equals(null));	
+        assertNotEquals(recorrido, connection);	
 		assertNotEquals(recorrido, different);
 	}
 
