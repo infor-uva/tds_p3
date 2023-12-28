@@ -8,7 +8,7 @@
 		<os family="unix" />
 	</condition>
 
-	<target name="all" depends="documentar,ejecutarTests,obtenerInformeCobertura">
+	<target name="all" depends="documentar,ejecutarTests,obtenerInformeCobertura, sonarqube">
 
 	</target>
 	<target name="compilar" depends="limpiar">
@@ -53,7 +53,7 @@
 	</target>
 	<target name="sonarqube" depends="obtenerInformeCobertura">
 		<exec dir="." executable="${executable}">
-			<arg line="${arglineIni}mvn clean verify sonar:sonar
+			<arg line="${arglineIni}mvn verify sonar:sonar
 					-Dsonar.projectKey=tds-practica3-grupo6
 					-Dsonar.projectName='tds-practica3-grupo6'
 					-Dsonar.host.url=http://localhost:9000
