@@ -114,18 +114,18 @@ public class DatabaseManager implements IDatabaseManager {
 	@Override
 	public Recorrido getRecorrido(String idRecorrido) {
 		Session session = getSession();
-
+		Recorrido rec = null;
 		try {
 			session.beginTransaction();
 
-			return session.get(Recorrido.class, idRecorrido);
+			rec = session.get(Recorrido.class, idRecorrido);
 
 		} catch (Exception e) {
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
 		}
-		return null;
+		return rec;
 	}
 
 	@Override
@@ -136,7 +136,6 @@ public class DatabaseManager implements IDatabaseManager {
 		try {
 			session.beginTransaction();
 			lista.addAll(session.createQuery("FROM Recorrido", Recorrido.class).getResultList());
-			return lista;
 
 		} catch (Exception e) {
 			session.getTransaction().rollback();
@@ -158,7 +157,6 @@ public class DatabaseManager implements IDatabaseManager {
 				if (fecha.equals(s.getDate()))
 					lista.add(s);
 			}
-			return lista;
 
 		} catch (Exception e) {
 			session.getTransaction().rollback();
@@ -236,16 +234,18 @@ public class DatabaseManager implements IDatabaseManager {
 	public Usuario getUsuario(String idUsuario) {
 		Session session = getSession();
 
+		Usuario user = null;
+		
 		try {
 			session.beginTransaction();
 
-			return session.get(Usuario.class, idUsuario);
+			user = session.get(Usuario.class, idUsuario);
 		} catch (Exception e) {
 			session.getTransaction().rollback();
 		} finally {
 			session.close();
 		}
-		return null;
+		return user;
 	}
 
 	@Override
@@ -343,7 +343,6 @@ public class DatabaseManager implements IDatabaseManager {
 				if (b.getLocalizador().equals(localizadorBilletes))
 					lista.add(b);
 			}
-			return lista;
 
 		} catch (Exception e) {
 			session.getTransaction().rollback();
