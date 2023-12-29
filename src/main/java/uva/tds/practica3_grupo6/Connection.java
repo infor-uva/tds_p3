@@ -12,6 +12,19 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+/**
+ * Class dedicated for the representation of the connection.
+ * 
+ * In this class you will can consult the origin, destination and duration of
+ * the route.
+ * 
+ * @author hugcubi
+ * @author diebomb
+ * @author migudel
+ * 
+ * @version 22/12/23
+ */
+
 @Entity
 @Table(name="CONNECTION")
 public class Connection {

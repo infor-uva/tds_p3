@@ -9,6 +9,19 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
+/**
+ * Class dedicated for the implementation of the BD.
+ * 
+ * In this class you will can consult the routes, users or the state of
+ * the tickets.
+ * 
+ * @author hugcubi
+ * @author diebomb
+ * @author migudel
+ * 
+ * @version 22/12/23
+ */
+
 public class DatabaseManager implements IDatabaseManager {
 
 	@Override

@@ -33,20 +33,20 @@ Sistema que delega la gestión de la información en una Database externa.
 Las clases anteriormente mencionadas estarán testeadas mediante le método Test-First o TDD (Test Driven Development), en base a las restricciones planteadas en el supuesto.
 <br>[`+ información →`](./src/test/java/uva/tds/practica2_grupo6/)
 
-## TestCode ratio (Actualizar cuando esté finiquitado)
+## TestCode ratio
 ----------------------------------
 
 |Clase|Lineas clase|Lineas de Test|Ratio|
 |--|:--:|:--:|:--:|
-|Billete                            |  35|  87|~2.48|
+|Billete                            |  36|  86|~2.38|
 |BusRecorrido                       | 124| 221|~1.78|
-|Connection                         |  35|  51|~1.45|
-|DatabaseManager                    | 256| 228|~0.89|
-|SistemaPersistenciaSinAislamiento  | 205| 656|~3.2 |
-|SistemaPersistencia                | 213|1320|~6.19|
-|System                             | 232| 645|~2.78|
-|TrainRecorrido                     | 125| 228|~1.82|
-|Usuario                            |  44|  73|~1.65|
+|Connection                         |  36|  53|~1.47|
+|DatabaseManager                    | 256| 227|~0.88|
+|SistemaPersistenciaSinAislamiento  | 166| 665|~4.0 |
+|SistemaPersistencia                | 194|1320|~6.8 |
+|System                             | 213| 651|~3.05|
+|TrainRecorrido                     | 125| 225|~1.8 |
+|Usuario                            |  48|  73|~1.52|
 ## Tiempo utilizado
 ----------------------------------
 ### Diego Bombín Sanz
@@ -55,9 +55,15 @@ Trabajo asignado:
 - Feature 5.1 - Comprar billetes
 - Feature 7 - Obtención precio total billetes de un usuario y obtención recorridos disponibles en una fecha
 
+Refactor
+- Implementar DatabaseManager
+- Conectar la base de datos
+- Ayudar a implementar las clases que de la base de datos
+
 Tiempo empleado: 
 - Fase Red: `4h 30min`
 - Fase green: `10h 36min`
+- Fase Refactor: `6h 15min`
     
 ### Hugo Cubino Cubino
 Trabajo asignado:
@@ -65,9 +71,15 @@ Trabajo asignado:
 - Feature 5.2 - Devolver billetes
 - Feature 6 - Reserva y anulación de reserva de billetes
 
+Refactor
+- Ayudar a implementar DatabaseManager
+- Implementar las clases de la base de datos
+- Test de DatabaseManager y de la conexión
+
 Tiempo empleado
 - Fase red: `3h 55min`
 - Fase green: `14h 45min`
+- Fase Refactor: `5h 40min`
 
 ### Miguel de las Moras Sastre
 Trabajo asignado:

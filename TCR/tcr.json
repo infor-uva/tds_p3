@@ -1,38 +1,38 @@
 {
     "Billete" : {
-        "code" : 35,
-        "test" : 87
+        "code" : 36,
+        "test" : 86
     },
     "BusRecorrido" : {
         "code" : 124,
         "test" : 221
     },
     "Connection" : {
-        "code" : 35,
-        "test" : 51
+        "code" : 36,
+        "test" : 53
     },
     "DatabaseManager" : {
         "code" : 256,
-        "test" : 228
+        "test" : 227
     },
     "SistemaPersistenciaSinAislamiento" : {
-        "code" : 205,
-        "test" : 656
+        "code" : 166,
+        "test" : 665
     },
     "SistemaPersistencia" : {
-        "code" : 213,
+        "code" : 194,
         "test" : 1320
     },
     "System" : {
-        "code" : 232,
-        "test" : 645
+        "code" : 213,
+        "test" : 651
     },
     "TrainRecorrido" : {
         "code" : 125,
-        "test" : 228
+        "test" : 225
     },
     "Usuario" : {
-        "code" : 44,
+        "code" : 48,
         "test" : 73
     }
 }
