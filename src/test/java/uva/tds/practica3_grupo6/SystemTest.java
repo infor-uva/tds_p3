@@ -27,8 +27,6 @@ import org.junit.jupiter.api.Test;
 class SystemTest {
 
 	private static final double ERROR_MARGIN = 0.00001;
-	private static final String BUS = Recorrido.BUS;
-	private static final String TRAIN = Recorrido.TRAIN;
 	private static final String ESTADO_RESERVADO = Billete.ESTADO_RESERVADO;
 	private static final String ESTADO_COMPRADO = Billete.ESTADO_COMPRADO;
 
@@ -38,13 +36,9 @@ class SystemTest {
 	private Usuario differentUser;
 	private String id;
 	private String idLI;
-	private String origin;
-	private String destination;
-	private String transport;
+	private Connection connection;
 	private double price;
-	private LocalDate date;
-	private LocalTime time;
-	private int duration;
+	private LocalDateTime dateTime;
 	private Recorrido recorrido;
 	private Recorrido recorridoLI;
 	private Recorrido differentRecorrido;
@@ -61,20 +55,14 @@ class SystemTest {
 		user = new Usuario(nif, nombre);
 		differentUser = new Usuario("79105889B", nombre);
 		id = "c12345";
-		origin = "Valladolid";
-		destination = "Galicia";
-		transport = BUS;
-		date = LocalDate.of(2023, 10, 27);
-		time = LocalTime.of(19, 06, 50);
+		connection = new Connection("Valladolid", "Palencia", 30);
+		dateTime = LocalDateTime.of(2023, 10, 27, 19, 06, 50);
 		price = 1.0;
 		numSeats = 50;
-		duration = 30;
-		recorrido = new Recorrido(id, origin, destination, transport, price, date, time, numSeats, duration);
-		transport = TRAIN;
-		differentRecorrido = new Recorrido("dif", origin, destination, transport, price, date, time, numSeats,
-				duration);
+		recorrido = new BusRecorrido(id, connection, price, dateTime, numSeats);
+		differentRecorrido = new TrainRecorrido("train", connection, price, dateTime, numSeats);
 		idLI = "i";
-		recorridoLI = new Recorrido(idLI, origin, destination, transport, price, date, time, numSeats, duration);
+		recorridoLI = new BusRecorrido(idLI, connection, price, dateTime, numSeats);
 
 		newDateTime = LocalDateTime.of(2023, 5, 14, 22, 56, 20);
 		newDate = LocalDate.of(2024, 2, 4);
@@ -203,8 +191,9 @@ class SystemTest {
 	void testGetPrecioTotalBilletesUsuarioSinBilletes() {
 		system.comprarBilletes("1234T", user, recorrido, 5);
 		system.devolverBilletes("1234T", 5);
+		String nif = user.getNif();
 		assertThrows(IllegalStateException.class, () -> {
-			system.getPrecioTotalBilletesUsuario(user.getNif());
+			system.getPrecioTotalBilletesUsuario(nif);
 		});
 	}
 
@@ -277,6 +266,7 @@ class SystemTest {
 	 */
 	@Test
 	void testGetRecorridosDisponiblesFecha() {
+		LocalDate date = dateTime.toLocalDate();
 		ArrayList<Recorrido> recorridos = new ArrayList<>();
 		recorridos.add(recorrido);
 		recorridos.add(differentRecorrido);
@@ -499,8 +489,9 @@ class SystemTest {
 	@Test
 	void testUpdateRecorridoDateConValoresActuales() {
 		system.addRecorrido(recorrido);
+		LocalDate date = recorrido.getDate();
 		assertThrows(IllegalStateException.class, () -> {
-			system.updateRecorridoDate(id, recorrido.getDate());
+			system.updateRecorridoDate(id, date);
 		});
 	}
 
@@ -547,8 +538,9 @@ class SystemTest {
 	@Test
 	void testUpdateRecorridoTimeConValoresActuales() {
 		system.addRecorrido(recorrido);
+		LocalTime time = recorrido.getTime();
 		assertThrows(IllegalStateException.class, () -> {
-			system.updateRecorridoTime(id, recorrido.getTime());
+			system.updateRecorridoTime(id, time);
 		});
 	}
 
@@ -596,8 +588,9 @@ class SystemTest {
 	@Test
 	void testUpdateRecorridoDateTimeConValoresActuales() {
 		system.addRecorrido(recorrido);
+		LocalDateTime dateTime = recorrido.getDateTime();
 		assertThrows(IllegalStateException.class, () -> {
-			system.updateRecorridoDateTime(id, recorrido.getDateTime());
+			system.updateRecorridoDateTime(id, dateTime);
 		});
 	}
 
@@ -652,8 +645,10 @@ class SystemTest {
 	@Test
 	void testUpdateRecorridoConValoresActuales() {
 		system.addRecorrido(recorrido);
+		LocalDate date = recorrido.getDate();
+		LocalTime time = recorrido.getTime();
 		assertThrows(IllegalStateException.class, () -> {
-			system.updateRecorrido(id, recorrido.getDate(), recorrido.getTime());
+			system.updateRecorrido(id, date, time);
 		});
 	}
 
@@ -696,7 +691,7 @@ class SystemTest {
 
 	@Test
 	void testComprarBilletesValidosTrenLimiteSuperior() {
-		differentRecorrido = new Recorrido("dif", origin, destination, transport, price, date, time, 250, duration);
+		differentRecorrido = new TrainRecorrido("dif", connection, price, dateTime, 250);
 		List<Billete> listaBilletes = system.comprarBilletes("ABC12345", user, differentRecorrido, 250);
 		List<Billete> listaBilletesComprobacion = new ArrayList<>();
 		Billete billeteComprobacion = new Billete("ABC12345", differentRecorrido, user, ESTADO_COMPRADO);
@@ -736,7 +731,7 @@ class SystemTest {
 
 	@Test
 	void testComprarBilleteBusInvalidoLimiteSuperiorDemasiadaCompras() {
-		recorrido = new Recorrido(id, origin, destination, transport, price, date, time, 50, duration);
+		recorrido = new BusRecorrido(id, connection, price, dateTime, 50);
 		system.comprarBilletes("ABC12345", user, recorrido, 49);
 		assertThrows(IllegalStateException.class, () -> {
 			system.comprarBilletes("ABC12346", differentUser, recorrido, 2);
@@ -745,7 +740,7 @@ class SystemTest {
 
 	@Test
 	void testComprarBilleteTrainInvalidoLimiteSuperiorDemasiadaCompras() {
-		differentRecorrido = new Recorrido("dif", origin, destination, transport, price, date, time, 250, duration);
+		differentRecorrido = new TrainRecorrido("dif", connection, price, dateTime, 250);
 		system.comprarBilletes("ABC12345", user, differentRecorrido, 249);
 		assertThrows(IllegalStateException.class, () -> {
 			system.comprarBilletes("ABC12346", differentUser, differentRecorrido, 2);
@@ -1158,7 +1153,9 @@ class SystemTest {
 		system.reservarBilletes(localizadorA, user, recorrido, numBilletesReservar);
 		system.reservarBilletes(localizadorB, user, recorrido, numBilletesReservar);
 		
+		int numAsientosAntes = recorrido.getNumAvailableSeats();
 		system.anularReserva(localizadorA, numBilletesAnular);
+		assertEquals(numAsientosAntes + numBilletesAnular, recorrido.getNumAvailableSeats());
 	}
 	
 	@Test
@@ -1171,8 +1168,9 @@ class SystemTest {
 		system.addRecorrido(recorrido);
 		system.comprarBilletes(localizadorA, user, recorrido, numBilletesComprar);
 		system.comprarBilletes(localizadorB, user, recorrido, numBilletesDevolver);
-		
+		int numAsientosAntes = recorrido.getNumAvailableSeats();
 		system.devolverBilletes(localizadorA, numBilletesDevolver);
+		assertEquals(numAsientosAntes + numBilletesDevolver, recorrido.getNumAvailableSeats());
 	}
 
 }

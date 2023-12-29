@@ -1,5 +1,15 @@
 package uva.tds.practica3_grupo6;
 
+import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
  * Class dedicated for the representation of the ticket.
  * 
@@ -13,18 +23,32 @@ package uva.tds.practica3_grupo6;
  * @author diebomb
  * @author migudel
  * 
- * @version 09/11/23
+ * @version 22/12/23
  */
+@Entity
+@Table(name="BILLETE")
 public class Billete {
 
 	public static final String ESTADO_COMPRADO = "comprado";
 	public static final String ESTADO_RESERVADO = "reservado";
-
+	
+	@Id
+	@GeneratedValue
+	private int id;
+	@Column(name="LOCALIZADOR")
 	private String localizador;
+	@ManyToOne()
+    @JoinColumn(name = "RECORRIDO_ID", referencedColumnName = "ID")
 	private Recorrido recorrido;
+	@ManyToOne()
+    @JoinColumn(name = "USUARIO_ID", referencedColumnName = "NIF")
 	private Usuario usuario;
+	@Column(name="ESTADO")
 	private String estado;
 
+	public Billete() {
+		
+	}
 	/**
 	 * @param localizador
 	 * @param recorrido
@@ -106,28 +130,30 @@ public class Billete {
 
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(estado, id, localizador, recorrido, usuario);
+	}
+	
 	/**
 	 * Compare if two tickets are the same
 	 * 
 	 * @param o ticket to compare
 	 * 
 	 * @return if are the same
-	 * 
-	 * @throws IllegalArgumentException if o is null
 	 */
 	@Override
-	public boolean equals(Object o) {
-		if (o == null)
-			throw new IllegalArgumentException("El objeto no puede ser null");
-		// Compruebas que es un objeto billete
-		if (!(o instanceof Billete))
-			return false;
-		Billete tmp = (Billete) o;
-		// Comparamos los objetos
-		return (this.localizador.equals(tmp.getLocalizador()) 
-				&& this.recorrido.equals(tmp.getRecorrido())
-				&& this.usuario.equals(tmp.getUsuario()) 
-				&& this.estado.equals(tmp.getEstado()));
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
 		}
+		if (!(obj instanceof Billete)) {
+			return false;
+		}
+		Billete other = (Billete) obj;
+		return Objects.equals(estado, other.estado) 
+				&& Objects.equals(localizador, other.localizador)
+				&& Objects.equals(recorrido, other.recorrido) 
+				&& Objects.equals(usuario, other.usuario);
 	}
-
+}

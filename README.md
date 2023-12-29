@@ -38,12 +38,15 @@ Las clases anteriormente mencionadas estarán testeadas mediante le método Test
 
 |Clase|Lineas clase|Lineas de Test|Ratio|
 |--|:--:|:--:|:--:|
-|Billete|33|91|~2.75|
-|Usuario|40|75|~1.88|
-|Recorrido|131|434|~3.31|
-|System|232|646|~2.78|
-|SistemaPersistencia|209|1224|~5.86|
-
+|Billete                            |  36|  86|~2.38|
+|BusRecorrido                       | 122| 221|~1.81|
+|Connection                         |  35|  53|~1.51|
+|DatabaseManager                    | 241| 228|~0.94|
+|SistemaPersistenciaSinAislamiento  | 170| 665|~3.91|
+|SistemaPersistencia                | 204|1320|~6.47|
+|System                             | 222| 651|~2.93|
+|TrainRecorrido                     | 123| 224|~1.82|
+|Usuario                            |  48|  73|~1.52|
 ## Tiempo utilizado
 ----------------------------------
 ### Diego Bombín Sanz
@@ -52,9 +55,15 @@ Trabajo asignado:
 - Feature 5.1 - Comprar billetes
 - Feature 7 - Obtención precio total billetes de un usuario y obtención recorridos disponibles en una fecha
 
+Refactor
+- Implementar DatabaseManager
+- Conectar la base de datos
+- Ayudar a implementar las clases que de la base de datos
+
 Tiempo empleado: 
 - Fase Red: `4h 30min`
 - Fase green: `10h 36min`
+- Fase Refactor: `6h 15min`
     
 ### Hugo Cubino Cubino
 Trabajo asignado:
@@ -62,9 +71,15 @@ Trabajo asignado:
 - Feature 5.2 - Devolver billetes
 - Feature 6 - Reserva y anulación de reserva de billetes
 
+Refactor
+- Ayudar a implementar DatabaseManager
+- Implementar las clases de la base de datos
+- Test de DatabaseManager y de la conexión
+
 Tiempo empleado
 - Fase red: `3h 55min`
 - Fase green: `14h 45min`
+- Fase Refactor: `5h 40min`
 
 ### Miguel de las Moras Sastre
 Trabajo asignado:
@@ -72,7 +87,33 @@ Trabajo asignado:
 - Feature 4 - Gestión de recorridos (añadir, eliminar y actualizar fecha y/o hora)
 - Feature 5.3 - Comprar billetes reservados
 
+Refactor
+- Refactorizar Recorrido
+- Expandir refactorizaciones a las clases afectadas
+- Ayudar a conectar la base de datos y a realizar tests para las conexiones
+
 Tiempo empleado:
 - Fase Red: `4h 25min` 
 - Fase Green: `9h 22min`
+- Fase Refactor: `5h 56min`
 
+## Refactorizaciones aplicadas
+----------------------------------
+### Usar objeto compuesto
+En recorrido en vez de pasar y tratar de forma independiente la fecha ([`LocalDate`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html)) y hora ([`LocalTime`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalTime.html)) usar la estructura de datos de java que une ambas ([`LocalDateTime`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDateTime.html))
+
+De esta manera logramos reducir la complejidad de la clase y el número de parámetros del constructor de recorrido.
+### Objecto parámetro
+En recorrido agrupar los parámetros `origin`, `destination` y `duration` en una objeto llamado `Connection` que se encargará de tratarlos y manejarlos.
+
+Esto reduce la complejidad en el constructor de Recorrido reduciendo en número de parámetros y el número de comprobaciones que se realizan en el mismo (la instantiation de esta clase es externa al constructor y por tanto las comprobaciones correspondientes serán entes).
+### Clase abstracta padre e clases hijas
+La clase recorrido se ha convertido en abstracta para que sus hijos (BusRecorrido y TrainRecorrido) tengan el comportamiento definido de la clase padre teniendo sus diferencias. 
+
+TrainRecorrido tiene un comportamiento especial llamado `getPriceWithDiscount()` en el cual se calcula el precio resultante de aplicar un descuento que este tipo de recorridos tienen.
+
+Además, con esta especialización logramos olvidarnos del tipo de recorrido, ya que cada clase representa un tipo diferente, reduciendo un atributo en la clase recorrido.
+### Eliminación de constantes mágicas
+Siguiendo uno de los casos anteriores, el descuento es convertido como un valor estático y final de la clase TrainRecorrido 
+### Extraer métodos
+Sobre todo para algunas comprobaciones repetitivas aplicamos esta refactorización para reducir el número de lineas de código repetido

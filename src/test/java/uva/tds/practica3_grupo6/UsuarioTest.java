@@ -2,6 +2,8 @@ package uva.tds.practica3_grupo6;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -12,10 +14,10 @@ import org.junit.jupiter.api.Test;
  * methods
  * 
  * @author diebomb
- * 
  * @author migudel
- * 
  * @author hugcubi
+ * 
+ * @version 21/12/23
  */
 
 class UsuarioTest {
@@ -137,21 +139,19 @@ class UsuarioTest {
 	void testEqualsValido() {
 		assertEquals(user, user);
 		assertEquals(user, sameUser);
-		assertNotEquals(user, true);
 		assertNotEquals(user, differentUser);
-	}
+        assertNotEquals(user, new ArrayList<Usuario>());
+    }
 
-	@Test
-	void testEqualsNoValido() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			user.equals(null);
-		});
-	}
-	
 	@Tag("Cobertura")
 	@Test
 	void testEqualNifIgual() {
 		Usuario user2 = new Usuario(nif, "Gonzalo");
 		assertNotEquals(user, user2);
+	}
+	
+	@Test
+	void testHashCode() {
+		assertEquals(sameUser.hashCode(), user.hashCode());
 	}
 }

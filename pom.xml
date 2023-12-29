@@ -8,10 +8,8 @@
 	<groupId>uva.tds</groupId>
 	<artifactId>practica3-grupo6</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-
-	<!--  <name>practica2-grupo6</name>-->
+	
 	<name>2023-2024 práctica 2 de TDS del grupo 6</name>
-	<!-- FIXME change it to the project's website -->
 	<url>http://www.example.com</url>
 
 	<properties>
@@ -20,7 +18,20 @@
 		<maven.compiler.target>17</maven.compiler.target>
 	</properties>
 
-	<dependencies><!--
+	<dependencies>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>5.6.5.Final</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.hsqldb/hsqldb -->
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.7.0</version>
+			<scope>test</scope>
+		</dependency>
+		<!--
 		https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -28,8 +39,16 @@
 			<version>5.10.1</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.easymock/easymock -->
-		<!-- https://mvnrepository.com/artifact/org.easymock/easymock -->
+		<!--
+		https://mvnrepository.com/artifact/org.sonarsource.scanner.gradle/sonarqube-gradle-plugin -->
+		<dependency>
+			<groupId>org.sonarsource.scanner.gradle</groupId>
+			<artifactId>sonarqube-gradle-plugin</artifactId>
+			<version>3.3</version>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- 
+		https://mvnrepository.com/artifact/org.easymock/easymock -->
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
