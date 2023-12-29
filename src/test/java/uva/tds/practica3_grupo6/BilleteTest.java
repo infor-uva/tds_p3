@@ -128,14 +128,7 @@ class BilleteTest {
 		b2.setComprado();
 		assertNotEquals(ticket,b2);
 
-		assertNotEquals(false, ticket);
-	}
-
-	@Test
-	void testEqualsNull() {
-		assertThrows(IllegalArgumentException.class, () -> {
-			ticket.equals(null);
-		});
+        assertNotEquals(ticket, recorrido);
 	}
 	
 	@Test
@@ -171,5 +164,10 @@ class BilleteTest {
 		Billete billete2 = new Billete("ABC12345", recorrido, user, ESTADO_COMPRADO);
 		assertNotEquals(billete,billete2);
 	}
-	
+
+	@Test
+	void testHashCode() {
+		Billete copy = new Billete(ticket.getLocalizador(), ticket.getRecorrido(), ticket.getUsuario(), ticket.getEstado());
+		assertEquals(copy.hashCode(), ticket.hashCode());
+	}
 }

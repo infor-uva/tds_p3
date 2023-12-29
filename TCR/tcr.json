@@ -1,0 +1,38 @@
+{
+    "Billete" : {
+        "code" : 35,
+        "test" : 87
+    },
+    "BusRecorrido" : {
+        "code" : 124,
+        "test" : 221
+    },
+    "Connection" : {
+        "code" : 35,
+        "test" : 51
+    },
+    "DatabaseManager" : {
+        "code" : 256,
+        "test" : 228
+    },
+    "SistemaPersistenciaSinAislamiento" : {
+        "code" : 205,
+        "test" : 656
+    },
+    "SistemaPersistencia" : {
+        "code" : 213,
+        "test" : 1320
+    },
+    "System" : {
+        "code" : 232,
+        "test" : 645
+    },
+    "TrainRecorrido" : {
+        "code" : 125,
+        "test" : 228
+    },
+    "Usuario" : {
+        "code" : 44,
+        "test" : 73
+    }
+}

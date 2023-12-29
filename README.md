@@ -33,17 +33,20 @@ Sistema que delega la gestión de la información en una Database externa.
 Las clases anteriormente mencionadas estarán testeadas mediante le método Test-First o TDD (Test Driven Development), en base a las restricciones planteadas en el supuesto.
 <br>[`+ información →`](./src/test/java/uva/tds/practica2_grupo6/)
 
-## TestCode ratio
+## TestCode ratio (Actualizar cuando esté finiquitado)
 ----------------------------------
 
 |Clase|Lineas clase|Lineas de Test|Ratio|
 |--|:--:|:--:|:--:|
-|Billete|33|91|~2.75|
-|Usuario|40|75|~1.88|
-|Recorrido|131|434|~3.31|
-|System|232|646|~2.78|
-|SistemaPersistencia|209|1224|~5.86|
-
+|Billete                            |  35|  87|~2.48|
+|BusRecorrido                       | 124| 221|~1.78|
+|Connection                         |  35|  51|~1.45|
+|DatabaseManager                    | 256| 228|~0.89|
+|SistemaPersistenciaSinAislamiento  | 205| 656|~3.2 |
+|SistemaPersistencia                | 213|1320|~6.19|
+|System                             | 232| 645|~2.78|
+|TrainRecorrido                     | 125| 228|~1.82|
+|Usuario                            |  44|  73|~1.65|
 ## Tiempo utilizado
 ----------------------------------
 ### Diego Bombín Sanz
@@ -72,7 +75,33 @@ Trabajo asignado:
 - Feature 4 - Gestión de recorridos (añadir, eliminar y actualizar fecha y/o hora)
 - Feature 5.3 - Comprar billetes reservados
 
+Refactor
+- Refactorizar Recorrido
+- Expandir refactorizaciones a las clases afectadas
+- Ayudar a conectar la base de datos y a realizar tests para las conexiones
+
 Tiempo empleado:
 - Fase Red: `4h 25min` 
 - Fase Green: `9h 22min`
+- Fase Refactor: `5h 56min`
 
+## Refactorizaciones aplicadas
+----------------------------------
+### Usar objeto compuesto
+En recorrido en vez de pasar y tratar de forma independiente la fecha ([`LocalDate`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html)) y hora ([`LocalTime`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalTime.html)) usar la estructura de datos de java que une ambas ([`LocalDateTime`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDateTime.html))
+
+De esta manera logramos reducir la complejidad de la clase y el número de parámetros del constructor de recorrido.
+### Objecto parámetro
+En recorrido agrupar los parámetros `origin`, `destination` y `duration` en una objeto llamado `Connection` que se encargará de tratarlos y manejarlos.
+
+Esto reduce la complejidad en el constructor de Recorrido reduciendo en número de parámetros y el número de comprobaciones que se realizan en el mismo (la instantiation de esta clase es externa al constructor y por tanto las comprobaciones correspondientes serán entes).
+### Clase abstracta padre e clases hijas
+La clase recorrido se ha convertido en abstracta para que sus hijos (BusRecorrido y TrainRecorrido) tengan el comportamiento definido de la clase padre teniendo sus diferencias. 
+
+TrainRecorrido tiene un comportamiento especial llamado `getPriceWithDiscount()` en el cual se calcula el precio resultante de aplicar un descuento que este tipo de recorridos tienen.
+
+Además, con esta especialización logramos olvidarnos del tipo de recorrido, ya que cada clase representa un tipo diferente, reduciendo un atributo en la clase recorrido.
+### Eliminación de constantes mágicas
+Siguiendo uno de los casos anteriores, el descuento es convertido como un valor estático y final de la clase TrainRecorrido 
+### Extraer métodos
+Sobre todo para algunas comprobaciones repetitivas aplicamos esta refactorización para reducir el número de lineas de código repetido

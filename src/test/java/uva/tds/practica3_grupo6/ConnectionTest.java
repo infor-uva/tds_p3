@@ -2,6 +2,8 @@ package uva.tds.practica3_grupo6;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -30,7 +32,6 @@ class ConnectionTest {
 		assertEquals(origin, c.getOrigin());
 		assertEquals(destination, c.getDestination());
 		assertEquals(duration, c.getDuration());
-		assertNotEquals(0, c.hashCode());
 	}
 	
 	@Test
@@ -84,7 +85,7 @@ class ConnectionTest {
 		assertEquals(connection, same);
 		assertEquals(connection, equal);
 		assertNotEquals(connection, different);
-		assertNotEquals(connection, null);
+        assertNotEquals(connection, new ArrayList<Connection>());
 	}
 	
 	@Test
@@ -97,5 +98,11 @@ class ConnectionTest {
 	@Tag("Cobertura")
 	void testEqualsDiferenteDestination() {
 		assertNotEquals(connection, new Connection(origin, "dif", duration));
+	}
+	
+	@Test
+	void testHashCode() {
+		Connection copy = new Connection(origin, destination, duration);
+		assertEquals(copy.hashCode(), connection.hashCode());
 	}
 }

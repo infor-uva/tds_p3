@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -54,20 +53,9 @@ import java.util.List;
  * @author diebomb
  * @author migudel
  * 
- * @version 28/11/23
+ * @version 21/12/23
  */
 public class System {
-
-	/**
-	 * List of the character indexed by the rest resulted of the division of nif and
-	 * 23
-	 */
-	private final List<Character> letrasNif = new ArrayList<>(Arrays.asList('T', 'R', 'W', 'A', 'G', 'M', 'Y', 'F', 'P',
-			'D', 'X', 'B', 'N', 'J', 'Z', 'S', 'Q', 'V', 'H', 'L', 'C', 'K', 'E'));
-	/**
-	 * {@link Recorrido#TRAIN}
-	 */
-	private static final TransportType TRAIN = TransportType.TRAIN;
 	/**
 	 * {@link Billete#ESTADO_RESERVADO}
 	 */
@@ -208,24 +196,7 @@ public class System {
 	 *                                  tickets.
 	 */
 	public double getPrecioTotalBilletesUsuario(String nif) {
-		if (nif == null)
-			throw new IllegalArgumentException("El nif es nulo\n");
-		if (nif.isEmpty())
-			throw new IllegalArgumentException("El nif esta vacio\n");
-		if (nif.length() > 9)
-			throw new IllegalArgumentException("Nif demasiado largo\n");
-		if (nif.length() <= 8)
-			throw new IllegalArgumentException("Nif demasiado corto\n");
-		if (!Character.isLetter(nif.charAt(8)))
-			throw new IllegalArgumentException("Nif no contiene la letra\n");
-		if (nif.charAt(8) == 'U' || nif.charAt(8) == 'I' || nif.charAt(8) == 'O' || nif.charAt(8) == 'Ñ')
-			throw new IllegalArgumentException("Nif contiene la letra erronea\n");
-		String cifras = nif.substring(0, nif.length() - 1);
-		char letra = nif.charAt(8);
-		int numero = Integer.parseInt(cifras);
-		int resto = numero % 23;
-		if (resto != letrasNif.indexOf(letra))
-			throw new IllegalArgumentException("La letra del nif no corresponde con las cifras del nif\n");
+		Usuario.checkNIF(nif);
 		if (!users.contains(nif))
 			throw new IllegalArgumentException("El nif no concuerda con ninguno del sistema\n");
 		boolean encuentraTiket = false;
@@ -238,9 +209,8 @@ public class System {
 		double precioTotal = 0;
 		for (Billete tiket : tickets) {
 			if (tiket.getUsuario().getNif().equals(nif)) {
-				if (tiket.getRecorrido() instanceof TrainRecorrido) {
-					double precioDescuento = tiket.getRecorrido().getPrice() * 0.9;
-					precioTotal += precioDescuento;
+				if (tiket.getRecorrido() instanceof TrainRecorrido trainRec) {
+					precioTotal += trainRec.getPriceWithDiscount();
 				} else
 					precioTotal += tiket.getRecorrido().getPrice();
 			}

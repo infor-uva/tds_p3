@@ -8,7 +8,7 @@
 		<os family="unix" />
 	</condition>
 
-	<target name="all" depends="documentar,ejecutarTests,obtenerInformeCobertura">
+	<target name="all" depends="documentar,ejecutarTests,obtenerInformeCobertura, sonarqube">
 
 	</target>
 	<target name="compilar" depends="limpiar">
@@ -53,11 +53,11 @@
 	</target>
 	<target name="sonarqube" depends="obtenerInformeCobertura">
 		<exec dir="." executable="${executable}">
-			<arg line="${arglineIni}mvn clean verify sonar:sonar 
-  					-Dsonar.projectKey=tds-practica3-grupo6
-  					-Dsonar.projectName='tds-practica3-grupo6'
-  					-Dsonar.host.url=http://localhost:9000
-  					-Dsonar.token=sqp_4d891e2fbe0d52627c7a68137751a6e06e6d2841${arglineEnd}" />
+			<arg line="${arglineIni}mvn verify sonar:sonar
+					-Dsonar.projectKey=tds-practica3-grupo6
+					-Dsonar.projectName='tds-practica3-grupo6'
+					-Dsonar.host.url=http://localhost:9000
+					-Dsonar.token=sqp_e6d8e6d0732ee32e04a03bcda9b09dfadca8983f${arglineEnd}" />
 		</exec>
 	</target>
 	<target name="os-check" description="Determina sistema operativo y asigna executable y argline" depends="os-check-unix, os-check-win" />

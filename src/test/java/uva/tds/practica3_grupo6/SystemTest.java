@@ -191,8 +191,9 @@ class SystemTest {
 	void testGetPrecioTotalBilletesUsuarioSinBilletes() {
 		system.comprarBilletes("1234T", user, recorrido, 5);
 		system.devolverBilletes("1234T", 5);
+		String nif = user.getNif();
 		assertThrows(IllegalStateException.class, () -> {
-			system.getPrecioTotalBilletesUsuario(user.getNif());
+			system.getPrecioTotalBilletesUsuario(nif);
 		});
 	}
 
@@ -488,8 +489,9 @@ class SystemTest {
 	@Test
 	void testUpdateRecorridoDateConValoresActuales() {
 		system.addRecorrido(recorrido);
+		LocalDate date = recorrido.getDate();
 		assertThrows(IllegalStateException.class, () -> {
-			system.updateRecorridoDate(id, recorrido.getDate());
+			system.updateRecorridoDate(id, date);
 		});
 	}
 
@@ -536,8 +538,9 @@ class SystemTest {
 	@Test
 	void testUpdateRecorridoTimeConValoresActuales() {
 		system.addRecorrido(recorrido);
+		LocalTime time = recorrido.getTime();
 		assertThrows(IllegalStateException.class, () -> {
-			system.updateRecorridoTime(id, recorrido.getTime());
+			system.updateRecorridoTime(id, time);
 		});
 	}
 
@@ -585,8 +588,9 @@ class SystemTest {
 	@Test
 	void testUpdateRecorridoDateTimeConValoresActuales() {
 		system.addRecorrido(recorrido);
+		LocalDateTime dateTime = recorrido.getDateTime();
 		assertThrows(IllegalStateException.class, () -> {
-			system.updateRecorridoDateTime(id, recorrido.getDateTime());
+			system.updateRecorridoDateTime(id, dateTime);
 		});
 	}
 
@@ -641,8 +645,10 @@ class SystemTest {
 	@Test
 	void testUpdateRecorridoConValoresActuales() {
 		system.addRecorrido(recorrido);
+		LocalDate date = recorrido.getDate();
+		LocalTime time = recorrido.getTime();
 		assertThrows(IllegalStateException.class, () -> {
-			system.updateRecorrido(id, recorrido.getDate(), recorrido.getTime());
+			system.updateRecorrido(id, date, time);
 		});
 	}
 
