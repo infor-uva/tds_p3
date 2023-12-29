@@ -39,13 +39,13 @@ Las clases anteriormente mencionadas estarán testeadas mediante le método Test
 |Clase|Lineas clase|Lineas de Test|Ratio|
 |--|:--:|:--:|:--:|
 |Billete                            |  36|  86|~2.38|
-|BusRecorrido                       | 124| 221|~1.78|
-|Connection                         |  36|  53|~1.47|
-|DatabaseManager                    | 256| 227|~0.88|
-|SistemaPersistenciaSinAislamiento  | 166| 665|~4.0 |
-|SistemaPersistencia                | 194|1320|~6.8 |
-|System                             | 213| 651|~3.05|
-|TrainRecorrido                     | 125| 225|~1.8 |
+|BusRecorrido                       | 122| 221|~1.81|
+|Connection                         |  35|  53|~1.51|
+|DatabaseManager                    | 241| 228|~0.94|
+|SistemaPersistenciaSinAislamiento  | 170| 665|~3.91|
+|SistemaPersistencia                | 204|1320|~6.47|
+|System                             | 222| 651|~2.93|
+|TrainRecorrido                     | 123| 224|~1.82|
 |Usuario                            |  48|  73|~1.52|
 ## Tiempo utilizado
 ----------------------------------
