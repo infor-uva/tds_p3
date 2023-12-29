@@ -38,7 +38,7 @@
 	</target>
 	<target name="ejecutarTestSinAislamiento" depends="compilar">
 		<exec dir="." executable="${executable}">
-			<arg line="${arglineIni} mvn -Dtest='RecorridoTest,BilleteTest,UsuarioTest,SystemTest' test${arglineEnd}" />
+			<arg line="${arglineIni} mvn -Dtest='ConnectionTest,SystemTest,TrainRecorridoTest,BilleteTest,BusRecorridoTest,UsuarioTest,DatabaseManagerTest,SistemaPersistenciaSinAislamientoTest' test${arglineEnd}" />
 		</exec>
 	</target>
 	<target name="ejecutarTests" depends="ejecutarTestCobertura,ejecutarTestEnAislamiento,ejecutarTestSinAislamiento">
